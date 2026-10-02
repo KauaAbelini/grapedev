@@ -1,0 +1,1539 @@
+<!doctype html>
+<html lang="pt-BR">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Produtos AquaFlow | GrapeDev</title>
+
+    <link rel="icon" href="fotos/favicon-32x32.png" type="image/png">
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@300;400;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+
+    <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"
+    >
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        :root {
+            --bg: #020817;
+            --text: #ffffff;
+            --muted: #aab4c7;
+            --nav: #c2c9d7;
+            --border: #2879ff55;
+
+            --purple: #8d35ff;
+            --purple-light: #c084fc;
+
+            --blue: #27cfff;
+            --card: linear-gradient(145deg, #071b38, #050d20);
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+
+            font-family: 'Nunito', sans-serif;
+
+            overflow-x: hidden;
+
+            transition:
+                background .35s ease,
+                color .35s ease;
+        }
+
+        body::before {
+            content: "";
+
+            position: fixed;
+            inset: 0;
+
+            pointer-events: none;
+
+            opacity: .32;
+
+            background-image:
+                linear-gradient(#1677ff0b 1px, transparent 1px),
+                linear-gradient(90deg, #1677ff0b 1px, transparent 1px);
+
+            background-size: 70px 70px;
+
+            z-index: -1;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        /* =========================
+           HEADER
+        ========================= */
+
+        header {
+            height: 78px;
+
+            width: 92%;
+            max-width: 1400px;
+
+            margin: auto;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            border-bottom: 1px solid var(--border);
+
+            position: relative;
+
+            z-index: 100;
+        }
+
+        /* LOGO */
+
+        .brand {
+            display: flex;
+            align-items: center;
+
+            gap: 10px;
+
+            font-size: 22px;
+            font-weight: 800;
+
+            white-space: nowrap;
+        }
+
+        .brand img {
+            width: 35px;
+            height: 35px;
+
+            object-fit: contain;
+
+            filter:
+                drop-shadow(0 0 8px rgba(155,57,255,.8))
+                drop-shadow(0 0 16px rgba(110,35,255,.3));
+        }
+
+        .brand span {
+            color: #a638ff;
+        }
+
+        /* MENU */
+
+        nav {
+            display: flex;
+
+            align-items: center;
+
+            gap: 42px;
+        }
+
+        nav a {
+            position: relative;
+
+            color: var(--nav);
+
+            font-size: 11px;
+
+            font-weight: 800;
+
+            letter-spacing: .10em;
+
+            transition: .3s;
+        }
+
+        nav a:hover,
+        nav a.active {
+            color: white;
+        }
+
+        nav a.active::after {
+            content: "";
+
+            position: absolute;
+
+            left: 0;
+            right: 0;
+
+            bottom: -30px;
+
+            height: 2px;
+
+            background:
+                linear-gradient(
+                    90deg,
+                    var(--purple),
+                    var(--blue)
+                );
+
+            box-shadow:
+                0 0 10px rgba(39,207,255,.5);
+        }
+
+        /* AÇÕES */
+
+        .actions {
+            display: flex;
+
+            align-items: center;
+
+            gap: 12px;
+        }
+
+        .login {
+            height: 36px;
+
+            display: flex;
+            align-items: center;
+            gap: 8px;
+
+            padding: 0 18px;
+
+            border: 1px solid #7540ff;
+
+            border-radius: 22px;
+
+            color: white;
+
+            font-size: 11px;
+            font-weight: 800;
+
+            letter-spacing: .05em;
+
+            background: rgba(117,64,255,.06);
+
+            transition: .3s;
+        }
+
+        .login i {
+            font-size: 14px;
+        }
+
+        .login:hover {
+            background: #7540ff;
+
+            box-shadow:
+                0 0 20px rgba(117,64,255,.35);
+
+            transform: translateY(-1px);
+        }
+
+        /* PESQUISA */
+
+        .search {
+            width: 42px;
+            height: 36px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border: 1px solid #7540ff;
+
+            border-radius: 22px;
+
+            color: #d8ccff;
+
+            cursor: pointer;
+
+            font-size: 16px;
+
+            transition: .3s;
+        }
+
+        .search:hover {
+            background: rgba(117,64,255,.18);
+
+            color: white;
+
+            box-shadow:
+                0 0 18px rgba(117,64,255,.3);
+        }
+
+        /* CAMPO DE PESQUISA */
+
+        .search-box {
+            position: absolute;
+
+            right: 0;
+            top: 68px;
+
+            width: 280px;
+
+            display: none;
+
+            padding: 10px;
+
+            border: 1px solid rgba(117,64,255,.5);
+
+            border-radius: 14px;
+
+            background: rgba(4,7,20,.95);
+
+            backdrop-filter: blur(15px);
+
+            box-shadow:
+                0 15px 40px rgba(0,0,0,.4);
+        }
+
+        .search-box.active {
+            display: flex;
+        }
+
+        .search-box input {
+            width: 100%;
+
+            padding: 11px 13px;
+
+            border: 1px solid rgba(255,255,255,.1);
+
+            border-radius: 9px;
+
+            outline: none;
+
+            background: rgba(255,255,255,.05);
+
+            color: white;
+
+            font-family: 'Nunito', sans-serif;
+
+            font-size: 12px;
+        }
+
+        .search-box input::placeholder {
+            color: #778096;
+        }
+
+        /* TEMA */
+
+        .toggle {
+            width: 55px;
+            height: 28px;
+
+            position: relative;
+
+            border: 1px solid #7540ff;
+
+            border-radius: 22px;
+
+            background: #0d1530;
+
+            cursor: pointer;
+
+            transition: .3s;
+        }
+
+        .toggle img {
+            position: absolute;
+
+            width: 20px;
+            height: 20px;
+
+            object-fit: contain;
+
+            left: 4px;
+            top: 3px;
+
+            filter:
+                drop-shadow(0 0 7px rgba(178,61,255,.8));
+
+            transition: .3s;
+        }
+
+        body.light .toggle img {
+            left: 30px;
+        }
+
+        /* MENU MOBILE */
+
+        .menu-mobile {
+            display: none;
+
+            width: 40px;
+            height: 36px;
+
+            align-items: center;
+            justify-content: center;
+
+            border: 1px solid #7540ff;
+
+            border-radius: 10px;
+
+            background: transparent;
+
+            color: white;
+
+            font-size: 19px;
+
+            cursor: pointer;
+        }
+
+        .mobile-nav {
+            display: none;
+
+            position: absolute;
+
+            top: 78px;
+            left: 0;
+
+            width: 100%;
+
+            padding: 20px;
+
+            background: rgba(4,7,20,.97);
+
+            border-bottom: 1px solid rgba(117,64,255,.3);
+
+            backdrop-filter: blur(15px);
+        }
+
+        .mobile-nav.active {
+            display: flex;
+
+            flex-direction: column;
+
+            gap: 18px;
+        }
+
+        .mobile-nav a {
+            color: #d8dce7;
+
+            font-size: 13px;
+
+            font-weight: 800;
+
+            letter-spacing: .08em;
+        }
+
+        /* =========================
+           LIGHT MODE
+        ========================= */
+
+        body.light {
+            --bg: #f3f7fc;
+            --text: #111827;
+            --muted: #526174;
+            --nav: #465266;
+            --border: rgba(73,80,220,.25);
+
+            background:
+                radial-gradient(
+                    circle at 15% 20%,
+                    rgba(115,62,220,.08),
+                    transparent 30%
+                ),
+                #f3f7fc;
+        }
+
+        body.light::before {
+            opacity: .18;
+
+            background-image:
+                linear-gradient(#6d35b80d 1px, transparent 1px),
+                linear-gradient(90deg, #6d35b80d 1px, transparent 1px);
+        }
+
+        body.light header {
+            border-bottom-color: rgba(80,50,160,.16);
+        }
+
+        body.light nav a:hover,
+        body.light nav a.active {
+            color: #24133b;
+        }
+
+        body.light .search {
+            color: #5531a0;
+        }
+
+        body.light .login {
+            color: #5531a0;
+
+            background: rgba(117,64,255,.05);
+        }
+
+        body.light .toggle {
+            background: #ddd5ef;
+        }
+
+        body.light .search-box {
+            background: rgba(255,255,255,.96);
+
+            border-color: rgba(117,64,255,.25);
+        }
+
+        body.light .search-box input {
+            background: #f4f5fa;
+
+            color: #202636;
+
+            border-color: #d9dce7;
+        }
+
+        body.light .mobile-nav {
+            background: rgba(248,249,253,.97);
+        }
+
+        body.light .mobile-nav a {
+            color: #353d4d;
+        }
+
+        /* =========================
+           MAIN
+        ========================= */
+
+        main {
+            width: 92%;
+
+            max-width: 1400px;
+
+            margin: auto;
+        }
+
+        /* =========================
+           INTRO
+        ========================= */
+
+        .intro {
+            padding: 55px 0 28px;
+
+            display: grid;
+
+            grid-template-columns: 42% 58%;
+
+            align-items: center;
+        }
+
+        .intro .eyebrow {
+            font-size: 11px;
+
+            letter-spacing: .18em;
+
+            color: var(--blue);
+
+            font-weight: 800;
+
+            margin-bottom: 14px;
+        }
+
+        .intro h1 {
+            font:
+                400 clamp(48px, 5vw, 76px)/.88
+                'Bebas Neue';
+
+            letter-spacing: .03em;
+        }
+
+        .intro h1 span {
+            background:
+                linear-gradient(
+                    100deg,
+                    #eefaff,
+                    #1dc8ff 55%,
+                    #813bff
+                );
+
+            -webkit-background-clip: text;
+
+            background-clip: text;
+
+            color: transparent;
+        }
+
+        .intro p {
+            color: var(--muted);
+
+            font-size: 13px;
+
+            line-height: 1.7;
+
+            max-width: 610px;
+
+            margin-top: 16px;
+        }
+
+        /* =========================
+           IMAGEM
+        ========================= */
+
+        .device-show {
+            height: 235px;
+
+            display: flex;
+
+            justify-content: center;
+
+            align-items: center;
+        }
+
+        .device-show img {
+            width: 100%;
+            height: 100%;
+
+            object-fit: contain;
+
+            filter:
+                drop-shadow(0 0 35px #007cff33);
+        }
+
+        /* =========================
+           SEÇÃO
+        ========================= */
+
+        .section {
+            padding: 28px 0 75px;
+        }
+
+        .heading {
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: end;
+
+            margin-bottom: 22px;
+        }
+
+        .heading h2 {
+            font:
+                400 42px
+                'Bebas Neue';
+
+            letter-spacing: .04em;
+        }
+
+        .heading p {
+            max-width: 570px;
+
+            text-align: right;
+
+            color: #8794aa;
+
+            font-size: 11px;
+
+            line-height: 1.65;
+        }
+
+        /* =========================
+           PRODUTOS
+        ========================= */
+
+        .grid {
+            display: grid;
+
+            grid-template-columns:
+                repeat(8, 1fr);
+
+            gap: 15px;
+        }
+
+        .card {
+            min-width: 0;
+
+            background: var(--card);
+
+            border: 1px solid #168cffaa;
+
+            border-radius: 13px;
+
+            padding: 12px 10px 11px;
+
+            box-shadow:
+                inset 0 0 20px #078cff0b;
+
+            transition: .25s;
+        }
+
+        .card:hover {
+            transform: translateY(-6px);
+
+            box-shadow:
+                0 15px 35px #0007;
+
+            border-color: #35cfff;
+        }
+
+        .pic {
+            height: 100px;
+
+            display: grid;
+
+            place-items: center;
+        }
+
+        .pic img {
+            max-width: 100%;
+            max-height: 100%;
+
+            object-fit: contain;
+
+            filter:
+                drop-shadow(0 7px 12px #008cff33);
+        }
+
+        .card h3 {
+            font-size: 12px;
+
+            margin-top: 8px;
+        }
+
+        .card p {
+            font-size: 8px;
+
+            line-height: 1.45;
+
+            color: #aeb8c9;
+
+            min-height: 44px;
+
+            margin: 6px 0 9px;
+        }
+
+        .price {
+            font-size: 11px;
+
+            font-weight: 800;
+
+            margin-bottom: 8px;
+        }
+
+        .buy {
+            display: block;
+
+            text-align: center;
+
+            border: 1px solid #385cff;
+
+            border-radius: 14px;
+
+            padding: 7px 4px;
+
+            color: #d8ddff;
+
+            font-size: 9px;
+
+            font-weight: 800;
+
+            transition: .3s;
+        }
+
+        .buy:hover {
+            background: #385cff;
+
+            color: white;
+        }
+
+        /* =========================
+           FOOTER
+        ========================= */
+
+        footer {
+            border-top: 1px solid #ffffff12;
+
+            padding: 20px 0;
+
+            color: #66738a;
+
+            font-size: 9px;
+
+            letter-spacing: .13em;
+
+            display: flex;
+
+            justify-content: space-between;
+        }
+
+        /* =========================
+           RESPONSIVO
+        ========================= */
+
+        @media(max-width: 1100px) {
+
+            nav {
+                display: none;
+            }
+
+            .menu-mobile {
+                display: flex;
+            }
+
+            .intro {
+                grid-template-columns: 1fr;
+            }
+
+            .device-show {
+                height: 260px;
+            }
+
+            .grid {
+                grid-template-columns:
+                    repeat(4, 1fr);
+            }
+
+            .heading {
+                align-items: start;
+
+                gap: 15px;
+
+                flex-direction: column;
+            }
+
+            .heading p {
+                text-align: left;
+            }
+
+        }
+
+        @media(max-width: 650px) {
+
+            header {
+                width: 92%;
+            }
+
+            .login,
+            .search {
+                display: none;
+            }
+
+            .intro {
+                padding-top: 45px;
+            }
+
+            .intro h1 {
+                font-size: 55px;
+            }
+
+            .device-show {
+                height: 220px;
+            }
+
+            .grid {
+                grid-template-columns:
+                    repeat(2, 1fr);
+            }
+
+            .card p {
+                min-height: 55px;
+            }
+
+            footer {
+                gap: 10px;
+
+                flex-direction: column;
+            }
+
+            .search-box {
+                right: -5px;
+
+                width: 240px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <!-- =========================
+         HEADER
+    ========================= -->
+
+    <header>
+
+
+        <!-- LOGO -->
+
+        <a class="brand" href="home.html">
+
+            <img
+                src="storage/images/icone uva sem fundo.png"
+                alt="GrapeDev"
+            >
+
+            Grape<span>Dev</span>
+
+        </a>
+
+
+        <!-- MENU DESKTOP -->
+
+        <nav>
+
+            <a href="home.html">
+                INÍCIO
+            </a>
+
+            <a href="sobre_nos.html">
+                SOBRE NÓS
+            </a>
+
+            <a class="active" href="projetos.html">
+                PROJETOS
+            </a>
+
+            <a href="contato.html">
+                CONTATO
+            </a>
+
+        </nav>
+
+
+        <!-- AÇÕES -->
+
+        <div class="actions">
+
+
+            <!-- PESQUISA -->
+
+            <div
+                class="search"
+                id="searchButton"
+                title="Pesquisar"
+            >
+                <i class="bi bi-search"></i>
+            </div>
+
+
+            <!-- LOGIN -->
+
+            <a
+                class="login"
+                href="backend/auth/login.php"
+            >
+                <i class="bi bi-person"></i>
+                LOGIN
+            </a>
+
+
+            <!-- TEMA -->
+
+            <button
+                class="toggle"
+                id="themeToggle"
+                title="Alterar tema"
+            >
+
+                <img
+                    src="storage/images/icone uva sem fundo.png"
+                    alt="Tema"
+                >
+
+            </button>
+
+
+            <!-- MENU MOBILE -->
+
+            <button
+                class="menu-mobile"
+                id="menuButton"
+                title="Menu"
+            >
+
+                <i class="bi bi-list"></i>
+
+            </button>
+
+
+        </div>
+
+
+        <!-- CAMPO DE PESQUISA -->
+
+        <div
+            class="search-box"
+            id="searchBox"
+        >
+
+            <input
+                type="text"
+                id="searchInput"
+                placeholder="Pesquisar..."
+            >
+
+        </div>
+
+
+        <!-- MENU MOBILE -->
+
+        <div
+            class="mobile-nav"
+            id="mobileNav"
+        >
+
+            <a href="home.html">
+                INÍCIO
+            </a>
+
+            <a href="sobre_nos.html">
+                SOBRE NÓS
+            </a>
+
+            <a href="projetos.html">
+                PROJETOS
+            </a>
+
+            <a href="contato.html">
+                CONTATO
+            </a>
+
+        </div>
+
+    </header>
+
+
+    <!-- =========================
+         CONTEÚDO
+    ========================= -->
+
+    <main>
+
+
+        <section class="intro">
+
+            <div>
+
+                <div class="eyebrow">
+                    // PRODUTOS AQUAFLOW
+                </div>
+
+                <h1>
+
+                    Soluções inteligentes
+
+                    <br>
+
+                    <span>
+                        para um futuro sustentável.
+                    </span>
+
+                </h1>
+
+                <p>
+                    Equipamentos e dispositivos de última geração
+                    que trabalham juntos para monitorar, controlar
+                    e otimizar o consumo de água, com mais eficiência,
+                    economia e sustentabilidade.
+                </p>
+
+            </div>
+
+
+            <div class="device-show">
+
+                <img
+                    src="storage/images/foto encima projeto.png"
+                    alt="Painel AquaFlow"
+                >
+
+            </div>
+
+        </section>
+
+
+        <section class="section">
+
+
+            <div class="heading">
+
+                <div>
+
+                    <div
+                        class="eyebrow"
+                        style="
+                            color:#27cfff;
+                            font-size:11px;
+                            font-weight:800;
+                            letter-spacing:.18em;
+                            margin-bottom:8px;
+                        "
+                    >
+                        SMART DEVICES
+                    </div>
+
+                    <h2>
+                        TECNOLOGIA EM CADA GOTA.
+                    </h2>
+
+                </div>
+
+
+                <p>
+                    Dispositivos conectados para transformar
+                    o monitoramento da água em uma experiência
+                    inteligente.
+                </p>
+
+            </div>
+
+
+            <div class="grid">
+
+
+                <article class="card">
+
+                    <div class="pic">
+                        <img src="storage/images/dispositivo.png">
+                    </div>
+
+                    <h3>
+                        Smart Sensor
+                    </h3>
+
+                    <p>
+                        Sensor inteligente para monitoramento
+                        automático de consumo.
+                    </p>
+
+                    <div class="price">
+                        R$ 149,90
+                    </div>
+
+                    <a
+                        class="buy"
+                        href="backend/auth/login.php"
+                    >
+                         Comprar
+                    </a>
+
+                </article>
+
+
+                <article class="card">
+
+                    <div class="pic">
+                        <img src="storage/images/meter.jpg">
+                    </div>
+
+                    <h3>
+                        Digital Meter
+                    </h3>
+
+                    <p>
+                        Controle preciso do uso de água
+                        com tecnologia moderna.
+                    </p>
+
+                    <div class="price">
+                        R$ 229,90
+                    </div>
+
+                    <a
+                        class="buy"
+                        href="backend/auth/login.php"
+                    >
+                         Comprar
+                    </a>
+
+                </article>
+
+
+                <article class="card">
+
+                    <div class="pic">
+                        <img src="storage/images/tablet.png">
+                    </div>
+
+                    <h3>
+                        Analytics Dashboard
+                    </h3>
+
+                    <p>
+                        Painel avançado para análise
+                        completa do consumo.
+                    </p>
+
+                    <div class="price">
+                        R$ 99,90
+                    </div>
+
+                    <a
+                        class="buy"
+                        href="backend/auth/login.php"
+                    >
+                         Comprar
+                    </a>
+
+                </article>
+
+
+                <article class="card">
+
+                    <div class="pic">
+                        <img src="storage/images/produto4.png">
+                    </div>
+
+                    <h3>
+                        Smart Valve
+                    </h3>
+
+                    <p>
+                        Uma válvula inteligente controlada
+                        por aplicativo.
+                    </p>
+
+                    <div class="price">
+                        R$ 299,90
+                    </div>
+
+                    <a
+                        class="buy"
+                        href="backend/auth/login.php"
+                    >
+                         Comprar
+                    </a>
+
+                </article>
+
+
+                <article class="card">
+
+                    <div class="pic">
+                        <img src="storage/images/ecoshower.png">
+                    </div>
+
+                    <h3>
+                        Leak Guard
+                    </h3>
+
+                    <p>
+                        Detecta vazamentos e alerta
+                        em tempo real.
+                    </p>
+
+                    <div class="price">
+                        R$ 179,90
+                    </div>
+
+                    <a
+                        class="buy"
+                        href="backend/auth/login.php"
+                    >
+                        Comprar
+                    </a>
+
+                </article>
+
+
+                <article class="card">
+
+                    <div class="pic">
+                        <img src="storage/images/produto66.png">
+                    </div>
+
+                    <h3>
+                        Gateway
+                    </h3>
+
+                    <p>
+                        Conecta todos os dispositivos
+                        ao sistema.
+                    </p>
+
+                    <div class="price">
+                        R$ 249,90
+                    </div>
+
+                    <a
+                        class="buy"
+                        href="backend/auth/login.php"
+                    >
+                         Comprar
+                    </a>
+
+                </article>
+
+
+                <article class="card">
+
+                    <div class="pic">
+                        <img src="storage/images/">
+                    </div>
+
+                    <h3>
+                        Power Backup
+                    </h3>
+
+                    <p>
+                        Mantém o sistema ativo mesmo
+                        sem energia.
+                    </p>
+
+                    <div class="price">
+                        R$ 199,90
+                    </div>
+
+                    <a
+                        class="buy"
+                        href="backend/auth/login.php"
+                    >
+                         Comprar
+                    </a>
+
+                </article>
+
+
+                <article class="card">
+
+                    <div class="pic">
+                        <img src="../../storage/images/">
+                    </div>
+
+                    <h3>
+                        Smart Controller
+                    </h3>
+
+                    <p>
+                        Controle total na palma
+                        da sua mão.
+                    </p>
+
+                    <div class="price">
+                        R$ 279,90
+                    </div>
+
+                    <a
+                        class="buy"
+                        href="backend/auth/login.php"
+                    >
+                         Comprar
+                    </a>
+
+                </article>
+
+
+            </div>
+
+        </section>
+
+
+        <footer>
+
+            <span>
+                GRAPEDEV / AQUAFLOW
+            </span>
+
+            <span>
+                SMART WATER TECHNOLOGY
+            </span>
+
+        </footer>
+
+
+    </main>
+
+
+    <script>
+
+        /* =========================
+           PESQUISA
+        ========================= */
+
+        const searchButton =
+            document.getElementById("searchButton");
+
+        const searchBox =
+            document.getElementById("searchBox");
+
+        const searchInput =
+            document.getElementById("searchInput");
+
+
+        searchButton.addEventListener("click", function(event) {
+
+            event.stopPropagation();
+
+            searchBox.classList.toggle("active");
+
+            if (searchBox.classList.contains("active")) {
+                searchInput.focus();
+            }
+
+        });
+
+
+        document.addEventListener("click", function(event) {
+
+            if (
+                !searchBox.contains(event.target) &&
+                !searchButton.contains(event.target)
+            ) {
+
+                searchBox.classList.remove("active");
+
+            }
+
+        });
+
+
+        searchInput.addEventListener("keydown", function(event) {
+
+            if (event.key === "Enter") {
+
+                const termo =
+                    searchInput.value
+                        .trim()
+                        .toLowerCase();
+
+                if (!termo) return;
+
+
+                const cards =
+                    document.querySelectorAll(".card");
+
+                let encontrado = false;
+
+
+                cards.forEach(card => {
+
+                    const texto =
+                        card.innerText.toLowerCase();
+
+                    if (texto.includes(termo)) {
+
+                        card.scrollIntoView({
+                            behavior: "smooth",
+                            block: "center"
+                        });
+
+                        card.style.boxShadow =
+                            "0 0 35px rgba(39,207,255,.7)";
+
+                        card.style.borderColor =
+                            "#35cfff";
+
+                        encontrado = true;
+
+
+                        setTimeout(() => {
+
+                            card.style.boxShadow = "";
+                            card.style.borderColor = "";
+
+                        }, 2000);
+
+                    }
+
+                });
+
+
+                if (!encontrado) {
+
+                    alert(
+                        "Nenhum produto encontrado para: " +
+                        searchInput.value
+                    );
+
+                }
+
+            }
+
+        });
+
+
+        /* =========================
+           MODO CLARO / ESCURO
+        ========================= */
+
+        const themeToggle =
+            document.getElementById("themeToggle");
+
+
+        const savedTheme =
+            localStorage.getItem("grapedev-theme");
+
+
+        if (savedTheme === "light") {
+
+            document.body.classList.add("light");
+
+        }
+
+
+        themeToggle.addEventListener("click", function() {
+
+            document.body.classList.toggle("light");
+
+
+            if (
+                document.body.classList.contains("light")
+            ) {
+
+                localStorage.setItem(
+                    "grapedev-theme",
+                    "light"
+                );
+
+            } else {
+
+                localStorage.setItem(
+                    "grapedev-theme",
+                    "dark"
+                );
+
+            }
+
+        });
+
+
+        /* =========================
+           MENU MOBILE
+        ========================= */
+
+        const menuButton =
+            document.getElementById("menuButton");
+
+        const mobileNav =
+            document.getElementById("mobileNav");
+
+
+        menuButton.addEventListener("click", function() {
+
+            mobileNav.classList.toggle("active");
+
+
+            const icon =
+                menuButton.querySelector("i");
+
+
+            if (
+                mobileNav.classList.contains("active")
+            ) {
+
+                icon.className =
+                    "bi bi-x-lg";
+
+            } else {
+
+                icon.className =
+                    "bi bi-list";
+
+            }
+
+        });
+
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,2679 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Bem-Estar Academy | GrapeDev</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+
+    <link
+        rel="stylesheet"
+        href="/grapedev/nex/assets/nex-jarvis.css"
+    >
+
+    <script
+        src="/grapedev/nex/assets/nex-jarvis.js"
+        defer
+    ></script>
+
+    <style>
+
+       :root {
+    --bg: #09070d;
+    --bg-secondary: #110d18;
+    --surface: rgba(255, 255, 255, 0.055);
+    --surface-hover: rgba(255, 255, 255, 0.085);
+
+    --text: #ffffff;
+    --text-soft: #bdb7c7;
+
+    --green: #1dc906;
+    --green-light: #4bf736;
+    --green-dark: #0d5203;
+
+    --border: rgba(255, 255, 255, 0.1);
+    --shadow: rgba(0, 0, 0, 0.4);
+}
+
+body.light {
+    --bg: #f5f2fa;
+    --bg-secondary: #ffffff;
+    --surface: rgba(13, 82, 3, 0.06);
+    --surface-hover: rgba(13, 82, 3, 0.1);
+
+    --text: #17121e;
+    --text-soft: #665f70;
+
+    --green: #169c04;
+    --green-light: #1dc906;
+    --green-dark: #0d5203;
+
+    --border: rgba(13, 82, 3, 0.13);
+    --shadow: rgba(13, 82, 3, 0.14);
+}
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: "Nunito", sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            overflow-x: hidden;
+            transition: background 0.35s ease, color 0.35s ease;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        button,
+        input {
+            font-family: inherit;
+        }
+
+        /* =========================
+           HEADER
+        ========================= */
+
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 78px;
+            padding: 0 6%;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            z-index: 1000;
+
+            background: rgba(9, 7, 13, 0.72);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+        }
+
+        body.light .header {
+            background: rgba(255, 255, 255, 0.78);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 160px;
+        }
+
+        .logo-grape {
+            width: 34px;
+            height: 34px;
+            object-fit: contain;
+            display: block;
+        }
+
+        .logo-text {
+            font-size: 20px;
+            font-weight: 900;
+            letter-spacing: -0.5px;
+        }
+
+        .menu {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 30px;
+        }
+
+        .menu a {
+            position: relative;
+
+            font-size: 12px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+
+            color: var(--text-soft);
+
+            transition: color 0.25s ease;
+        }
+
+        .menu a:hover,
+        .menu a.active {
+            color: var(--text);
+        }
+
+        .menu a::after {
+            content: "";
+
+            position: absolute;
+            left: 0;
+            bottom: -8px;
+
+            width: 0;
+            height: 2px;
+
+            border-radius: 10px;
+            background: var(--green);
+
+            transition: width 0.25s ease;
+        }
+
+        .menu a:hover::after,
+        .menu a.active::after {
+            width: 100%;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 10px;
+            min-width: 160px;
+        }
+
+        .header-actions > button,
+        .login-button {
+            height: 40px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border: 1px solid var(--border);
+
+            background: var(--surface);
+            color: var(--text);
+
+            cursor: pointer;
+
+            transition:
+                transform 0.25s ease,
+                background 0.25s ease,
+                border-color 0.25s ease,
+                box-shadow 0.25s ease;
+        }
+
+        /* =========================
+           BOTÃO DE PESQUISA
+        ========================= */
+
+        .search {
+            width: 40px !important;
+            min-width: 40px;
+            padding: 0 !important;
+
+            border-radius: 50%;
+        }
+
+        .search i {
+            font-size: 16px;
+        }
+
+        .search:hover {
+            background: var(--green);
+            border-color: var(--green);
+            transform: translateY(-2px);
+        }
+
+        /* =========================
+           LOGIN
+        ========================= */
+
+        .login-button {
+            width: auto !important;
+            min-width: auto;
+
+            padding: 0 18px;
+
+            border-radius: 30px;
+
+            font-size: 11px;
+            font-weight: 900;
+
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .login-button:hover {
+            background: var(--green);
+            border-color: var(--green);
+            transform: translateY(-2px);
+        }
+
+        /* =========================
+           UVA - TEMA
+        ========================= */
+
+        .theme-toggle {
+            width: 40px !important;
+            height: 40px !important;
+
+            min-width: 40px;
+
+            padding: 8px !important;
+
+            display: flex !important;
+            align-items: center;
+            justify-content: center;
+
+            border: 1px solid var(--border) !important;
+            border-radius: 50% !important;
+
+            background: var(--surface) !important;
+
+            cursor: pointer;
+
+            overflow: hidden;
+
+            transition:
+                transform 0.25s ease,
+                background 0.25s ease,
+                border-color 0.25s ease,
+                box-shadow 0.25s ease;
+        }
+
+        .theme-toggle img {
+            width: 22px !important;
+            height: 22px !important;
+
+            max-width: 22px !important;
+            max-height: 22px !important;
+
+            object-fit: contain;
+
+            display: block;
+
+            transition:
+                transform 0.35s ease,
+                filter 0.35s ease;
+        }
+
+        .theme-toggle:hover {
+            background: var(--green) !important;
+            border-color: var(--green) !important;
+
+            transform: translateY(-2px) rotate(8deg);
+
+            box-shadow:
+                0 0 18px rgba(130, 71, 229, 0.35);
+        }
+
+        .theme-toggle:hover img {
+            transform: scale(1.08) rotate(-8deg);
+        }
+
+        body.light .theme-toggle {
+            background: rgba(61, 29, 102, 0.07) !important;
+        }
+
+        body.light .theme-toggle img {
+            filter: drop-shadow(
+                0 0 5px rgba(111, 53, 181, 0.35)
+            );
+        }
+
+        /* =========================
+           MENU MOBILE
+        ========================= */
+
+        .menu-mobile {
+            display: none !important;
+
+            width: 40px !important;
+            min-width: 40px;
+
+            padding: 0 !important;
+
+            border-radius: 50%;
+        }
+
+        .menu-mobile:hover {
+            background: var(--green);
+            border-color: var(--green);
+        }
+
+        /* =========================
+           SEARCH OVERLAY
+        ========================= */
+
+        .search-overlay {
+            position: fixed;
+            inset: 0;
+
+            z-index: 2000;
+
+            padding-top: 110px;
+
+            background: rgba(4, 3, 7, 0.82);
+
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+
+            opacity: 0;
+            visibility: hidden;
+
+            transition: 0.3s ease;
+        }
+
+        .search-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        body.light .search-overlay {
+            background: rgba(245, 242, 250, 0.88);
+        }
+
+        .search-box {
+            width: min(700px, 90%);
+
+            margin: auto;
+
+            display: flex;
+            align-items: center;
+
+            gap: 15px;
+
+            padding: 16px 20px;
+
+            background: var(--bg-secondary);
+
+            border: 1px solid var(--border);
+
+            border-radius: 18px;
+
+            box-shadow:
+                0 25px 80px var(--shadow);
+        }
+
+        .search-box > i {
+            color: var(--green-light);
+            font-size: 20px;
+        }
+
+        .search-box input {
+            flex: 1;
+
+            border: none;
+            outline: none;
+
+            background: transparent;
+
+            color: var(--text);
+
+            font-size: 16px;
+        }
+
+        .search-box input::placeholder {
+            color: var(--text-soft);
+        }
+
+        .search-box button {
+            width: 35px;
+            height: 35px;
+
+            border: none;
+
+            background: transparent;
+
+            color: var(--text-soft);
+
+            cursor: pointer;
+
+            font-size: 18px;
+        }
+
+        .search-results {
+            width: min(700px, 90%);
+
+            margin: 15px auto 0;
+
+            display: grid;
+            gap: 10px;
+        }
+
+        .search-result {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+
+            padding: 16px 20px;
+
+            border: 1px solid var(--border);
+            border-radius: 14px;
+
+            background: var(--bg-secondary);
+
+            transition: 0.2s ease;
+        }
+
+        .search-result:hover {
+            border-color: var(--green);
+            transform: translateX(4px);
+        }
+
+        .search-result strong {
+            color: var(--text);
+        }
+
+        .search-result span,
+        .search-empty {
+            color: var(--text-soft);
+            font-size: 13px;
+        }
+
+        /* =========================
+           HERO
+        ========================= */
+
+        .hero {
+            min-height: 100vh;
+
+            padding: 150px 7% 80px;
+
+            display: flex;
+            align-items: center;
+
+            position: relative;
+
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: "";
+
+            position: absolute;
+
+            width: 700px;
+            height: 700px;
+
+            right: -220px;
+            top: 100px;
+
+            background:
+                radial-gradient(
+                    circle,
+                    rgba(130, 71, 229, 0.25),
+                    transparent 65%
+                );
+
+            pointer-events: none;
+        }
+
+        .hero::after {
+            content: "";
+
+            position: absolute;
+
+            width: 500px;
+            height: 500px;
+
+            left: -250px;
+            bottom: -200px;
+
+            background:
+                radial-gradient(
+                    circle,
+                    rgba(61, 29, 102, 0.25),
+                    transparent 65%
+                );
+
+            pointer-events: none;
+        }
+
+        .hero-container {
+            width: 100%;
+            max-width: 1350px;
+
+            margin: auto;
+
+            display: grid;
+
+            grid-template-columns: 1.05fr 0.95fr;
+
+            align-items: center;
+
+            gap: 70px;
+
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero-tag {
+            display: inline-flex;
+            align-items: center;
+
+            gap: 9px;
+
+            padding: 8px 14px;
+
+            margin-bottom: 25px;
+
+            border: 1px solid rgba(130, 71, 229, 0.35);
+
+            border-radius: 30px;
+
+            background: rgba(130, 71, 229, 0.08);
+
+            color: var(--green-light);
+
+            font-size: 11px;
+            font-weight: 900;
+
+            letter-spacing: 2px;
+        }
+
+        .hero-tag::before {
+            content: "";
+
+            width: 7px;
+            height: 7px;
+
+            border-radius: 50%;
+
+            background: var(--green-light);
+
+            box-shadow:
+                0 0 12px var(--green-light);
+        }
+
+        .hero h1 {
+            font-family: "Bebas Neue", sans-serif;
+
+            font-size: clamp(70px, 9vw, 145px);
+
+            line-height: 0.83;
+
+            letter-spacing: 2px;
+
+            font-weight: 400;
+
+            max-width: 750px;
+        }
+
+        .hero h1 span {
+            display: block;
+            color: var(--green-light);
+        }
+
+        .hero-description {
+            max-width: 650px;
+
+            margin-top: 32px;
+
+            color: var(--text-soft);
+
+            font-size: 17px;
+
+            line-height: 1.8;
+        }
+
+        .hero-buttons {
+            display: flex;
+
+            gap: 14px;
+
+            margin-top: 35px;
+
+            flex-wrap: wrap;
+        }
+
+        .primary-button,
+        .secondary-button {
+            min-height: 50px;
+
+            padding: 0 24px;
+
+            border-radius: 12px;
+
+            display: inline-flex;
+
+            align-items: center;
+            justify-content: center;
+
+            gap: 9px;
+
+            font-size: 12px;
+            font-weight: 900;
+
+            text-transform: uppercase;
+
+            letter-spacing: 1px;
+
+            transition: 0.25s ease;
+        }
+
+        .primary-button {
+            background: var(--green);
+
+            color: white;
+
+            box-shadow:
+                0 12px 35px rgba(130, 71, 229, 0.25);
+        }
+
+        .primary-button:hover {
+            background: var(--green-light);
+
+            transform: translateY(-3px);
+
+            box-shadow:
+                0 18px 45px rgba(130, 71, 229, 0.35);
+        }
+
+        .secondary-button {
+            border: 1px solid var(--border);
+
+            color: var(--text);
+
+            background: var(--surface);
+        }
+
+        .secondary-button:hover {
+            border-color: var(--green);
+
+            transform: translateY(-3px);
+        }
+
+        /* =========================
+           VISUAL
+        ========================= */
+
+        .hero-visual {
+            min-height: 570px;
+
+            display: flex;
+
+            align-items: center;
+            justify-content: center;
+
+            position: relative;
+        }
+
+        .visual-glow {
+            position: absolute;
+
+            width: 470px;
+            height: 470px;
+
+            border-radius: 50%;
+
+            background:
+                radial-gradient(
+                    circle,
+                    rgba(130, 71, 229, 0.28),
+                    transparent 67%
+                );
+
+            filter: blur(8px);
+        }
+
+        .visual-ring {
+            position: absolute;
+
+            width: 390px;
+            height: 390px;
+
+            border: 1px solid rgba(166, 108, 255, 0.25);
+
+            border-radius: 50%;
+
+            animation:
+                rotate 18s linear infinite;
+        }
+
+        .visual-ring::before,
+        .visual-ring::after {
+            content: "";
+
+            position: absolute;
+
+            width: 10px;
+            height: 10px;
+
+            border-radius: 50%;
+
+            background: var(--green-light);
+
+            box-shadow:
+                0 0 20px var(--green-light);
+        }
+
+        .visual-ring::before {
+            top: 35px;
+            left: 50%;
+        }
+
+        .visual-ring::after {
+            bottom: 50px;
+            right: 15px;
+        }
+
+        .visual-card {
+            width: min(420px, 90%);
+
+            min-height: 470px;
+
+            padding: 30px;
+
+            position: relative;
+            z-index: 3;
+
+            border: 1px solid rgba(166, 108, 255, 0.25);
+
+            border-radius: 28px;
+
+            background:
+                linear-gradient(
+                    145deg,
+                    rgba(130, 71, 229, 0.13),
+                    rgba(255, 255, 255, 0.025)
+                );
+
+            backdrop-filter: blur(20px);
+
+            box-shadow:
+                0 30px 80px rgba(0, 0, 0, 0.4),
+                inset 0 1px rgba(255, 255, 255, 0.08);
+
+            transform: rotate(3deg);
+
+            transition: 0.4s ease;
+
+            animation:
+                float 5s ease-in-out infinite;
+        }
+
+        .visual-card:hover {
+            transform: rotate(0deg) translateY(-8px);
+        }
+
+        .visual-card-top {
+            display: flex;
+
+            align-items: center;
+            justify-content: space-between;
+
+            margin-bottom: 35px;
+        }
+
+        .visual-card-title {
+            font-size: 12px;
+
+            font-weight: 900;
+
+            text-transform: uppercase;
+
+            letter-spacing: 1.5px;
+
+            color: var(--text-soft);
+        }
+
+        .online {
+            display: flex;
+
+            align-items: center;
+
+            gap: 7px;
+
+            font-size: 10px;
+
+            font-weight: 900;
+
+            color: #8ff0b0;
+        }
+
+        .online::before {
+            content: "";
+
+            width: 7px;
+            height: 7px;
+
+            border-radius: 50%;
+
+            background: #5ee58a;
+
+            box-shadow:
+                0 0 10px #5ee58a;
+        }
+
+        .visual-logo {
+            width: 95px;
+            height: 95px;
+
+            margin: 0 auto 30px;
+
+            display: flex;
+
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 25px;
+
+            background: rgba(130, 71, 229, 0.14);
+
+            border: 1px solid rgba(166, 108, 255, 0.2);
+
+            box-shadow:
+                0 0 50px rgba(130, 71, 229, 0.15);
+        }
+
+        .visual-logo i {
+            font-size: 48px;
+            color: var(--green-light);
+        }
+
+        .visual-card h3 {
+            text-align: center;
+
+            font-family: "Bebas Neue", sans-serif;
+
+            font-size: 48px;
+
+            font-weight: 400;
+
+            letter-spacing: 1px;
+        }
+
+        .visual-card h3 span {
+            color: var(--green-light);
+        }
+
+        .visual-card-subtitle {
+            text-align: center;
+
+            color: var(--text-soft);
+
+            font-size: 12px;
+
+            margin-top: 4px;
+        }
+
+        .mini-stats {
+            display: grid;
+
+            grid-template-columns: repeat(2, 1fr);
+
+            gap: 12px;
+
+            margin-top: 35px;
+        }
+
+        .mini-stat {
+            padding: 17px;
+
+            border: 1px solid var(--border);
+
+            border-radius: 15px;
+
+            background: var(--surface);
+        }
+
+        .mini-stat span {
+            display: block;
+
+            color: var(--text-soft);
+
+            font-size: 10px;
+
+            font-weight: 700;
+
+            margin-bottom: 5px;
+        }
+
+        .mini-stat strong {
+            font-size: 20px;
+            font-weight: 900;
+        }
+
+        /* =========================
+           FEATURES
+        ========================= */
+
+        .features {
+            padding: 110px 7%;
+
+            background: var(--bg-secondary);
+
+            position: relative;
+        }
+
+        .section-container {
+            width: 100%;
+
+            max-width: 1250px;
+
+            margin: auto;
+        }
+
+        .section-heading {
+            max-width: 700px;
+
+            margin-bottom: 55px;
+        }
+
+        .section-kicker {
+            color: var(--green-light);
+
+            font-size: 11px;
+
+            font-weight: 900;
+
+            letter-spacing: 2px;
+        }
+
+        .section-heading h2 {
+            margin-top: 12px;
+
+            font-family: "Bebas Neue", sans-serif;
+
+            font-size: clamp(50px, 6vw, 85px);
+
+            line-height: 0.9;
+
+            font-weight: 400;
+        }
+
+        .section-heading p {
+            margin-top: 20px;
+
+            color: var(--text-soft);
+
+            font-size: 15px;
+
+            line-height: 1.7;
+        }
+
+        .features-grid {
+            display: grid;
+
+            grid-template-columns: repeat(3, 1fr);
+
+            gap: 16px;
+        }
+
+        .feature-card {
+            min-height: 220px;
+
+            padding: 28px;
+
+            border: 1px solid var(--border);
+
+            border-radius: 22px;
+
+            background: var(--surface);
+
+            transition: 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-7px);
+
+            border-color:
+                rgba(130, 71, 229, 0.5);
+
+            background: var(--surface-hover);
+        }
+
+        .feature-icon {
+            width: 50px;
+            height: 50px;
+
+            display: flex;
+
+            align-items: center;
+            justify-content: center;
+
+            margin-bottom: 28px;
+
+            border-radius: 14px;
+
+            background:
+                rgba(130, 71, 229, 0.13);
+
+            color: var(--green-light);
+
+            font-size: 22px;
+        }
+
+        .feature-card h3 {
+            font-size: 17px;
+
+            font-weight: 900;
+
+            margin-bottom: 9px;
+        }
+
+        .feature-card p {
+            color: var(--text-soft);
+
+            font-size: 13px;
+
+            line-height: 1.65;
+        }
+
+        /* =========================
+           INFO
+        ========================= */
+
+        .info {
+            padding: 120px 7%;
+        }
+
+        .info-container {
+            max-width: 1250px;
+
+            margin: auto;
+
+            display: grid;
+
+            grid-template-columns: 0.9fr 1.1fr;
+
+            gap: 80px;
+
+            align-items: center;
+        }
+
+        .info-image {
+            min-height: 470px;
+
+            position: relative;
+
+            display: flex;
+
+            align-items: center;
+            justify-content: center;
+        }
+
+        .info-image::before {
+            content: "";
+
+            position: absolute;
+
+            width: 360px;
+            height: 360px;
+
+            border-radius: 50%;
+
+            background:
+                radial-gradient(
+                    circle,
+                    rgba(130, 71, 229, 0.22),
+                    transparent 70%
+                );
+        }
+
+        .info-image img {
+            position: relative;
+
+            z-index: 2;
+
+            width: min(360px, 85%);
+
+            max-height: 400px;
+
+            object-fit: contain;
+
+            filter:
+                drop-shadow(
+                    0 30px 40px rgba(0, 0, 0, 0.35)
+                );
+
+            transition: 0.4s ease;
+        }
+
+        .info-image img:hover {
+            transform:
+                scale(1.04)
+                translateY(-8px);
+        }
+
+        .info-content h2 {
+            font-family: "Bebas Neue", sans-serif;
+
+            font-size: clamp(55px, 6vw, 90px);
+
+            line-height: 0.88;
+
+            font-weight: 400;
+        }
+
+        .info-content h2 span {
+            color: var(--green-light);
+        }
+
+        .info-content > p {
+            margin-top: 25px;
+
+            color: var(--text-soft);
+
+            line-height: 1.8;
+
+            font-size: 15px;
+        }
+
+        .check-list {
+            display: grid;
+
+            gap: 13px;
+
+            margin-top: 30px;
+        }
+
+        .check-item {
+            display: flex;
+
+            align-items: center;
+
+            gap: 12px;
+
+            color: var(--text-soft);
+
+            font-size: 14px;
+
+            font-weight: 700;
+        }
+
+        .check-item i {
+            color: var(--green-light);
+
+            font-size: 18px;
+        }
+
+        /* =========================
+           CTA
+        ========================= */
+
+        .cta {
+            padding: 100px 7%;
+        }
+
+        .cta-box {
+            max-width: 1250px;
+
+            min-height: 330px;
+
+            margin: auto;
+
+            padding: 55px;
+
+            position: relative;
+
+            overflow: hidden;
+
+            border:
+                1px solid rgba(166, 108, 255, 0.25);
+
+            border-radius: 30px;
+
+            background:
+                radial-gradient(
+                    circle at 80% 30%,
+                    rgba(130, 71, 229, 0.32),
+                    transparent 35%
+                ),
+                linear-gradient(
+                    120deg,
+                    #1a1025,
+                    #0e0a13
+                );
+        }
+
+        body.light .cta-box {
+            background:
+                radial-gradient(
+                    circle at 80% 30%,
+                    rgba(130, 71, 229, 0.2),
+                    transparent 35%
+                ),
+                linear-gradient(
+                    120deg,
+                    #ffffff,
+                    #eee8f7
+                );
+        }
+
+        .cta-box h2 {
+            max-width: 750px;
+
+            font-family: "Bebas Neue", sans-serif;
+
+            font-size: clamp(50px, 6vw, 82px);
+
+            line-height: 0.9;
+
+            font-weight: 400;
+        }
+
+        .cta-box h2 span {
+            color: var(--green-light);
+        }
+
+        .cta-box p {
+            max-width: 600px;
+
+            margin-top: 18px;
+
+            color: var(--text-soft);
+
+            line-height: 1.7;
+        }
+
+        .cta-box .primary-button {
+            margin-top: 28px;
+        }
+
+        /* =========================
+           FOOTER
+        ========================= */
+
+        footer {
+            padding: 55px 7% 30px;
+
+            background: #0b090f;
+
+            color: white;
+        }
+
+        body.light footer {
+            background: #3d1d66;
+        }
+
+        .footer-container {
+            max-width: 1250px;
+
+            margin: auto;
+
+            display: flex;
+
+            justify-content: space-between;
+
+            gap: 50px;
+
+            padding-bottom: 40px;
+
+            border-bottom:
+                1px solid rgba(255, 255, 255, 0.12);
+        }
+
+        .footer-brand {
+            max-width: 360px;
+        }
+
+        .footer-brand-logo {
+            display: flex;
+
+            align-items: center;
+
+            gap: 10px;
+
+            font-size: 20px;
+
+            font-weight: 900;
+        }
+
+        .footer-brand-logo img {
+            width: 34px;
+            height: 34px;
+
+            object-fit: contain;
+        }
+
+        .footer-brand p {
+            margin-top: 15px;
+
+            color:
+                rgba(255, 255, 255, 0.62);
+
+            font-size: 13px;
+
+            line-height: 1.7;
+        }
+
+        .footer-links {
+            display: flex;
+
+            gap: 70px;
+        }
+
+        .footer-column h4 {
+            margin-bottom: 16px;
+
+            font-size: 11px;
+
+            text-transform: uppercase;
+
+            letter-spacing: 1.5px;
+        }
+
+        .footer-column a {
+            display: block;
+
+            margin-bottom: 10px;
+
+            color:
+                rgba(255, 255, 255, 0.58);
+
+            font-size: 13px;
+
+            transition: 0.2s ease;
+        }
+
+        .footer-column a:hover {
+            color: white;
+
+            transform: translateX(3px);
+        }
+
+        .footer-bottom {
+            max-width: 1250px;
+
+            margin: 25px auto 0;
+
+            display: flex;
+
+            justify-content: space-between;
+
+            gap: 20px;
+
+            color:
+                rgba(255, 255, 255, 0.45);
+
+            font-size: 11px;
+        }
+
+        /* =========================
+           ANIMAÇÕES
+        ========================= */
+
+        @keyframes rotate {
+
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform:
+                    translateY(0)
+                    rotate(3deg);
+            }
+
+            50% {
+                transform:
+                    translateY(-10px)
+                    rotate(3deg);
+            }
+
+        }
+
+        /* =========================
+           RESPONSIVO
+        ========================= */
+
+        @media (max-width: 1000px) {
+
+            .menu {
+                gap: 16px;
+            }
+
+            .menu a {
+                font-size: 10px;
+            }
+
+            .hero-container,
+            .info-container {
+                grid-template-columns: 1fr;
+            }
+
+            .hero {
+                padding-top: 130px;
+            }
+
+            .hero-content {
+                text-align: center;
+            }
+
+            .hero-description {
+                margin-left: auto;
+                margin-right: auto;
+            }
+
+            .hero-buttons {
+                justify-content: center;
+            }
+
+            .hero-visual {
+                min-height: 520px;
+            }
+
+            .features-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .info-content {
+                text-align: center;
+            }
+
+            .check-list {
+                max-width: 500px;
+
+                margin-left: auto;
+                margin-right: auto;
+
+                text-align: left;
+            }
+
+        }
+
+        @media (max-width: 760px) {
+
+            .header {
+                height: 70px;
+
+                padding: 0 5%;
+            }
+
+            .menu {
+                position: fixed;
+
+                top: 70px;
+
+                left: 5%;
+                right: 5%;
+
+                padding: 25px;
+
+                flex-direction: column;
+
+                align-items: stretch;
+
+                gap: 20px;
+
+                border:
+                    1px solid var(--border);
+
+                border-radius: 18px;
+
+                background:
+                    var(--bg-secondary);
+
+                box-shadow:
+                    0 25px 60px var(--shadow);
+
+                opacity: 0;
+                visibility: hidden;
+
+                transform:
+                    translateY(-10px);
+
+                transition: 0.25s ease;
+            }
+
+            .menu.active {
+                opacity: 1;
+                visibility: visible;
+
+                transform:
+                    translateY(0);
+            }
+
+            .menu a {
+                font-size: 12px;
+
+                padding: 4px 0;
+            }
+
+            .menu-mobile {
+                display: flex !important;
+            }
+
+            .header-actions {
+                min-width: auto;
+            }
+
+            .login-button {
+                display: none !important;
+            }
+
+            .hero {
+                padding:
+                    120px 5% 70px;
+            }
+
+            .hero h1 {
+                font-size:
+                    clamp(65px, 19vw, 105px);
+            }
+
+            .hero-description {
+                font-size: 15px;
+            }
+
+            .hero-visual {
+                min-height: 450px;
+            }
+
+            .visual-ring {
+                width: 310px;
+                height: 310px;
+            }
+
+            .visual-glow {
+                width: 350px;
+                height: 350px;
+            }
+
+            .visual-card {
+                min-height: 400px;
+
+                padding: 25px;
+            }
+
+            .features,
+            .info,
+            .cta {
+                padding-left: 5%;
+                padding-right: 5%;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .info {
+                padding-top: 80px;
+                padding-bottom: 80px;
+            }
+
+            .info-image {
+                min-height: 360px;
+            }
+
+            .info-image img {
+                width: 280px;
+            }
+
+            .cta-box {
+                padding: 35px 25px;
+            }
+
+            .footer-container {
+                flex-direction: column;
+            }
+
+            .footer-links {
+                gap: 40px;
+
+                flex-wrap: wrap;
+            }
+
+            .footer-bottom {
+                flex-direction: column;
+            }
+
+        }
+
+        @media (max-width: 480px) {
+
+            .logo-text {
+                font-size: 17px;
+            }
+
+            .logo-grape {
+                width: 30px;
+                height: 30px;
+            }
+
+            .search {
+                display: flex !important;
+            }
+
+            .theme-toggle {
+                width: 40px !important;
+                height: 40px !important;
+
+                min-width: 40px;
+
+                padding: 8px !important;
+            }
+
+            .theme-toggle img {
+                width: 21px !important;
+                height: 21px !important;
+            }
+
+            .hero h1 {
+                font-size: 68px;
+            }
+
+            .hero-buttons {
+                flex-direction: column;
+            }
+
+            .primary-button,
+            .secondary-button {
+                width: 100%;
+            }
+
+            .mini-stats {
+                grid-template-columns: 1fr;
+            }
+
+            .visual-card {
+                width: 94%;
+            }
+
+            .visual-card h3 {
+                font-size: 40px;
+            }
+
+        }
+
+    </style>
+</head>
+
+<body>
+
+    <!-- HEADER -->
+
+    <header class="header">
+
+        <a href="home.html" class="logo">
+
+            <img
+                src="../../storage/images/icone_uva_sem_fundo.png"
+                class="logo-grape"
+                alt="GrapeDev"
+            >
+
+            <span class="logo-text">
+                Grape<span style="color:#8247e5;">Dev</span>
+            </span>
+
+        </a>
+
+        <nav class="menu" id="menu">
+
+            <a href="home.html">
+                Início
+            </a>
+
+            <a href="projetos.html" class="active">
+                Projetos
+            </a>
+
+            <a href="sobre_nos.html">
+                Sobre nós
+            </a>
+
+            <a href="cartao.html">
+                Cartão de Visita
+            </a>
+
+            <a href="contato.html">
+                Contato
+            </a>
+
+        </nav>
+
+        <div class="header-actions">
+
+            <button
+                class="search"
+                id="searchButton"
+                type="button"
+                aria-label="Pesquisar"
+            >
+                <i class="bi bi-search"></i>
+            </button>
+
+            <a
+                href="login.php"
+                class="login-button"
+            >
+                Login
+            </a>
+
+            <button
+                class="theme-toggle"
+                id="themeToggle"
+                type="button"
+                aria-label="Alterar tema"
+            >
+                <img
+                    src="../../storage/images/icone_uva_sem_fundo.png"
+                    alt="Alterar tema"
+                >
+            </button>
+
+            <button
+                class="menu-mobile"
+                id="menuMobile"
+                type="button"
+                aria-label="Abrir menu"
+            >
+                <i class="bi bi-list"></i>
+            </button>
+
+        </div>
+
+    </header>
+
+
+    <!-- PESQUISA -->
+
+    <div
+        class="search-overlay"
+        id="searchOverlay"
+    >
+
+        <div class="search-box">
+
+            <i class="bi bi-search"></i>
+
+            <input
+                type="search"
+                id="searchInput"
+                placeholder="Pesquisar no site..."
+                autocomplete="off"
+            >
+
+            <button
+                type="button"
+                id="closeSearch"
+                aria-label="Fechar pesquisa"
+            >
+                <i class="bi bi-x-lg"></i>
+            </button>
+
+        </div>
+
+        <div
+            class="search-results"
+            id="searchResults"
+        ></div>
+
+    </div>
+
+
+    <!-- HERO -->
+
+    <section class="hero">
+
+        <div class="hero-container">
+
+            <div class="hero-content">
+
+                <span class="hero-tag">
+                    SMART GYM MANAGEMENT
+                </span>
+
+                <h1>
+                    BEM-ESTAR
+                    <span>ACADEMY.</span>
+                </h1>
+
+                <p class="hero-description">
+                    Uma plataforma inteligente desenvolvida para automatizar,
+                    organizar e modernizar a gestão de academias, oferecendo
+                    mais eficiência, controle e uma experiência digital completa
+                    para alunos e administradores.
+                </p>
+
+                <div class="hero-buttons">
+
+                    <a
+                        href="/produtosbemestar.html"
+                        class="primary-button"
+                    >
+                        Explorar recursos
+                        <i class="bi bi-arrow-right"></i>
+                    </a>
+
+                    <a
+                        href="#recursos"
+                        class="secondary-button"
+                    >
+                        Conhecer o sistema
+                        <i class="bi bi-chevron-down"></i>
+                    </a>
+
+                </div>
+
+            </div>
+
+
+            <div class="hero-visual">
+
+                <div class="visual-glow"></div>
+
+                <div class="visual-ring"></div>
+
+                <div class="visual-card">
+
+                    <div class="visual-card-top">
+
+                        <span class="visual-card-title">
+                            Bem-Estar System
+                        </span>
+
+                        <span class="online">
+                            SISTEMA ONLINE
+                        </span>
+
+                    </div>
+
+                    <div class="visual-logo">
+
+                        <i class="bi bi-heart-pulse"></i>
+
+                    </div>
+
+                    <h3>
+                        BEM-<span>ESTAR</span>
+                    </h3>
+
+                    <p class="visual-card-subtitle">
+                        SMART GYM MANAGEMENT PLATFORM
+                    </p>
+
+                    <div class="mini-stats">
+
+                        <div class="mini-stat">
+
+                            <span>
+                                ALUNOS
+                            </span>
+
+                            <strong>
+                                +1000
+                            </strong>
+
+                        </div>
+
+                        <div class="mini-stat">
+
+                            <span>
+                                DISPONIBILIDADE
+                            </span>
+
+                            <strong>
+                                24/7
+                            </strong>
+
+                        </div>
+
+                        <div class="mini-stat">
+
+                            <span>
+                                GESTÃO
+                            </span>
+
+                            <strong>
+                                100%
+                            </strong>
+
+                        </div>
+
+                        <div class="mini-stat">
+
+                            <span>
+                                RELATÓRIOS
+                            </span>
+
+                            <strong>
+                                +95%
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- RECURSOS -->
+
+    <section
+        class="features"
+        id="recursos"
+    >
+
+        <div class="section-container">
+
+            <div class="section-heading">
+
+                <span class="section-kicker">
+                    SMART MANAGEMENT
+                </span>
+
+                <h2>
+                    TUDO EM UM<br>
+                    ÚNICO SISTEMA.
+                </h2>
+
+                <p>
+                    O Bem-Estar Academy reúne ferramentas para facilitar
+                    o gerenciamento completo de academias e centros esportivos.
+                </p>
+
+            </div>
+
+
+            <div class="features-grid">
+
+                <div class="feature-card">
+
+                    <div class="feature-icon">
+                        <i class="bi bi-person-check"></i>
+                    </div>
+
+                    <h3>
+                        Controle de alunos
+                    </h3>
+
+                    <p>
+                        Cadastro, acompanhamento e gerenciamento
+                        completo dos alunos e suas matrículas.
+                    </p>
+
+                </div>
+
+
+                <div class="feature-card">
+
+                    <div class="feature-icon">
+                        <i class="bi bi-calendar-week"></i>
+                    </div>
+
+                    <h3>
+                        Horários e turmas
+                    </h3>
+
+                    <p>
+                        Organize aulas, turmas, horários e
+                        atividades da academia.
+                    </p>
+
+                </div>
+
+
+                <div class="feature-card">
+
+                    <div class="feature-icon">
+                        <i class="bi bi-door-open"></i>
+                    </div>
+
+                    <h3>
+                        Controle de acesso
+                    </h3>
+
+                    <p>
+                        Acompanhe entradas e saídas e tenha
+                        maior controle sobre o ambiente.
+                    </p>
+
+                </div>
+
+
+                <div class="feature-card">
+
+                    <div class="feature-icon">
+                        <i class="bi bi-bar-chart-line"></i>
+                    </div>
+
+                    <h3>
+                        Relatórios
+                    </h3>
+
+                    <p>
+                        Visualize informações administrativas
+                        para auxiliar na tomada de decisões.
+                    </p>
+
+                </div>
+
+
+                <div class="feature-card">
+
+                    <div class="feature-icon">
+                        <i class="bi bi-box-seam"></i>
+                    </div>
+
+                    <h3>
+                        Estoque e vendas
+                    </h3>
+
+                    <p>
+                        Organize produtos, estoque e vendas
+                        dentro da própria plataforma.
+                    </p>
+
+                </div>
+
+
+                <div class="feature-card">
+
+                    <div class="feature-icon">
+                        <i class="bi bi-play-circle"></i>
+                    </div>
+
+                    <h3>
+                        Aulas online
+                    </h3>
+
+                    <p>
+                        Recursos digitais para aulas online
+                        e suporte virtual aos alunos.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- SOBRE O PROJETO -->
+
+    <section class="info">
+
+        <div class="info-container">
+
+            <div class="info-image">
+
+                <img
+                    src="../../storage/images/bemestar_logo.png"
+                    alt="Bem-Estar Academy"
+                >
+
+            </div>
+
+
+            <div class="info-content">
+
+                <span class="section-kicker">
+                    UMA NOVA EXPERIÊNCIA
+                </span>
+
+                <h2>
+                    TECNOLOGIA<br>
+                    PARA O <span>BEM-ESTAR.</span>
+                </h2>
+
+                <p>
+                    O Bem-Estar Academy foi desenvolvido para transformar
+                    a maneira como academias administram seus processos.
+                    Em um único ambiente, gestores podem organizar alunos,
+                    horários, acessos, estoque, vendas e informações
+                    administrativas.
+                </p>
+
+                <div class="check-list">
+
+                    <div class="check-item">
+                        <i class="bi bi-check-circle-fill"></i>
+                        Gestão centralizada
+                    </div>
+
+                    <div class="check-item">
+                        <i class="bi bi-check-circle-fill"></i>
+                        Organização dos processos
+                    </div>
+
+                    <div class="check-item">
+                        <i class="bi bi-check-circle-fill"></i>
+                        Informações acessíveis
+                    </div>
+
+                    <div class="check-item">
+                        <i class="bi bi-check-circle-fill"></i>
+                        Experiência digital moderna
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- CTA -->
+
+    <section class="cta">
+
+        <div class="cta-box">
+
+            <h2>
+                PRONTO PARA<br>
+                <span>MODERNIZAR</span> SUA ACADEMIA?
+            </h2>
+
+            <p>
+                Conheça os recursos desenvolvidos para tornar
+                a gestão da sua academia mais simples, organizada
+                e eficiente.
+            </p>
+
+            <a
+                href="/produtosbemestar.html"
+                class="primary-button"
+            >
+                Ver produtos e recursos
+                <i class="bi bi-arrow-up-right"></i>
+            </a>
+
+        </div>
+
+    </section>
+
+
+    <!-- FOOTER -->
+
+    <footer>
+
+        <div class="footer-container">
+
+            <div class="footer-brand">
+
+                <div class="footer-brand-logo">
+
+                    <img
+                        src="../../storage/images/icone_uva_sem_fundo.png"
+                        alt="GrapeDev"
+                    >
+
+                    <span>
+                        Grape<span style="color:#a66cff;">Dev</span>
+                    </span>
+
+                </div>
+
+                <p>
+                    Tecnologia, criatividade e inovação para transformar
+                    ideias em soluções digitais.
+                </p>
+
+            </div>
+
+
+            <div class="footer-links">
+
+                <div class="footer-column">
+
+                    <h4>
+                        Navegação
+                    </h4>
+
+                    <a href="/home.html">
+                        Início
+                    </a>
+
+                    <a href="/projetos.html">
+                        Projetos
+                    </a>
+
+                    <a href="/sobre_nos.html">
+                        Sobre nós
+                    </a>
+
+                    <a href="contato.html">
+                        Contato
+                    </a>
+
+                </div>
+
+
+                <div class="footer-column">
+
+                    <h4>
+                        Bem-Estar
+                    </h4>
+
+                    <a href="bemestar.html">
+                        Projeto
+                    </a>
+
+                    <a href="produtosbemestar.html">
+                        Recursos
+                    </a>
+
+                    <a href="login.php">
+                        Login
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="footer-bottom">
+
+            <span>
+                © 2026 GrapeDev. Todos os direitos reservados.
+            </span>
+
+            <span>
+                Bem-Estar Academy
+            </span>
+
+        </div>
+
+    </footer>
+
+
+    <script>
+
+        /* =========================
+           TEMA
+        ========================= */
+
+        const themeToggle =
+            document.getElementById("themeToggle");
+
+        const temaSalvo =
+            localStorage.getItem("grapedev-theme");
+
+        if (temaSalvo === "light") {
+
+            document.body.classList.add("light");
+
+        }
+
+        themeToggle.addEventListener(
+            "click",
+            () => {
+
+                document.body.classList.toggle("light");
+
+                localStorage.setItem(
+                    "grapedev-theme",
+                    document.body.classList.contains("light")
+                        ? "light"
+                        : "dark"
+                );
+
+            }
+        );
+
+
+        /* =========================
+           MENU MOBILE
+        ========================= */
+
+        const menuMobile =
+            document.getElementById("menuMobile");
+
+        const menu =
+            document.getElementById("menu");
+
+        menuMobile.addEventListener(
+            "click",
+            () => {
+
+                menu.classList.toggle("active");
+
+                const icon =
+                    menuMobile.querySelector("i");
+
+                if (menu.classList.contains("active")) {
+
+                    icon.className =
+                        "bi bi-x-lg";
+
+                } else {
+
+                    icon.className =
+                        "bi bi-list";
+
+                }
+
+            }
+        );
+
+
+        document
+            .querySelectorAll(".menu a")
+            .forEach(link => {
+
+                link.addEventListener(
+                    "click",
+                    () => {
+
+                        menu.classList.remove("active");
+
+                        const icon =
+                            menuMobile.querySelector("i");
+
+                        icon.className =
+                            "bi bi-list";
+
+                    }
+                );
+
+            });
+
+
+        /* =========================
+           PESQUISA
+        ========================= */
+
+        const botaoPesquisa =
+            document.getElementById("searchButton");
+
+        const overlayPesquisa =
+            document.getElementById("searchOverlay");
+
+        const campoPesquisa =
+            document.getElementById("searchInput");
+
+        const fecharPesquisa =
+            document.getElementById("closeSearch");
+
+        const resultadosPesquisa =
+            document.getElementById("searchResults");
+
+
+        const paginas = [
+
+            {
+                titulo: "Início",
+                descricao:
+                    "Conheça a GrapeDev e nossas soluções digitais.",
+                link: "home.html"
+            },
+
+            {
+                titulo: "Projetos",
+                descricao:
+                    "Conheça os projetos desenvolvidos pela GrapeDev.",
+                link: "projetos.html"
+            },
+
+            {
+                titulo: "Bem-Estar Academy",
+                descricao:
+                    "Sistema inteligente para gestão de academias.",
+                link: "bemestar.html"
+            },
+
+            {
+                titulo: "Produtos Bem-Estar",
+                descricao:
+                    "Conheça os recursos do Bem-Estar Academy.",
+                link: "produtosbemestar.html"
+            },
+
+            {
+                titulo: "AquaFlow",
+                descricao:
+                    "Sistema inteligente de monitoramento de água.",
+                link: "aquaflow.html"
+            },
+
+            {
+                titulo: "Sobre nós",
+                descricao:
+                    "Conheça a equipe e a história da GrapeDev.",
+                link: "sobre_nos.html"
+            },
+
+            {
+                titulo: "Cartão de Visita",
+                descricao:
+                    "Conheça o cartão digital da GrapeDev.",
+                link: "cartao.html"
+            },
+
+            {
+                titulo: "Contato",
+                descricao:
+                    "Entre em contato com a equipe GrapeDev.",
+                link: "contato.html"
+            },
+
+            {
+                titulo: "Dashboard",
+                descricao:
+                    "Acesse o painel do AquaFlow.",
+                link: "dashboard.php"
+            }
+
+        ];
+
+
+        function escapar(texto) {
+
+            const div =
+                document.createElement("div");
+
+            div.textContent = texto;
+
+            return div.innerHTML;
+
+        }
+
+
+        function mostrarResultados() {
+
+            const termo =
+                campoPesquisa.value
+                    .trim()
+                    .toLowerCase();
+
+
+            if (!termo) {
+
+                resultadosPesquisa.innerHTML =
+                    '<div class="search-empty">Digite algo para pesquisar no site.</div>';
+
+                return;
+
+            }
+
+
+            const encontrados =
+                paginas.filter(pagina => {
+
+                    return (
+                        pagina.titulo
+                            .toLowerCase()
+                            .includes(termo)
+
+                        ||
+
+                        pagina.descricao
+                            .toLowerCase()
+                            .includes(termo)
+                    );
+
+                });
+
+
+            if (!encontrados.length) {
+
+                resultadosPesquisa.innerHTML =
+                    '<div class="search-empty">Nenhum resultado encontrado para "' +
+                    escapar(campoPesquisa.value) +
+                    '".</div>';
+
+                return;
+
+            }
+
+
+            resultadosPesquisa.innerHTML = "";
+
+
+            encontrados.forEach(pagina => {
+
+                const link =
+                    document.createElement("a");
+
+                link.className =
+                    "search-result";
+
+                link.href =
+                    pagina.link;
+
+
+                const titulo =
+                    document.createElement("strong");
+
+                titulo.textContent =
+                    pagina.titulo;
+
+
+                const descricao =
+                    document.createElement("span");
+
+                descricao.textContent =
+                    pagina.descricao;
+
+
+                link.appendChild(titulo);
+
+                link.appendChild(descricao);
+
+                resultadosPesquisa.appendChild(link);
+
+            });
+
+        }
+
+
+        function abrirPesquisa() {
+
+            overlayPesquisa.classList.add("active");
+
+            document.body.style.overflow =
+                "hidden";
+
+            campoPesquisa.value = "";
+
+            mostrarResultados();
+
+
+            setTimeout(
+                () => {
+
+                    campoPesquisa.focus();
+
+                },
+                100
+            );
+
+        }
+
+
+        function fechar() {
+
+            overlayPesquisa.classList.remove("active");
+
+            document.body.style.overflow = "";
+
+            campoPesquisa.value = "";
+
+            resultadosPesquisa.innerHTML = "";
+
+        }
+
+
+        botaoPesquisa.addEventListener(
+            "click",
+            abrirPesquisa
+        );
+
+
+        fecharPesquisa.addEventListener(
+            "click",
+            fechar
+        );
+
+
+        campoPesquisa.addEventListener(
+            "input",
+            mostrarResultados
+        );
+
+
+        overlayPesquisa.addEventListener(
+            "click",
+            evento => {
+
+                if (
+                    evento.target === overlayPesquisa
+                ) {
+
+                    fechar();
+
+                }
+
+            }
+        );
+
+
+        document.addEventListener(
+            "keydown",
+            evento => {
+
+                if (
+                    evento.key === "Escape" &&
+                    overlayPesquisa.classList.contains("active")
+                ) {
+
+                    fechar();
+
+                }
+
+            }
+        );
+
+    </script>
+
+</body>
+
+</html>

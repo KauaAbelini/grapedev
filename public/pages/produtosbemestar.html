@@ -1,0 +1,3224 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Produtos Bem-Estar | GrapeDev</title>
+
+    <link
+        rel="icon"
+        href="fotos/favicon-32x32.png"
+        type="image/png"
+    >
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet"
+    >
+
+    <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+    >
+
+
+<link
+    rel="stylesheet"
+    href="/grapedev/nex/assets/nex-jarvis.css"
+>
+
+<script
+    src="/grapedev/nex/assets/nex-jarvis.js"
+    defer
+></script>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+html{
+    scroll-behavior:smooth;
+}
+
+body{
+    min-height:100vh;
+    overflow-x:hidden;
+
+    background:#05030d;
+    color:#fff;
+
+    font-family:"Nunito",sans-serif;
+
+    transition:.4s ease;
+}
+
+body.light{
+    background:#f5f1fa;
+    color:#24152f;
+}
+
+
+/* ================= HEADER ================= */
+
+.header{
+
+    position:fixed;
+
+    top:0;
+    left:0;
+
+    width:100%;
+    height:88px;
+
+    padding:0 6%;
+
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+
+    z-index:1000;
+
+    background:rgba(5,3,13,.72);
+
+    border-bottom:1px solid rgba(255,255,255,.04);
+
+    backdrop-filter:blur(18px);
+    -webkit-backdrop-filter:blur(18px);
+}
+
+body.light .header{
+    background:rgba(245,241,250,.82);
+    border-color:rgba(70,40,90,.08);
+}
+
+
+.logo{
+
+    display:flex;
+    align-items:center;
+
+    gap:9px;
+
+    color:#fff;
+
+    text-decoration:none;
+}
+
+body.light .logo{
+    color:#24152f;
+}
+
+.logo-grape{
+
+    width:38px;
+    height:42px;
+
+    object-fit:contain;
+
+    filter:
+        drop-shadow(0 0 8px rgba(145,55,255,.7));
+}
+
+.logo-text{
+
+    font-size:20px;
+    font-weight:900;
+
+    letter-spacing:-.7px;
+}
+
+.menu{
+
+    position:absolute;
+
+    left:50%;
+
+    transform:translateX(-50%);
+
+    height:88px;
+
+    display:flex;
+    align-items:center;
+
+    gap:30px;
+}
+
+.menu a{
+
+    position:relative;
+
+    color:#c9c6d5;
+
+    text-decoration:none;
+
+    font-size:12px;
+    font-weight:800;
+
+    white-space:nowrap;
+
+    transition:.25s ease;
+}
+
+.menu a:hover{
+    color:#fff;
+}
+
+body.light .menu a{
+    color:#574d61;
+}
+
+body.light .menu a:hover{
+    color:#7022ca;
+}
+
+.menu a.active{
+    color:#a744ff;
+}
+
+.menu a.active::after{
+
+    content:"";
+
+    position:absolute;
+
+    left:0;
+    bottom:-16px;
+
+    width:24px;
+    height:2px;
+
+    background:#963cff;
+
+    box-shadow:0 0 10px #963cff;
+}
+
+
+.header-actions{
+
+    display:flex;
+    align-items:center;
+
+    gap:12px;
+}
+
+
+.search{
+
+    width:34px;
+    height:40px;
+
+    border:0;
+
+    background:none;
+
+    color:#d5d1df;
+
+    font-size:19px;
+
+    cursor:pointer;
+
+    transition:.2s;
+}
+
+.search:hover{
+    color:#a744ff;
+}
+
+
+.login{
+
+    width:82px;
+    height:40px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    border:1px solid #7620d5;
+
+    border-radius:10px;
+
+    color:#ddd8e7;
+
+    text-decoration:none;
+
+    font-size:12px;
+    font-weight:800;
+
+    transition:.25s;
+}
+
+.login:hover{
+
+    border-color:#a744ff;
+
+    box-shadow:
+        0 0 20px rgba(150,60,255,.25);
+}
+
+body.light .login{
+    color:#5c496c;
+}
+
+
+.theme-button{
+
+    width:40px;
+    height:40px;
+
+    border:none;
+
+    border-radius:10px;
+
+    background:
+        linear-gradient(
+            145deg,
+            #6c18d8,
+            #4b0ba8
+        );
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    cursor:pointer;
+
+    box-shadow:
+        0 7px 20px rgba(78,16,170,.28);
+
+    transition:.25s;
+}
+
+.theme-button:hover{
+    transform:translateY(-2px);
+}
+
+.theme-button img{
+
+    width:24px;
+    height:24px;
+
+    object-fit:contain;
+
+    filter:
+        brightness(0)
+        invert(1);
+}
+
+
+.mobile-menu{
+
+    display:none;
+
+    width:40px;
+    height:40px;
+
+    border:1px solid #7620d5;
+
+    border-radius:10px;
+
+    background:transparent;
+
+    color:white;
+
+    font-size:20px;
+
+    cursor:pointer;
+}
+
+
+/* ================= HERO ================= */
+
+.hero{
+
+    position:relative;
+
+    min-height:690px;
+
+    padding:
+        150px 8%
+        90px;
+
+    display:flex;
+    align-items:center;
+
+    overflow:hidden;
+
+    background:
+
+        radial-gradient(
+            circle at 78% 45%,
+            rgba(143,48,255,.22),
+            transparent 30%
+        ),
+
+        radial-gradient(
+            circle at 15% 90%,
+            rgba(71,16,150,.14),
+            transparent 35%
+        ),
+
+        #05030d;
+}
+
+body.light .hero{
+
+    background:
+
+        radial-gradient(
+            circle at 80% 40%,
+            rgba(126,63,210,.14),
+            transparent 32%
+        ),
+
+        #f5f1fa;
+}
+
+
+.hero-grid{
+
+    position:absolute;
+
+    inset:0;
+
+    background-image:
+
+        linear-gradient(
+            rgba(145,55,255,.025) 1px,
+            transparent 1px
+        ),
+
+        linear-gradient(
+            90deg,
+            rgba(145,55,255,.025) 1px,
+            transparent 1px
+        );
+
+    background-size:90px 90px;
+
+    mask-image:
+        linear-gradient(
+            to right,
+            transparent,
+            black 20%,
+            black 80%,
+            transparent
+        );
+}
+
+
+.hero-content{
+
+    position:relative;
+
+    z-index:10;
+
+    width:52%;
+    max-width:680px;
+}
+
+
+.hero-tag{
+
+    display:inline-flex;
+
+    align-items:center;
+    gap:9px;
+
+    height:31px;
+
+    padding:0 14px;
+
+    border:1px solid #7620d5;
+
+    border-radius:30px;
+
+    color:#b65aff;
+
+    font-size:9px;
+    font-weight:900;
+
+    letter-spacing:1.2px;
+}
+
+.hero-tag i{
+    font-size:11px;
+}
+
+
+.hero h1{
+
+    margin-top:20px;
+
+    font-family:"Bebas Neue",sans-serif;
+
+    font-size:
+        clamp(
+            75px,
+            8vw,
+            125px
+        );
+
+    line-height:.82;
+
+    font-weight:400;
+
+    letter-spacing:1px;
+}
+
+.hero h1 span{
+    display:block;
+}
+
+.hero-title-white{
+    color:#f7f5fb;
+}
+
+body.light .hero-title-white{
+    color:#24152f;
+}
+
+.hero-title-purple{
+
+    background:
+        linear-gradient(
+            180deg,
+            #d27aff,
+            #a43cff 40%,
+            #6a18d7
+        );
+
+    -webkit-background-clip:text;
+    background-clip:text;
+
+    -webkit-text-fill-color:transparent;
+
+    filter:
+        drop-shadow(
+            0 0 12px
+            rgba(132,35,255,.35)
+        );
+}
+
+
+.hero-description{
+
+    max-width:590px;
+
+    margin-top:28px;
+
+    color:#bbb7c8;
+
+    font-size:14px;
+
+    line-height:1.7;
+
+    font-weight:500;
+}
+
+body.light .hero-description{
+    color:#62566d;
+}
+
+
+.hero-button{
+
+    display:inline-flex;
+
+    align-items:center;
+    justify-content:center;
+
+    gap:10px;
+
+    margin-top:30px;
+
+    height:48px;
+
+    padding:0 23px;
+
+    border-radius:9px;
+
+    background:
+        linear-gradient(
+            100deg,
+            #7021e8,
+            #a744ff
+        );
+
+    color:white;
+
+    text-decoration:none;
+
+    font-size:11px;
+    font-weight:900;
+
+    box-shadow:
+        0 10px 30px
+        rgba(113,26,227,.28);
+
+    transition:.25s;
+}
+
+.hero-button:hover{
+    transform:translateY(-3px);
+}
+
+
+/* ================= HERO VISUAL ================= */
+
+.hero-visual{
+
+    position:absolute;
+
+    right:4%;
+
+    top:50%;
+
+    transform:translateY(-50%);
+
+    width:43%;
+
+    height:560px;
+}
+
+
+.visual-glow{
+
+    position:absolute;
+
+    width:480px;
+    height:480px;
+
+    left:50%;
+    top:50%;
+
+    transform:translate(-50%,-50%);
+
+    border-radius:50%;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(146,51,255,.26),
+            rgba(97,25,190,.08) 45%,
+            transparent 70%
+        );
+
+    filter:blur(20px);
+
+    animation:
+        visualPulse 4s ease-in-out infinite;
+}
+
+@keyframes visualPulse{
+
+    0%,100%{
+        transform:
+            translate(-50%,-50%)
+            scale(.95);
+    }
+
+    50%{
+        transform:
+            translate(-50%,-50%)
+            scale(1.05);
+    }
+}
+
+
+.visual-circle{
+
+    position:absolute;
+
+    left:50%;
+    top:50%;
+
+    transform:
+        translate(-50%,-50%);
+
+    width:390px;
+    height:390px;
+
+    border-radius:50%;
+
+    border:
+        1px solid
+        rgba(167,68,255,.32);
+
+    box-shadow:
+        0 0 60px
+        rgba(135,43,255,.13);
+
+    animation:
+        circleRotate 18s linear infinite;
+}
+
+@keyframes circleRotate{
+
+    from{
+        transform:
+            translate(-50%,-50%)
+            rotate(0deg);
+    }
+
+    to{
+        transform:
+            translate(-50%,-50%)
+            rotate(360deg);
+    }
+}
+
+
+.visual-circle::before,
+.visual-circle::after{
+
+    content:"";
+
+    position:absolute;
+
+    border-radius:50%;
+
+    border:1px solid
+        rgba(167,68,255,.22);
+}
+
+.visual-circle::before{
+    inset:35px;
+}
+
+.visual-circle::after{
+    inset:75px;
+}
+
+
+.visual-center{
+
+    position:absolute;
+
+    left:50%;
+    top:50%;
+
+    transform:
+        translate(-50%,-50%);
+
+    width:190px;
+    height:190px;
+
+    border-radius:50%;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(139,42,255,.3),
+            rgba(17,7,29,.92) 70%
+        );
+
+    border:
+        1px solid
+        rgba(176,93,255,.5);
+
+    box-shadow:
+        0 0 40px
+        rgba(140,44,255,.25);
+}
+
+
+.visual-center i{
+
+    font-size:80px;
+
+    color:#b85cff;
+
+    filter:
+        drop-shadow(
+            0 0 20px
+            rgba(167,68,255,.8)
+        );
+}
+
+
+.floating-info{
+
+    position:absolute;
+
+    min-width:145px;
+
+    padding:13px 15px;
+
+    border:
+        1px solid
+        rgba(150,60,255,.35);
+
+    border-radius:10px;
+
+    background:
+        rgba(16,8,29,.82);
+
+    backdrop-filter:blur(12px);
+
+    box-shadow:
+        0 15px 40px
+        rgba(0,0,0,.28);
+
+    animation:
+        infoFloat 4s ease-in-out infinite;
+}
+
+body.light .floating-info{
+    background:rgba(255,255,255,.86);
+}
+
+
+.info-one{
+    left:2%;
+    top:25%;
+}
+
+.info-two{
+    right:0;
+    top:34%;
+
+    animation-delay:.7s;
+}
+
+.info-three{
+    left:13%;
+    bottom:20%;
+
+    animation-delay:1.2s;
+}
+
+
+@keyframes infoFloat{
+
+    0%,100%{
+        transform:translateY(0);
+    }
+
+    50%{
+        transform:translateY(-8px);
+    }
+}
+
+
+.info-label{
+
+    display:block;
+
+    color:#858092;
+
+    font-size:8px;
+
+    font-weight:800;
+
+    text-transform:uppercase;
+
+    letter-spacing:1px;
+}
+
+.info-value{
+
+    display:block;
+
+    margin-top:3px;
+
+    color:#c979ff;
+
+    font-size:14px;
+
+    font-weight:900;
+}
+
+
+/* ================= PRODUTOS ================= */
+
+.products-section{
+
+    position:relative;
+
+    padding:
+        110px 8%
+        130px;
+
+    overflow:hidden;
+
+    background:#090611;
+}
+
+body.light .products-section{
+    background:#eee8f4;
+}
+
+
+.products-header{
+
+    max-width:700px;
+
+    margin:0 auto 60px;
+
+    text-align:center;
+}
+
+
+.products-kicker{
+
+    color:#a744ff;
+
+    font-size:9px;
+
+    font-weight:900;
+
+    letter-spacing:2px;
+}
+
+
+.products-header h2{
+
+    margin-top:13px;
+
+    font-family:"Bebas Neue",sans-serif;
+
+    font-size:62px;
+
+    line-height:.95;
+
+    font-weight:400;
+}
+
+body.light .products-header h2{
+    color:#24152f;
+}
+
+
+.products-header p{
+
+    margin-top:17px;
+
+    color:#9f99aa;
+
+    font-size:13px;
+
+    line-height:1.6;
+}
+
+body.light .products-header p{
+    color:#665b6e;
+}
+
+
+.products-grid{
+
+    display:grid;
+
+    grid-template-columns:
+        repeat(3,1fr);
+
+    gap:25px;
+
+    max-width:1250px;
+
+    margin:auto;
+}
+
+
+.product-card{
+
+    position:relative;
+
+    overflow:hidden;
+
+    min-height:440px;
+
+    display:flex;
+
+    flex-direction:column;
+
+    border:
+        1px solid
+        rgba(150,60,255,.16);
+
+    border-radius:18px;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(35,17,53,.95),
+            rgba(12,7,20,.98)
+        );
+
+    box-shadow:
+        0 20px 60px
+        rgba(0,0,0,.25);
+
+    transition:
+        transform .35s ease,
+        border-color .35s ease,
+        box-shadow .35s ease;
+}
+
+body.light .product-card{
+
+    background:#fff;
+
+    border-color:
+        rgba(112,34,202,.12);
+
+    box-shadow:
+        0 18px 45px
+        rgba(65,35,85,.10);
+}
+
+
+.product-card:hover{
+
+    transform:translateY(-9px);
+
+    border-color:
+        rgba(167,68,255,.5);
+
+    box-shadow:
+        0 25px 70px
+        rgba(111,29,245,.16);
+}
+
+
+.product-image{
+
+    position:relative;
+
+    width:100%;
+    height:235px;
+
+    overflow:hidden;
+
+    background:
+        radial-gradient(
+            circle at center,
+            rgba(130,40,255,.16),
+            transparent 65%
+        );
+}
+
+
+.product-image::after{
+
+    content:"";
+
+    position:absolute;
+
+    inset:0;
+
+    background:
+        linear-gradient(
+            to bottom,
+            transparent 60%,
+            rgba(8,4,14,.8)
+        );
+}
+
+
+.product-image img{
+
+    width:100%;
+    height:100%;
+
+    object-fit:cover;
+
+    transition:
+        transform .5s ease;
+}
+
+
+.product-card:hover
+.product-image img{
+
+    transform:scale(1.06);
+}
+
+
+.product-info{
+
+    position:relative;
+
+    z-index:5;
+
+    padding:25px;
+}
+
+
+.product-number{
+
+    color:#8631e8;
+
+    font-family:"Bebas Neue",sans-serif;
+
+    font-size:14px;
+
+    letter-spacing:1px;
+}
+
+
+.product-info h3{
+
+    margin-top:4px;
+
+    color:#fff;
+
+    font-size:21px;
+
+    font-weight:900;
+}
+
+body.light .product-info h3{
+    color:#24152f;
+}
+
+
+.product-info p{
+
+    margin-top:8px;
+
+    min-height:42px;
+
+    color:#9690a0;
+
+    font-size:12px;
+
+    line-height:1.5;
+}
+
+body.light .product-info p{
+    color:#6c6173;
+}
+
+
+.product-bottom{
+
+    display:flex;
+
+    align-items:center;
+    justify-content:space-between;
+
+    margin-top:20px;
+
+    padding-top:17px;
+
+    border-top:
+        1px solid
+        rgba(255,255,255,.07);
+}
+
+body.light .product-bottom{
+    border-color:rgba(70,40,90,.09);
+}
+
+
+.product-price{
+
+    color:#c978ff;
+
+    font-size:18px;
+
+    font-weight:900;
+}
+
+
+.product-buy{
+
+    display:flex;
+
+    align-items:center;
+    justify-content:center;
+
+    gap:8px;
+
+    height:38px;
+
+    padding:0 16px;
+
+    border-radius:8px;
+
+    background:
+        linear-gradient(
+            100deg,
+            #7021e8,
+            #a744ff
+        );
+
+    color:#fff;
+
+    text-decoration:none;
+
+    font-size:10px;
+
+    font-weight:900;
+
+    transition:.25s;
+}
+
+.product-buy:hover{
+    transform:translateY(-2px);
+}
+
+
+/* ================= BENEFÍCIOS ================= */
+
+.benefits{
+
+    padding:
+        100px 8%
+        110px;
+
+    background:
+        radial-gradient(
+            circle at 50% 0%,
+            rgba(119,36,220,.12),
+            transparent 40%
+        ),
+        #05030d;
+}
+
+body.light .benefits{
+    background:#f5f1fa;
+}
+
+
+.benefits-header{
+
+    text-align:center;
+
+    margin-bottom:50px;
+}
+
+
+.benefits-header span{
+
+    color:#a744ff;
+
+    font-size:9px;
+
+    font-weight:900;
+
+    letter-spacing:2px;
+}
+
+
+.benefits-header h2{
+
+    margin-top:12px;
+
+    font-family:"Bebas Neue",sans-serif;
+
+    font-size:52px;
+
+    font-weight:400;
+}
+
+body.light .benefits-header h2{
+    color:#24152f;
+}
+
+
+.benefits-grid{
+
+    max-width:1100px;
+
+    margin:auto;
+
+    display:grid;
+
+    grid-template-columns:
+        repeat(3,1fr);
+
+    gap:20px;
+}
+
+
+.benefit{
+
+    padding:28px;
+
+    border:
+        1px solid
+        rgba(150,60,255,.14);
+
+    border-radius:14px;
+
+    background:
+        rgba(255,255,255,.025);
+
+    transition:.3s;
+}
+
+body.light .benefit{
+    background:#fff;
+}
+
+
+.benefit:hover{
+
+    transform:translateY(-5px);
+
+    border-color:
+        rgba(150,60,255,.4);
+}
+
+
+.benefit-icon{
+
+    width:45px;
+    height:45px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    border-radius:11px;
+
+    background:
+        rgba(130,40,255,.12);
+
+    color:#b95cff;
+
+    font-size:21px;
+}
+
+
+.benefit h3{
+
+    margin-top:18px;
+
+    font-size:16px;
+
+    font-weight:900;
+}
+
+.benefit p{
+
+    margin-top:7px;
+
+    color:#918a9d;
+
+    font-size:11px;
+
+    line-height:1.6;
+}
+
+body.light .benefit p{
+    color:#6b6071;
+}
+
+
+/* ================= CTA ================= */
+
+.cta{
+
+    padding:75px 8%;
+
+    background:
+        linear-gradient(
+            100deg,
+            #321158,
+            #641cb1,
+            #321158
+        );
+
+    position:relative;
+
+    overflow:hidden;
+}
+
+.cta::before{
+
+    content:"";
+
+    position:absolute;
+
+    width:450px;
+    height:450px;
+
+    right:-150px;
+    top:-250px;
+
+    border-radius:50%;
+
+    background:
+        rgba(255,255,255,.07);
+
+    filter:blur(20px);
+}
+
+
+.cta-inner{
+
+    position:relative;
+
+    z-index:2;
+
+    max-width:1100px;
+
+    margin:auto;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+
+    gap:30px;
+}
+
+
+.cta h2{
+
+    font-family:"Bebas Neue",sans-serif;
+
+    font-size:47px;
+
+    font-weight:400;
+
+    line-height:.95;
+}
+
+
+.cta h2 span{
+    color:#e1b8ff;
+}
+
+
+.cta p{
+
+    margin-top:8px;
+
+    color:#d8c8e5;
+
+    font-size:12px;
+}
+
+
+.cta-button{
+
+    display:flex;
+
+    align-items:center;
+    justify-content:center;
+
+    gap:10px;
+
+    min-width:180px;
+
+    height:48px;
+
+    padding:0 20px;
+
+    border-radius:9px;
+
+    background:#fff;
+
+    color:#531494;
+
+    text-decoration:none;
+
+    font-size:11px;
+
+    font-weight:900;
+
+    transition:.25s;
+}
+
+.cta-button:hover{
+    transform:translateY(-3px);
+}
+
+
+/* ================= FOOTER ================= */
+
+.footer{
+
+    padding:
+        65px 8%
+        25px;
+
+    background:#08050d;
+
+    border-top:
+        1px solid
+        rgba(255,255,255,.05);
+}
+
+body.light .footer{
+    background:#21152a;
+}
+
+
+.footer-content{
+
+    max-width:1200px;
+
+    margin:auto;
+
+    display:grid;
+
+    grid-template-columns:
+        1.5fr
+        1fr
+        1fr
+        1fr;
+
+    gap:50px;
+
+    padding-bottom:45px;
+}
+
+
+.footer-logo{
+
+    display:flex;
+    align-items:center;
+
+    gap:8px;
+
+    color:#fff;
+
+    font-size:19px;
+    font-weight:900;
+}
+
+
+.footer-logo img{
+
+    width:34px;
+    height:38px;
+
+    object-fit:contain;
+}
+
+
+.footer-logo span{
+    color:#9d42ff;
+}
+
+
+.footer-description{
+
+    max-width:280px;
+
+    margin-top:15px;
+
+    color:#85808e;
+
+    font-size:11px;
+
+    line-height:1.6;
+}
+
+
+.footer-title{
+
+    margin-bottom:15px;
+
+    color:#fff;
+
+    font-size:12px;
+
+    font-weight:900;
+}
+
+
+.footer-links{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:9px;
+}
+
+
+.footer-links a{
+
+    color:#817b8c;
+
+    text-decoration:none;
+
+    font-size:11px;
+
+    transition:.2s;
+}
+
+.footer-links a:hover{
+    color:#b95cff;
+}
+
+
+.footer-bottom{
+
+    max-width:1200px;
+
+    margin:auto;
+
+    padding-top:22px;
+
+    border-top:
+        1px solid
+        rgba(255,255,255,.05);
+
+    display:flex;
+
+    justify-content:space-between;
+
+    color:#625d69;
+
+    font-size:10px;
+}
+
+
+/* ================= PESQUISA ================= */
+
+.search-overlay{
+
+    position:fixed;
+
+    inset:0;
+
+    z-index:99999;
+
+    display:flex;
+
+    flex-direction:column;
+
+    align-items:center;
+
+    padding-top:120px;
+
+    background:
+        rgba(5,3,13,.9);
+
+    backdrop-filter:blur(18px);
+
+    opacity:0;
+    visibility:hidden;
+
+    transition:.25s;
+}
+
+.search-overlay.active{
+
+    opacity:1;
+    visibility:visible;
+}
+
+body.light .search-overlay{
+    background:
+        rgba(245,241,250,.92);
+}
+
+
+.search-box{
+
+    width:min(700px,90%);
+
+    min-height:60px;
+
+    display:flex;
+    align-items:center;
+
+    padding:0 17px;
+
+    border:
+        1px solid
+        rgba(150,60,255,.5);
+
+    border-radius:13px;
+
+    background:#120a1f;
+}
+
+body.light .search-box{
+    background:#fff;
+}
+
+
+.search-box > i{
+
+    margin-right:12px;
+
+    color:#a744ff;
+
+    font-size:19px;
+}
+
+
+.search-box input{
+
+    flex:1;
+
+    border:0;
+    outline:0;
+
+    background:transparent;
+
+    color:#fff;
+
+    font-family:"Nunito",sans-serif;
+
+    font-size:14px;
+    font-weight:700;
+}
+
+body.light .search-box input{
+    color:#24152f;
+}
+
+
+.search-box input::placeholder{
+    color:#81798d;
+}
+
+
+.search-box button{
+
+    width:38px;
+    height:38px;
+
+    border:0;
+
+    border-radius:8px;
+
+    background:transparent;
+
+    color:#aaa5b7;
+
+    cursor:pointer;
+
+    font-size:17px;
+}
+
+
+.search-box button:hover{
+    color:#fff;
+
+    background:
+        rgba(150,60,255,.15);
+}
+
+
+.search-results{
+
+    width:min(700px,90%);
+
+    max-height:60vh;
+
+    margin-top:14px;
+
+    overflow-y:auto;
+}
+
+
+.search-result{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:4px;
+
+    padding:16px 18px;
+
+    margin-bottom:8px;
+
+    border:
+        1px solid
+        rgba(150,60,255,.17);
+
+    border-radius:11px;
+
+    background:
+        rgba(18,10,31,.9);
+
+    color:#fff;
+
+    text-decoration:none;
+
+    transition:.2s;
+}
+
+.search-result:hover{
+
+    transform:translateY(-2px);
+
+    border-color:
+        rgba(150,60,255,.5);
+}
+
+body.light .search-result{
+    background:#fff;
+    color:#24152f;
+}
+
+
+.search-result strong{
+
+    color:#b95cff;
+
+    font-size:14px;
+}
+
+
+.search-result span{
+
+    color:#938c9d;
+
+    font-size:11px;
+}
+
+
+.search-empty{
+
+    padding:22px;
+
+    border-radius:11px;
+
+    background:
+        rgba(18,10,31,.8);
+
+    color:#938c9d;
+
+    text-align:center;
+
+    font-size:12px;
+}
+
+
+/* ================= RESPONSIVO ================= */
+
+@media(max-width:1000px){
+
+    .menu{
+        gap:17px;
+    }
+
+    .products-grid{
+        grid-template-columns:1fr 1fr;
+    }
+
+    .benefits-grid{
+        grid-template-columns:1fr 1fr;
+    }
+
+    .hero-content{
+        width:60%;
+    }
+
+    .hero-visual{
+        width:50%;
+        opacity:.6;
+    }
+
+}
+
+
+@media(max-width:750px){
+
+    .header{
+        height:75px;
+        padding:0 20px;
+    }
+
+    .menu{
+        display:none;
+
+        position:absolute;
+
+        top:75px;
+        left:0;
+
+        transform:none;
+
+        width:100%;
+        height:auto;
+
+        padding:20px;
+
+        flex-direction:column;
+
+        align-items:flex-start;
+
+        gap:18px;
+
+        background:
+            rgba(5,3,13,.97);
+
+        border-top:
+            1px solid
+            rgba(150,60,255,.12);
+    }
+
+    body.light .menu{
+        background:#f5f1fa;
+    }
+
+    .menu.open{
+        display:flex;
+    }
+
+    .menu a.active::after{
+        display:none;
+    }
+
+    .mobile-menu{
+        display:flex;
+
+        align-items:center;
+        justify-content:center;
+    }
+
+    .login{
+        display:none;
+    }
+
+    .hero{
+
+        min-height:auto;
+
+        padding:
+            130px 25px
+            80px;
+
+    }
+
+    .hero-content{
+        width:100%;
+    }
+
+    .hero h1{
+        font-size:76px;
+    }
+
+    .hero-description{
+        font-size:13px;
+    }
+
+    .hero-visual{
+
+        position:relative;
+
+        right:auto;
+        top:auto;
+
+        transform:none;
+
+        width:100%;
+
+        height:350px;
+
+        margin-top:20px;
+
+        opacity:.45;
+    }
+
+    .visual-circle{
+        width:280px;
+        height:280px;
+    }
+
+    .visual-center{
+        width:130px;
+        height:130px;
+    }
+
+    .visual-center i{
+        font-size:55px;
+    }
+
+    .floating-info{
+        transform:scale(.85);
+    }
+
+    .products-section{
+        padding:
+            80px 20px
+            90px;
+    }
+
+    .products-header h2{
+        font-size:48px;
+    }
+
+    .products-grid{
+        grid-template-columns:1fr;
+    }
+
+    .benefits{
+        padding:
+            80px 20px;
+    }
+
+    .benefits-grid{
+        grid-template-columns:1fr;
+    }
+
+    .cta{
+        padding:
+            55px 25px;
+    }
+
+    .cta-inner{
+        flex-direction:column;
+
+        align-items:flex-start;
+    }
+
+    .cta h2{
+        font-size:39px;
+    }
+
+    .footer{
+        padding:
+            50px 25px
+            25px;
+    }
+
+    .footer-content{
+        grid-template-columns:1fr 1fr;
+        gap:35px;
+    }
+
+}
+
+
+@media(max-width:500px){
+
+    .header-actions{
+        gap:5px;
+    }
+
+    .search{
+        display:flex !important;
+
+        align-items:center;
+        justify-content:center;
+
+        width:36px;
+        height:36px;
+    }
+
+    .theme-button{
+        width:36px;
+        height:36px;
+    }
+
+    .mobile-menu{
+        width:36px;
+        height:36px;
+    }
+
+    .hero h1{
+        font-size:65px;
+    }
+
+    .hero-visual{
+        height:300px;
+    }
+
+    .info-one{
+        left:-5%;
+    }
+
+    .info-two{
+        right:-8%;
+    }
+
+    .info-three{
+        left:0;
+    }
+
+    .footer-content{
+        grid-template-columns:1fr;
+    }
+
+    .footer-bottom{
+        flex-direction:column;
+        gap:8px;
+    }
+
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<!-- ================= HEADER ================= -->
+
+<header class="header">
+
+    <a href="home.html" class="logo">
+
+        <img
+            src="fotos/icone uva sem fundo.png"
+            class="logo-grape"
+            alt="GrapeDev"
+        >
+
+        <span class="logo-text">
+            GrapeDev
+        </span>
+
+    </a>
+
+
+    <nav class="menu" id="menu">
+
+        <a href="home.html">
+            Início
+        </a>
+
+        <a href="projetos.html">
+            Projetos
+        </a>
+
+        <a href="sobre_nos.html">
+            Sobre nós
+        </a>
+
+        <a href="cartao.html">
+            Cartão de Visita
+        </a>
+
+        <a href="contato.html">
+            Contato
+        </a>
+
+    </nav>
+
+
+    <div class="header-actions">
+
+        <button
+            class="search"
+            id="searchButton"
+            type="button"
+            aria-label="Abrir pesquisa"
+        >
+            <i class="bi bi-search"></i>
+        </button>
+
+
+        <a
+            href="backend/authlogin.php"
+            class="login"
+        >
+            Login
+        </a>
+
+
+        <button
+            class="theme-button"
+            id="themeButton"
+            type="button"
+            aria-label="Alterar tema"
+        >
+
+            <img
+                src="fotos/icone uva sem fundo.png"
+                alt="Tema"
+            >
+
+        </button>
+
+
+        <button
+            class="mobile-menu"
+            id="mobileMenu"
+            type="button"
+            aria-label="Abrir menu"
+        >
+
+            <i class="bi bi-list"></i>
+
+        </button>
+
+    </div>
+
+</header>
+
+
+
+<!-- ================= PESQUISA ================= -->
+
+<div
+    class="search-overlay"
+    id="searchOverlay"
+>
+
+    <div class="search-box">
+
+        <i class="bi bi-search"></i>
+
+        <input
+            type="search"
+            id="searchInput"
+            placeholder="Pesquisar no site..."
+            autocomplete="off"
+        >
+
+        <button
+            type="button"
+            id="closeSearch"
+            aria-label="Fechar pesquisa"
+        >
+
+            <i class="bi bi-x-lg"></i>
+
+        </button>
+
+    </div>
+
+
+    <div
+        class="search-results"
+        id="searchResults"
+    ></div>
+
+</div>
+
+
+
+<!-- ================= HERO ================= -->
+
+<section class="hero">
+
+    <div class="hero-grid"></div>
+
+
+    <div class="hero-content">
+
+        <span class="hero-tag">
+
+            <i class="bi bi-heart-pulse-fill"></i>
+
+            BEM-ESTAR ACADEMY
+
+        </span>
+
+
+        <h1>
+
+            <span class="hero-title-white">
+                TECNOLOGIA
+            </span>
+
+            <span class="hero-title-purple">
+                PARA SUA ACADEMIA.
+            </span>
+
+        </h1>
+
+
+        <p class="hero-description">
+
+            O Bem-Estar Academy é uma plataforma moderna
+            desenvolvida para automatizar processos e melhorar
+            a administração de academias.
+
+            <br><br>
+
+            Controle alunos, matrículas, horários, pagamentos
+            e desempenho administrativo em um único ambiente.
+
+        </p>
+
+
+        <a
+            href="#produtos"
+            class="hero-button"
+        >
+
+            Conhecer soluções
+
+            <i class="bi bi-arrow-down"></i>
+
+        </a>
+
+    </div>
+
+
+    <!-- VISUAL -->
+
+    <div class="hero-visual">
+
+        <div class="visual-glow"></div>
+
+        <div class="visual-circle"></div>
+
+
+        <div class="visual-center">
+
+            <i class="bi bi-activity"></i>
+
+        </div>
+
+
+        <div class="floating-info info-one">
+
+            <span class="info-label">
+                Alunos
+            </span>
+
+            <span class="info-value">
+                +1000
+            </span>
+
+        </div>
+
+
+        <div class="floating-info info-two">
+
+            <span class="info-label">
+                Disponibilidade
+            </span>
+
+            <span class="info-value">
+                24/7
+            </span>
+
+        </div>
+
+
+        <div class="floating-info info-three">
+
+            <span class="info-label">
+                Gestão
+            </span>
+
+            <span class="info-value">
+                Inteligente
+            </span>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<!-- ================= PRODUTOS ================= -->
+
+<section
+    class="products-section"
+    id="produtos"
+>
+
+
+    <div class="products-header">
+
+        <span class="products-kicker">
+            SMART TOOLS
+        </span>
+
+        <h2>
+            RECURSOS PARA SUA ACADEMIA.
+        </h2>
+
+        <p>
+
+            Ferramentas desenvolvidas para facilitar
+            o gerenciamento completo de academias
+            e centros esportivos.
+
+        </p>
+
+    </div>
+
+
+    <div class="products-grid">
+
+
+        <!-- PRODUTO 1 -->
+
+        <article class="product-card">
+
+            <div class="product-image">
+
+                <img
+                    src="fotos/alunos.png"
+                    alt="Controle de alunos"
+                >
+
+            </div>
+
+
+            <div class="product-info">
+
+                <span class="product-number">
+                    01 / STUDENTS
+                </span>
+
+                <h3>
+                    Student Manager
+                </h3>
+
+                <p>
+                    Cadastro, acompanhamento e
+                    gestão completa de alunos.
+                </p>
+
+
+                <div class="product-bottom">
+
+                    <span class="product-price">
+                        R$ 89,90
+                    </span>
+
+                    <a
+                        href="backend/auth/login.php"
+                        class="product-buy"
+                    >
+
+                        Comprar
+
+                        <i class="bi bi-arrow-right"></i>
+
+                    </a>
+
+                </div>
+
+            </div>
+
+        </article>
+
+
+
+        <!-- PRODUTO 2 -->
+
+        <article class="product-card">
+
+            <div class="product-image">
+
+                <img
+                    src="fotos/agenda.png"
+                    alt="Agenda de academia"
+                >
+
+            </div>
+
+
+            <div class="product-info">
+
+                <span class="product-number">
+                    02 / SCHEDULE
+                </span>
+
+                <h3>
+                    Smart Schedule
+                </h3>
+
+                <p>
+                    Organização de aulas,
+                    turmas e horários.
+                </p>
+
+
+                <div class="product-bottom">
+
+                    <span class="product-price">
+                        R$ 129,90
+                    </span>
+
+                    <a
+                        href="backend/auth/login.php"
+                        class="product-buy"
+                    >
+
+                        Comprar
+
+                        <i class="bi bi-arrow-right"></i>
+
+                    </a>
+
+                </div>
+
+            </div>
+
+        </article>
+
+
+
+        <!-- PRODUTO 3 -->
+
+        <article class="product-card">
+
+            <div class="product-image">
+
+                <img
+                    src="fotos/dashboardgym.png"
+                    alt="Dashboard de academia"
+                >
+
+            </div>
+
+
+            <div class="product-info">
+
+                <span class="product-number">
+                    03 / DASHBOARD
+                </span>
+
+                <h3>
+                    Gym Dashboard
+                </h3>
+
+                <p>
+                    Painel completo para análises
+                    administrativas.
+                </p>
+
+
+                <div class="product-bottom">
+
+                    <span class="product-price">
+                        R$ 99,90
+                    </span>
+
+                    <a
+                        href="backend/auth/login.php"
+                        class="product-buy"
+                    >
+
+                        Comprar
+
+                        <i class="bi bi-arrow-right"></i>
+
+                    </a>
+
+                </div>
+
+            </div>
+
+        </article>
+
+
+    </div>
+
+</section>
+
+
+
+<!-- ================= BENEFÍCIOS ================= -->
+
+<section class="benefits">
+
+    <div class="benefits-header">
+
+        <span>
+            BEM-ESTAR ACADEMY
+        </span>
+
+        <h2>
+            TUDO EM UM SÓ LUGAR.
+        </h2>
+
+    </div>
+
+
+    <div class="benefits-grid">
+
+
+        <div class="benefit">
+
+            <div class="benefit-icon">
+
+                <i class="bi bi-people-fill"></i>
+
+            </div>
+
+            <h3>
+                Gestão de alunos
+            </h3>
+
+            <p>
+                Centralize cadastros, matrículas
+                e informações dos alunos.
+            </p>
+
+        </div>
+
+
+        <div class="benefit">
+
+            <div class="benefit-icon">
+
+                <i class="bi bi-calendar-check"></i>
+
+            </div>
+
+            <h3>
+                Organização
+            </h3>
+
+            <p>
+                Organize aulas, horários e turmas
+                de forma simples.
+            </p>
+
+        </div>
+
+
+        <div class="benefit">
+
+            <div class="benefit-icon">
+
+                <i class="bi bi-graph-up-arrow"></i>
+
+            </div>
+
+            <h3>
+                Indicadores
+            </h3>
+
+            <p>
+                Acompanhe informações administrativas
+                através de relatórios.
+            </p>
+
+        </div>
+
+
+    </div>
+
+</section>
+
+
+
+<!-- ================= CTA ================= -->
+
+<section class="cta">
+
+    <div class="cta-inner">
+
+        <div>
+
+            <h2>
+                TRANSFORME A GESTÃO
+                <span>DA SUA ACADEMIA.</span>
+            </h2>
+
+            <p>
+                Conheça as soluções Bem-Estar Academy.
+            </p>
+
+        </div>
+
+
+        <a
+            href="contato.html"
+            class="cta-button"
+        >
+
+            Falar com a GrapeDev
+
+            <i class="bi bi-arrow-right"></i>
+
+        </a>
+
+    </div>
+
+</section>
+
+
+
+<!-- ================= FOOTER ================= -->
+
+<footer class="footer">
+
+    <div class="footer-content">
+
+
+        <div>
+
+            <div class="footer-logo">
+
+                <img
+                    src="fotos/icone uva sem fundo.png"
+                    alt="GrapeDev"
+                >
+
+                GrapeDev
+
+                <span>
+                    BR
+                </span>
+
+            </div>
+
+
+            <p class="footer-description">
+
+                Desenvolvendo soluções inteligentes
+                para transformar ideias em tecnologia real.
+
+            </p>
+
+        </div>
+
+
+        <div>
+
+            <h3 class="footer-title">
+                Links rápidos
+            </h3>
+
+
+            <div class="footer-links">
+
+                <a href="home.html">
+                    Início
+                </a>
+
+                <a href="projetos.html">
+                    Projetos
+                </a>
+
+                <a href="sobre_nos.html">
+                    Sobre nós
+                </a>
+
+                <a href="cartao.html">
+                    Cartão de Visita
+                </a>
+
+                <a href="contato.html">
+                    Contato
+                </a>
+
+            </div>
+
+        </div>
+
+
+        <div>
+
+            <h3 class="footer-title">
+                Bem-Estar
+            </h3>
+
+
+            <div class="footer-links">
+
+                <a href="#produtos">
+                    Produtos
+                </a>
+
+                <a href="#produtos">
+                    Student Manager
+                </a>
+
+                <a href="#produtos">
+                    Smart Schedule
+                </a>
+
+                <a href="#produtos">
+                    Gym Dashboard
+                </a>
+
+            </div>
+
+        </div>
+
+
+        <div>
+
+            <h3 class="footer-title">
+                GrapeDev
+            </h3>
+
+
+            <div class="footer-links">
+
+                <a href="backend/auth/login.php">
+                    Login
+                </a>
+
+                <a href="contato.html">
+                    Entre em contato
+                </a>
+
+                <a href="projetos.html">
+                    Outros projetos
+                </a>
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+    <div class="footer-bottom">
+
+        <span>
+            © 2026 GrapeDev. Todos os direitos reservados.
+        </span>
+
+        <span>
+            Bem-Estar Academy
+        </span>
+
+    </div>
+
+</footer>
+
+
+
+<script>
+
+/* ================= TEMA ================= */
+
+(function(){
+
+    const themeButton =
+        document.getElementById("themeButton");
+
+
+    if(!themeButton){
+        return;
+    }
+
+
+    const temaSalvo =
+        localStorage.getItem("grapedev-theme");
+
+
+    if(temaSalvo === "light"){
+
+        document.body.classList.add("light");
+
+    }
+
+
+    themeButton.addEventListener(
+        "click",
+        function(){
+
+            document.body.classList.toggle("light");
+
+
+            if(
+                document.body.classList.contains("light")
+            ){
+
+                localStorage.setItem(
+                    "grapedev-theme",
+                    "light"
+                );
+
+            }else{
+
+                localStorage.setItem(
+                    "grapedev-theme",
+                    "dark"
+                );
+
+            }
+
+        }
+    );
+
+})();
+
+
+
+/* ================= MENU MOBILE ================= */
+
+(function(){
+
+    const mobileMenu =
+        document.getElementById("mobileMenu");
+
+    const menu =
+        document.getElementById("menu");
+
+
+    if(!mobileMenu || !menu){
+        return;
+    }
+
+
+    mobileMenu.addEventListener(
+        "click",
+        function(){
+
+            menu.classList.toggle("open");
+
+
+            const icon =
+                mobileMenu.querySelector("i");
+
+
+            if(
+                menu.classList.contains("open")
+            ){
+
+                icon.className =
+                    "bi bi-x-lg";
+
+            }else{
+
+                icon.className =
+                    "bi bi-list";
+
+            }
+
+        }
+    );
+
+
+    menu.querySelectorAll("a").forEach(
+        function(link){
+
+            link.addEventListener(
+                "click",
+                function(){
+
+                    menu.classList.remove("open");
+
+                    const icon =
+                        mobileMenu.querySelector("i");
+
+                    icon.className =
+                        "bi bi-list";
+
+                }
+            );
+
+        }
+    );
+
+})();
+
+
+
+/* ================= PESQUISA ================= */
+
+(function(){
+
+    const searchButton =
+        document.getElementById("searchButton");
+
+    const searchOverlay =
+        document.getElementById("searchOverlay");
+
+    const searchInput =
+        document.getElementById("searchInput");
+
+    const closeSearch =
+        document.getElementById("closeSearch");
+
+    const searchResults =
+        document.getElementById("searchResults");
+
+
+    if(
+        !searchButton ||
+        !searchOverlay ||
+        !searchInput ||
+        !closeSearch ||
+        !searchResults
+    ){
+
+        return;
+
+    }
+
+
+    const paginas = [
+
+        {
+            titulo:"Início",
+            descricao:
+                "Conheça a GrapeDev e nossas soluções digitais.",
+            link:"home.html"
+        },
+
+        {
+            titulo:"Projetos",
+            descricao:
+                "Conheça os projetos desenvolvidos pela GrapeDev.",
+            link:"projetos.html"
+        },
+
+        {
+            titulo:"AquaFlow",
+            descricao:
+                "Sistema inteligente de monitoramento e controle de água.",
+            link:"aquaflow.html"
+        },
+
+        {
+            titulo:"Bem-Estar Academy",
+            descricao:
+                "Plataforma inteligente para gestão de academias.",
+            link:"produtosbemestar.html"
+        },
+
+        {
+            titulo:"Student Manager",
+            descricao:
+                "Controle de alunos e matrículas.",
+            link:"#produtos"
+        },
+
+        {
+            titulo:"Smart Schedule",
+            descricao:
+                "Organização de aulas, turmas e horários.",
+            link:"#produtos"
+        },
+
+        {
+            titulo:"Gym Dashboard",
+            descricao:
+                "Painel para análises administrativas.",
+            link:"#produtos"
+        },
+
+        {
+            titulo:"Sobre nós",
+            descricao:
+                "Conheça a equipe e a história da GrapeDev.",
+            link:"sobre_nos.html"
+        },
+
+        {
+            titulo:"Cartão de Visita",
+            descricao:
+                "Conheça o cartão digital da GrapeDev.",
+            link:"cartao.html"
+        },
+
+        {
+            titulo:"Contato",
+            descricao:
+                "Entre em contato com a equipe GrapeDev.",
+            link:"contato.html"
+        },
+
+        {
+            titulo:"Dashboard",
+            descricao:
+                "Acesse o painel do AquaFlow.",
+            link:"dashboard.php"
+        }
+
+    ];
+
+
+    function mostrarResultados(){
+
+        const termo =
+            searchInput.value
+                .trim()
+                .toLowerCase();
+
+
+        if(termo === ""){
+
+            searchResults.innerHTML =
+                '<div class="search-empty">' +
+                'Digite algo para pesquisar no site.' +
+                '</div>';
+
+            return;
+
+        }
+
+
+        const encontrados =
+            paginas.filter(
+                function(pagina){
+
+                    return (
+
+                        pagina.titulo
+                            .toLowerCase()
+                            .includes(termo)
+
+                        ||
+
+                        pagina.descricao
+                            .toLowerCase()
+                            .includes(termo)
+
+                    );
+
+                }
+            );
+
+
+        if(encontrados.length === 0){
+
+            searchResults.innerHTML =
+                '<div class="search-empty">' +
+                'Nenhum resultado encontrado.' +
+                '</div>';
+
+            return;
+
+        }
+
+
+        searchResults.innerHTML = "";
+
+
+        encontrados.forEach(
+            function(pagina){
+
+                const link =
+                    document.createElement("a");
+
+                link.className =
+                    "search-result";
+
+                link.href =
+                    pagina.link;
+
+
+                const titulo =
+                    document.createElement("strong");
+
+                titulo.textContent =
+                    pagina.titulo;
+
+
+                const descricao =
+                    document.createElement("span");
+
+                descricao.textContent =
+                    pagina.descricao;
+
+
+                link.appendChild(titulo);
+
+                link.appendChild(descricao);
+
+                searchResults.appendChild(link);
+
+            }
+        );
+
+    }
+
+
+    function abrirPesquisa(){
+
+        searchOverlay.classList.add("active");
+
+        document.body.style.overflow =
+            "hidden";
+
+        searchInput.value = "";
+
+        mostrarResultados();
+
+
+        setTimeout(
+            function(){
+
+                searchInput.focus();
+
+            },
+            100
+        );
+
+    }
+
+
+    function fecharPesquisa(){
+
+        searchOverlay.classList.remove("active");
+
+        document.body.style.overflow = "";
+
+        searchInput.value = "";
+
+        searchResults.innerHTML = "";
+
+    }
+
+
+    searchButton.addEventListener(
+        "click",
+        abrirPesquisa
+    );
+
+
+    closeSearch.addEventListener(
+        "click",
+        fecharPesquisa
+    );
+
+
+    searchInput.addEventListener(
+        "input",
+        mostrarResultados
+    );
+
+
+    searchOverlay.addEventListener(
+        "click",
+        function(event){
+
+            if(
+                event.target === searchOverlay
+            ){
+
+                fecharPesquisa();
+
+            }
+
+        }
+    );
+
+
+    document.addEventListener(
+        "keydown",
+        function(event){
+
+            if(
+                event.key === "Escape" &&
+                searchOverlay.classList.contains("active")
+            ){
+
+                fecharPesquisa();
+
+            }
+
+        }
+    );
+
+})();
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,18 @@
+CREATE TABLE IF NOT EXISTS nex_memoria (
+
+    id INT AUTO_INCREMENT PRIMARY KEY,
+
+    chave VARCHAR(100)
+        NOT NULL UNIQUE,
+
+    valor TEXT
+        NOT NULL,
+
+    criado_em TIMESTAMP
+        DEFAULT CURRENT_TIMESTAMP,
+
+    atualizado_em TIMESTAMP
+        DEFAULT CURRENT_TIMESTAMP
+        ON UPDATE CURRENT_TIMESTAMP
+
+);

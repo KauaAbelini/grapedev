@@ -1,0 +1,1378 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>AquaFlow | GrapeDev</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+
+  <link
+      rel="stylesheet"
+      href="/grapedev/nex/assets/nex-jarvis.css"
+  >
+
+  <script
+      src="/grapedev/nex/assets/nex-jarvis.js"
+      defer
+  ></script>
+
+  <style>
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    :root {
+      --bg: #020817;
+      --bg-secondary: #071225;
+      --text: #ffffff;
+      --text-secondary: #c5ccda;
+      --muted: #8e99aa;
+      --border: rgba(52, 124, 255, 0.32);
+
+      --purple: #a237ff;
+      --purple-light: #c976ff;
+      --blue: #4388ff;
+      --blue-light: #63a0ff;
+
+      --header-bg: rgba(2, 8, 23, 0.72);
+
+      --grid: rgba(22, 119, 255, 0.055);
+      --shadow: rgba(69, 52, 255, 0.20);
+    }
+
+    body.light {
+      --bg: #f3f6fc;
+      --bg-secondary: #ffffff;
+      --text: #101828;
+      --text-secondary: #4e5b70;
+      --muted: #667085;
+      --border: rgba(76, 106, 180, 0.25);
+
+      --purple: #7528d9;
+      --purple-light: #7d35d6;
+      --blue: #2563eb;
+      --blue-light: #3478ff;
+
+      --header-bg: rgba(243, 246, 252, 0.78);
+
+      --grid: rgba(37, 99, 235, 0.045);
+      --shadow: rgba(37, 99, 235, 0.12);
+    }
+
+    body {
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Nunito", sans-serif;
+      overflow-x: hidden;
+      transition:
+        background 0.35s ease,
+        color 0.35s ease;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+
+      pointer-events: none;
+
+      opacity: 1;
+
+      background-image:
+        linear-gradient(var(--grid) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+
+      background-size: 70px 70px;
+
+      z-index: -2;
+    }
+
+    body::after {
+      content: "";
+      position: fixed;
+      width: 600px;
+      height: 600px;
+
+      top: 10%;
+      right: -250px;
+
+      background: radial-gradient(
+        circle,
+        rgba(75, 37, 255, 0.10),
+        transparent 70%
+      );
+
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    button,
+    input {
+      font-family: inherit;
+    }
+
+    /* =========================
+       HEADER
+    ========================= */
+
+    header {
+      width: 92%;
+      max-width: 1400px;
+      height: 78px;
+
+      margin: auto;
+
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      border-bottom: 1px solid var(--border);
+
+      position: relative;
+      z-index: 100;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+
+      font-size: 21px;
+      font-weight: 800;
+
+      white-space: nowrap;
+    }
+
+    .brand img {
+      width: 34px;
+      height: 34px;
+
+      object-fit: contain;
+
+      filter:
+        drop-shadow(0 0 10px rgba(160, 55, 255, 0.7));
+
+      transition: 0.3s ease;
+    }
+
+    .brand:hover img {
+      transform: rotate(-8deg) scale(1.06);
+    }
+
+    .brand b {
+      color: var(--purple-light);
+    }
+
+    nav {
+      display: flex;
+      align-items: center;
+      gap: 40px;
+    }
+
+    nav a {
+      position: relative;
+
+      color: var(--text-secondary);
+
+      font-size: 11px;
+      font-weight: 800;
+
+      letter-spacing: 0.10em;
+
+      transition: 0.25s ease;
+    }
+
+    nav a::after {
+      content: "";
+
+      position: absolute;
+
+      left: 0;
+      bottom: -9px;
+
+      width: 0;
+      height: 2px;
+
+      background: linear-gradient(
+        90deg,
+        var(--purple),
+        var(--blue)
+      );
+
+      transition: width 0.25s ease;
+    }
+
+    nav a:hover,
+    nav a.active {
+      color: var(--text);
+    }
+
+    nav a:hover::after,
+    nav a.active::after {
+      width: 100%;
+    }
+
+    .actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    /* LOGIN */
+
+    .login {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+
+      padding: 9px 17px;
+
+      border: 1px solid var(--purple);
+      border-radius: 22px;
+
+      color: var(--text);
+
+      font-size: 11px;
+      font-weight: 800;
+
+      transition: 0.25s ease;
+    }
+
+    .login i {
+      font-size: 14px;
+      color: var(--purple-light);
+    }
+
+    .login:hover {
+      background: rgba(162, 55, 255, 0.12);
+      box-shadow: 0 0 20px rgba(162, 55, 255, 0.18);
+      transform: translateY(-1px);
+    }
+
+    /* SEARCH BUTTON */
+
+    .search-btn {
+      width: 40px;
+      height: 36px;
+
+      display: grid;
+      place-items: center;
+
+      border: 1px solid var(--purple);
+      border-radius: 20px;
+
+      background: transparent;
+      color: var(--text);
+
+      cursor: pointer;
+
+      transition: 0.25s ease;
+    }
+
+    .search-btn i {
+      font-size: 17px;
+    }
+
+    .search-btn:hover {
+      background: rgba(162, 55, 255, 0.12);
+      box-shadow: 0 0 18px rgba(162, 55, 255, 0.20);
+    }
+
+    /* THEME */
+
+    .theme-btn {
+      width: 55px;
+      height: 28px;
+
+      border: 1px solid var(--purple);
+      border-radius: 20px;
+
+      background: rgba(13, 21, 48, 0.65);
+
+      position: relative;
+
+      cursor: pointer;
+
+      overflow: hidden;
+
+      transition: 0.3s ease;
+    }
+
+    body.light .theme-btn {
+      background: rgba(255, 255, 255, 0.8);
+    }
+
+    .theme-btn img {
+      position: absolute;
+
+      width: 20px;
+      height: 20px;
+
+      left: 4px;
+      top: 3px;
+
+      object-fit: contain;
+
+      filter:
+        drop-shadow(0 0 7px rgba(178, 61, 255, 0.8));
+
+      transition:
+        transform 0.35s ease,
+        left 0.35s ease;
+    }
+
+    body.light .theme-btn img {
+      left: 30px;
+      transform: rotate(180deg);
+    }
+
+    /* SEARCH BOX */
+
+    .search-box {
+      position: absolute;
+
+      top: 88px;
+      right: 0;
+
+      width: 330px;
+
+      padding: 12px;
+
+      background: var(--bg-secondary);
+
+      border: 1px solid var(--border);
+      border-radius: 14px;
+
+      box-shadow:
+        0 15px 45px rgba(0, 0, 0, 0.25),
+        0 0 30px var(--shadow);
+
+      display: none;
+
+      z-index: 200;
+
+      animation: searchOpen 0.25s ease;
+    }
+
+    .search-box.active {
+      display: flex;
+    }
+
+    @keyframes searchOpen {
+      from {
+        opacity: 0;
+        transform: translateY(-8px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .search-input-area {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+
+      width: 100%;
+    }
+
+    .search-input-area i {
+      color: var(--purple-light);
+      font-size: 17px;
+    }
+
+    .search-input {
+      width: 100%;
+
+      border: 0;
+      outline: 0;
+
+      background: transparent;
+
+      color: var(--text);
+
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .search-input::placeholder {
+      color: var(--muted);
+    }
+
+    .search-close {
+      width: 30px;
+      height: 30px;
+
+      display: grid;
+      place-items: center;
+
+      border: 0;
+      background: transparent;
+
+      color: var(--muted);
+
+      cursor: pointer;
+    }
+
+    .search-close:hover {
+      color: var(--text);
+    }
+
+    .search-result {
+      margin-top: 10px;
+
+      font-size: 12px;
+      color: var(--muted);
+
+      display: none;
+    }
+
+    /* MOBILE */
+
+    .menu-btn {
+      display: none;
+
+      width: 40px;
+      height: 36px;
+
+      border: 1px solid var(--purple);
+      border-radius: 10px;
+
+      background: transparent;
+
+      color: var(--text);
+
+      cursor: pointer;
+    }
+
+    .mobile-menu {
+      display: none;
+
+      position: absolute;
+
+      top: 78px;
+      left: 0;
+
+      width: 100%;
+
+      padding: 20px;
+
+      background: var(--bg-secondary);
+
+      border-bottom: 1px solid var(--border);
+
+      flex-direction: column;
+      gap: 18px;
+
+      z-index: 90;
+    }
+
+    .mobile-menu.active {
+      display: flex;
+    }
+
+    .mobile-menu a {
+      font-size: 13px;
+      font-weight: 800;
+
+      color: var(--text-secondary);
+    }
+
+    /* =========================
+       MAIN
+    ========================= */
+
+    main {
+      width: 92%;
+      max-width: 1400px;
+
+      margin: auto;
+    }
+
+    .hero {
+      min-height: calc(100vh - 78px);
+
+      display: grid;
+
+      grid-template-columns: 40% 60%;
+
+      align-items: center;
+
+      position: relative;
+    }
+
+    .copy {
+      position: relative;
+      z-index: 3;
+
+      padding-right: 20px;
+    }
+
+    .tag {
+      display: inline-block;
+
+      padding: 9px 22px;
+
+      border: 1px solid var(--purple);
+
+      border-radius: 30px;
+
+      color: var(--purple-light);
+
+      font-size: 11px;
+      font-weight: 900;
+
+      letter-spacing: 0.08em;
+
+      margin-bottom: 23px;
+
+      background: rgba(162, 55, 255, 0.035);
+    }
+
+    .copy h1 {
+      margin-bottom: 20px;
+
+      font-family: "Bebas Neue", sans-serif;
+
+      font-size: clamp(72px, 7.5vw, 112px);
+
+      font-weight: 400;
+
+      line-height: 0.8;
+
+      letter-spacing: 0.01em;
+    }
+
+    .aqua {
+      color: var(--text);
+    }
+
+    .flow {
+      background: linear-gradient(
+        100deg,
+        #e1a4ff,
+        #8e27ff 48%,
+        #4388ff
+      );
+
+      -webkit-background-clip: text;
+      background-clip: text;
+
+      color: transparent;
+    }
+
+    .sub {
+      margin-bottom: 25px;
+
+      color: var(--text);
+
+      font-size: 12px;
+
+      font-weight: 900;
+
+      letter-spacing: 0.15em;
+    }
+
+    .desc {
+      max-width: 510px;
+
+      margin-bottom: 32px;
+
+      color: var(--text-secondary);
+
+      font-size: 14px;
+
+      font-weight: 600;
+
+      line-height: 1.7;
+    }
+
+    .cta {
+      display: inline-flex;
+
+      align-items: center;
+      gap: 20px;
+
+      padding: 14px 25px;
+
+      border: 1px solid var(--purple);
+
+      border-radius: 12px;
+
+      color: var(--purple-light);
+
+      font-size: 12px;
+
+      font-weight: 900;
+
+      box-shadow:
+        0 0 22px rgba(141, 47, 255, 0.10);
+
+      transition: 0.25s ease;
+    }
+
+    .cta b {
+      font-size: 20px;
+      font-weight: 400;
+    }
+
+    .cta:hover {
+      transform: translateY(-2px);
+
+      background: rgba(162, 55, 255, 0.08);
+
+      box-shadow:
+        0 0 30px rgba(141, 47, 255, 0.20);
+    }
+
+    /* =========================
+       VISUAL
+    ========================= */
+
+    .visual {
+      height: 650px;
+
+      position: relative;
+
+      overflow: hidden;
+
+      border-radius: 0;
+    }
+
+    .visual::after {
+      content: "";
+
+      position: absolute;
+
+      inset: 0;
+
+      background:
+        linear-gradient(
+          90deg,
+          var(--bg) 0%,
+          transparent 25%
+        );
+
+      pointer-events: none;
+
+      transition: 0.35s ease;
+    }
+
+    body.light .visual::after {
+      background:
+        linear-gradient(
+          90deg,
+          var(--bg) 0%,
+          transparent 22%
+        );
+    }
+
+    .visual img {
+      width: 100%;
+      height: 100%;
+
+      display: block;
+
+      object-fit: cover;
+      object-position: center;
+
+      transition: transform 0.6s ease;
+    }
+
+    .visual:hover img {
+      transform: scale(1.015);
+    }
+
+    /* =========================
+       SEARCH HIGHLIGHT
+    ========================= */
+
+    .search-highlight {
+      animation: highlightFound 1.2s ease;
+    }
+
+    @keyframes highlightFound {
+      0% {
+        text-shadow:
+          0 0 0 transparent;
+      }
+
+      30% {
+        text-shadow:
+          0 0 15px var(--purple),
+          0 0 30px var(--blue);
+      }
+
+      100% {
+        text-shadow:
+          0 0 0 transparent;
+      }
+    }
+
+    /* =========================
+       RESPONSIVE
+    ========================= */
+
+    @media (max-width: 1000px) {
+
+      nav {
+        gap: 22px;
+      }
+
+      .hero {
+        grid-template-columns: 45% 55%;
+      }
+
+      .visual {
+        height: 560px;
+      }
+
+    }
+
+    @media (max-width: 850px) {
+
+      header {
+        height: 70px;
+      }
+
+      nav {
+        display: none;
+      }
+
+      .menu-btn {
+        display: grid;
+        place-items: center;
+      }
+
+      .login,
+      .search-btn {
+        display: none;
+      }
+
+      .hero {
+        grid-template-columns: 1fr;
+
+        padding: 70px 0 50px;
+      }
+
+      .copy {
+        padding-right: 0;
+      }
+
+      .visual {
+        height: 480px;
+
+        margin-top: 35px;
+      }
+
+      .visual::after {
+        background:
+          linear-gradient(
+            180deg,
+            var(--bg) 0%,
+            transparent 20%
+          );
+      }
+
+      body.light .visual::after {
+        background:
+          linear-gradient(
+            180deg,
+            var(--bg) 0%,
+            transparent 20%
+          );
+      }
+
+    }
+
+    @media (max-width: 560px) {
+
+      header {
+        width: 90%;
+      }
+
+      .brand {
+        font-size: 19px;
+      }
+
+      .brand img {
+        width: 31px;
+        height: 31px;
+      }
+
+      .theme-btn {
+        width: 51px;
+      }
+
+      .hero {
+        padding-top: 50px;
+      }
+
+      .copy h1 {
+        font-size: 72px;
+      }
+
+      .tag {
+        font-size: 9px;
+        padding: 8px 17px;
+      }
+
+      .sub {
+        font-size: 9px;
+        letter-spacing: 0.12em;
+      }
+
+      .desc {
+        font-size: 13px;
+      }
+
+      .visual {
+        height: 360px;
+      }
+
+      .search-box {
+        width: calc(100vw - 40px);
+
+        right: 50%;
+        transform: translateX(50%);
+      }
+
+      .search-box.active {
+        animation: searchMobile 0.25s ease;
+      }
+
+      @keyframes searchMobile {
+        from {
+          opacity: 0;
+          transform: translate(50%, -8px);
+        }
+
+        to {
+          opacity: 1;
+          transform: translate(50%, 0);
+        }
+      }
+
+    }
+
+  </style>
+</head>
+
+<body>
+
+  <header>
+
+    <a href="home.html" class="brand">
+      <img
+        src="../../storage/images/icone_uva_sem_fundo.png"
+        alt="GrapeDev"
+      >
+
+      <span>
+        Grape<b>Dev</b>
+      </span>
+    </a>
+
+    <nav>
+
+      <a href="home.html">
+        INÍCIO
+      </a>
+
+      <a href="sobre_nos.html">
+        SOBRE NÓS
+      </a>
+
+      <a
+        href="projetos.html"
+        class="active"
+      >
+        PROJETOS
+      </a>
+
+      <a href="contato.html">
+        CONTATO
+      </a>
+
+    </nav>
+
+    <div class="actions">
+
+      <button
+        class="search-btn"
+        id="searchButton"
+        aria-label="Pesquisar"
+        title="Pesquisar"
+      >
+        <i class="bi bi-search"></i>
+      </button>
+
+      <a
+        href="backend/auth/login.php"
+        class="login"
+      >
+        <i class="bi bi-person"></i>
+        LOGIN
+      </a>
+
+      <button
+        class="theme-btn"
+        id="themeButton"
+        aria-label="Alternar tema"
+        title="Alternar modo claro/escuro"
+      >
+        <img
+          src="../../storage/images/icone_uva_sem_fundo.png"
+          alt=""
+        >
+      </button>
+
+      <button
+        class="menu-btn"
+        id="menuButton"
+        aria-label="Abrir menu"
+      >
+        <i class="bi bi-list"></i>
+      </button>
+
+    </div>
+
+    <div
+      class="search-box"
+      id="searchBox"
+    >
+
+      <div class="search-input-area">
+
+        <i class="bi bi-search"></i>
+
+        <input
+          type="text"
+          id="searchInput"
+          class="search-input"
+          placeholder="Pesquisar nesta página..."
+          autocomplete="off"
+        >
+
+        <button
+          class="search-close"
+          id="searchClose"
+          aria-label="Fechar pesquisa"
+        >
+          <i class="bi bi-x-lg"></i>
+        </button>
+
+      </div>
+
+      <div
+        class="search-result"
+        id="searchResult"
+      ></div>
+
+    </div>
+
+    <div
+      class="mobile-menu"
+      id="mobileMenu"
+    >
+
+      <a href="home.html">
+        INÍCIO
+      </a>
+
+      <a href="sobre_nos.html">
+        SOBRE NÓS
+      </a>
+
+      <a href="projetos.html">
+        PROJETOS
+      </a>
+
+      <a href="contato.html">
+        CONTATO
+      </a>
+
+      <a href="backend/auth/login.php">
+        LOGIN
+      </a>
+
+    </div>
+
+  </header>
+
+
+  <main>
+
+    <section class="hero">
+
+      <div class="copy">
+
+        <span class="tag">
+          PROJETO EM DESTAQUE
+        </span>
+
+        <h1 id="aquaTitle">
+          <span class="aqua">
+            Aqua
+          </span>
+
+          <span class="flow">
+            Flow
+          </span>
+        </h1>
+
+        <div class="sub">
+          CONTROLE TOTAL DO SISTEMA DE ÁGUA
+        </div>
+
+        <p class="desc">
+          O AquaFlow é um sistema inteligente que monitora
+          e controla o abastecimento de água em tempo real,
+          utilizando IoT e tecnologia de ponta.
+        </p>
+
+        <a
+          class="cta"
+          href="produtosaquaflow.html"
+        >
+          Ver mais detalhes
+
+          <b>
+            →
+          </b>
+        </a>
+
+      </div>
+
+
+      <div class="visual">
+
+        <img
+          src="../../storage/images/aquaflow_capa_projetos.png"
+          alt="Sistema AquaFlow"
+        >
+
+      </div>
+
+    </section>
+
+  </main>
+
+
+  <script>
+
+    /* =========================
+       MODO ESCURO / CLARO
+    ========================= */
+
+    const themeButton =
+      document.getElementById("themeButton");
+
+    const savedTheme =
+      localStorage.getItem("grapedev-theme");
+
+    if (savedTheme === "light") {
+      document.body.classList.add("light");
+    }
+
+    themeButton.addEventListener("click", () => {
+
+      document.body.classList.toggle("light");
+
+      const isLight =
+        document.body.classList.contains("light");
+
+      localStorage.setItem(
+        "grapedev-theme",
+        isLight ? "light" : "dark"
+      );
+
+    });
+
+
+    /* =========================
+       PESQUISA
+    ========================= */
+
+    const searchButton =
+      document.getElementById("searchButton");
+
+    const searchBox =
+      document.getElementById("searchBox");
+
+    const searchInput =
+      document.getElementById("searchInput");
+
+    const searchClose =
+      document.getElementById("searchClose");
+
+    const searchResult =
+      document.getElementById("searchResult");
+
+
+    function openSearch() {
+
+      searchBox.classList.add("active");
+
+      setTimeout(() => {
+        searchInput.focus();
+      }, 100);
+
+    }
+
+
+    function closeSearch() {
+
+      searchBox.classList.remove("active");
+
+      searchInput.value = "";
+
+      searchResult.style.display = "none";
+
+      searchResult.textContent = "";
+
+    }
+
+
+    searchButton.addEventListener(
+      "click",
+      (event) => {
+
+        event.stopPropagation();
+
+        if (
+          searchBox.classList.contains("active")
+        ) {
+          closeSearch();
+        } else {
+          openSearch();
+        }
+
+      }
+    );
+
+
+    searchClose.addEventListener(
+      "click",
+      closeSearch
+    );
+
+
+    /* FECHAR CLICANDO FORA */
+
+    document.addEventListener(
+      "click",
+      (event) => {
+
+        if (
+          searchBox.classList.contains("active") &&
+          !searchBox.contains(event.target) &&
+          !searchButton.contains(event.target)
+        ) {
+
+          closeSearch();
+
+        }
+
+      }
+    );
+
+
+    /* =========================
+       FUNÇÃO DE PESQUISA
+    ========================= */
+
+    function performSearch() {
+
+      const term =
+        searchInput.value
+          .trim()
+          .toLowerCase();
+
+      if (!term) {
+
+        searchResult.style.display = "none";
+
+        return;
+
+      }
+
+
+      const elements =
+        document.querySelectorAll(
+          "main h1, main h2, main h3, main p, main span, main a"
+        );
+
+
+      let found = null;
+
+
+      for (const element of elements) {
+
+        if (
+          element.textContent
+            .toLowerCase()
+            .includes(term)
+        ) {
+
+          found = element;
+
+          break;
+
+        }
+
+      }
+
+
+      if (found) {
+
+        searchResult.textContent =
+          "Resultado encontrado.";
+
+        searchResult.style.display =
+          "block";
+
+        found.scrollIntoView({
+          behavior: "smooth",
+          block: "center"
+        });
+
+
+        found.classList.remove(
+          "search-highlight"
+        );
+
+
+        void found.offsetWidth;
+
+
+        found.classList.add(
+          "search-highlight"
+        );
+
+      } else {
+
+        searchResult.textContent =
+          "Nenhum resultado encontrado.";
+
+        searchResult.style.display =
+          "block";
+
+      }
+
+    }
+
+
+    searchInput.addEventListener(
+      "keydown",
+      (event) => {
+
+        if (event.key === "Enter") {
+
+          event.preventDefault();
+
+          performSearch();
+
+        }
+
+
+        if (event.key === "Escape") {
+
+          closeSearch();
+
+        }
+
+      }
+    );
+
+
+    /* =========================
+       MENU MOBILE
+    ========================= */
+
+    const menuButton =
+      document.getElementById("menuButton");
+
+    const mobileMenu =
+      document.getElementById("mobileMenu");
+
+
+    menuButton.addEventListener(
+      "click",
+      () => {
+
+        mobileMenu.classList.toggle("active");
+
+        const icon =
+          menuButton.querySelector("i");
+
+        if (
+          mobileMenu.classList.contains("active")
+        ) {
+
+          icon.className =
+            "bi bi-x-lg";
+
+        } else {
+
+          icon.className =
+            "bi bi-list";
+
+        }
+
+      }
+    );
+
+
+    /* FECHAR MENU AO CLICAR */
+
+    mobileMenu
+      .querySelectorAll("a")
+      .forEach((link) => {
+
+        link.addEventListener(
+          "click",
+          () => {
+
+            mobileMenu.classList.remove(
+              "active"
+            );
+
+            menuButton
+              .querySelector("i")
+              .className =
+              "bi bi-list";
+
+          }
+        );
+
+      });
+
+
+  </script>
+
+</body>
+</html>

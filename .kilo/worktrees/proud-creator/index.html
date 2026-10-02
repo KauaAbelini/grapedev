@@ -1,0 +1,1836 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>GrapeDev</title>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;600;700;800&display=swap');
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+html,
+body{
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    background:#030107;
+}
+
+body{
+    font-family:Nunito,Arial,sans-serif;
+    color:white;
+}
+
+/* =========================================================
+   INTRO
+========================================================= */
+
+#intro{
+    position:fixed;
+    inset:0;
+    z-index:999999;
+    overflow:hidden;
+
+    background:
+        radial-gradient(
+            circle at 50% 45%,
+            rgba(115,42,235,.20),
+            transparent 22%
+        ),
+        radial-gradient(
+            circle at 50% 52%,
+            rgba(61,29,102,.30),
+            transparent 55%
+        ),
+        #030107;
+
+    transition:
+        opacity .35s ease,
+        transform .35s ease;
+}
+
+#intro.saindo{
+    opacity:0;
+    transform:scale(1.015);
+    pointer-events:none;
+}
+
+#particles{
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+}
+
+/* =========================================================
+   MARCA
+========================================================= */
+
+.brand{
+    position:absolute;
+    top:28px;
+    left:34px;
+    z-index:50;
+
+    font-size:17px;
+    font-weight:800;
+    letter-spacing:4px;
+}
+
+.brand span{
+    color:#a45aff;
+}
+
+.version{
+    position:absolute;
+    top:31px;
+    right:34px;
+    z-index:50;
+
+    color:#9474aa;
+    font-size:9px;
+    letter-spacing:3px;
+}
+
+/* =========================================================
+   PALCO
+========================================================= */
+
+.stage{
+    position:absolute;
+    left:50%;
+    top:45%;
+
+    width:min(650px,94vw);
+    height:min(650px,94vw);
+
+    transform:translate(-50%,-50%);
+
+    display:grid;
+    place-items:center;
+
+    perspective:900px;
+}
+
+/* =========================================================
+   AURA
+========================================================= */
+
+.aura{
+    position:absolute;
+
+    width:300px;
+    height:300px;
+
+    border-radius:50%;
+
+    background:rgba(133,51,255,.28);
+
+    filter:blur(75px);
+
+    opacity:0;
+
+    animation:auraIn 4.5s ease forwards;
+}
+
+/* =========================================================
+   ANÉIS
+========================================================= */
+
+.ring{
+    position:absolute;
+
+    border-radius:50%;
+
+    border:1px solid rgba(172,91,255,.35);
+
+    box-shadow:
+        0 0 20px rgba(139,55,255,.18);
+
+    opacity:0;
+}
+
+.ring.one{
+    width:450px;
+    height:155px;
+
+    transform:rotateX(67deg);
+
+    animation:
+        ringIn .7s .8s ease-out forwards,
+        ringSpin 4s 1.5s linear infinite;
+}
+
+.ring.two{
+    width:375px;
+    height:130px;
+
+    transform:
+        rotateX(67deg)
+        rotateZ(35deg);
+
+    border-style:dashed;
+
+    animation:
+        ringIn .7s 1s ease-out forwards,
+        ringSpinReverse 3.2s 1.7s linear infinite;
+}
+
+.ring.three{
+    width:295px;
+    height:103px;
+
+    transform:
+        rotateX(67deg)
+        rotateZ(-45deg);
+
+    border-color:rgba(215,167,255,.25);
+
+    animation:
+        ringIn .7s 1.15s ease-out forwards,
+        ringSpin 2.7s 1.85s linear infinite;
+}
+
+/* =========================================================
+   SCANNER
+========================================================= */
+
+.scanner{
+    position:absolute;
+
+    width:320px;
+    height:320px;
+
+    border-radius:50%;
+
+    border:1px solid rgba(172,92,255,.13);
+
+    opacity:0;
+
+    animation:
+        scannerIn .5s 1.35s ease forwards,
+        scannerSpin 2.5s 1.85s linear infinite;
+}
+
+.scanner:after{
+    content:"";
+
+    position:absolute;
+
+    left:50%;
+    top:-1px;
+
+    width:2px;
+    height:50%;
+
+    transform-origin:bottom;
+
+    background:
+        linear-gradient(
+            to top,
+            rgba(184,103,255,.8),
+            transparent
+        );
+
+    box-shadow:0 0 12px #a55aff;
+}
+
+/* =========================================================
+   UVA
+========================================================= */
+
+.grapeWrap{
+    position:absolute;
+
+    width:min(370px,65vw);
+    aspect-ratio:1/1;
+
+    z-index:10;
+
+    opacity:0;
+
+    transform:
+        translateY(20px)
+        scale(.55)
+        rotateY(-16deg);
+
+    filter:
+        blur(12px)
+        brightness(.45);
+
+    animation:
+        grapeAppear 1.15s 1.05s cubic-bezier(.12,.8,.18,1) forwards,
+        grapeFloat 2.4s 2.2s ease-in-out infinite;
+}
+
+.grapeWrap:before{
+    content:"";
+
+    position:absolute;
+
+    inset:12%;
+
+    border-radius:50%;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(153,74,255,.40),
+            transparent 62%
+        );
+
+    filter:blur(35px);
+
+    z-index:-1;
+}
+
+.grape{
+    width:100%;
+    height:100%;
+
+    object-fit:contain;
+
+    display:block;
+
+    mix-blend-mode:screen;
+
+    user-select:none;
+    -webkit-user-drag:none;
+}
+
+/* =========================================================
+   NEX
+========================================================= */
+
+.nex{
+    position:absolute;
+
+    width:175px;
+    height:175px;
+
+    z-index:15;
+
+    opacity:0;
+
+    transform:
+        translateX(180px)
+        scale(.4)
+        rotateY(-25deg);
+
+    animation:
+        nexAppear 1.2s 2.45s cubic-bezier(.16,.8,.2,1) forwards,
+        nexFloat 3s 3.8s ease-in-out infinite;
+}
+
+/* Corpo principal */
+
+.nex-core{
+    position:absolute;
+
+    left:50%;
+    top:50%;
+
+    width:105px;
+    height:105px;
+
+    transform:translate(-50%,-50%);
+
+    border-radius:32px;
+
+    background:
+        linear-gradient(
+            145deg,
+            #24103c,
+            #09040f 65%
+        );
+
+    border:1px solid rgba(191,126,255,.7);
+
+    box-shadow:
+        0 0 25px rgba(143,65,255,.5),
+        inset 0 0 30px rgba(116,38,209,.20);
+
+    transform-style:preserve-3d;
+}
+
+/* Brilho externo */
+
+.nex-core:before{
+    content:"";
+
+    position:absolute;
+    inset:-8px;
+
+    border-radius:38px;
+
+    border:1px solid rgba(170,88,255,.22);
+
+    box-shadow:
+        0 0 20px rgba(154,69,255,.25);
+
+    animation:nexPulse 2s ease-in-out infinite;
+}
+
+/* Tela */
+
+.nex-face{
+    position:absolute;
+
+    left:50%;
+    top:50%;
+
+    width:73px;
+    height:57px;
+
+    transform:translate(-50%,-50%);
+
+    border-radius:20px;
+
+    background:
+        radial-gradient(
+            circle at 50% 35%,
+            rgba(183,117,255,.20),
+            transparent 65%
+        ),
+        #08050d;
+
+    border:1px solid rgba(185,125,255,.55);
+
+    box-shadow:
+        inset 0 0 15px rgba(144,65,255,.28),
+        0 0 10px rgba(158,76,255,.20);
+
+    overflow:hidden;
+}
+
+/* Olhos */
+
+.nex-eye{
+    position:absolute;
+
+    top:19px;
+
+    width:10px;
+    height:15px;
+
+    border-radius:50%;
+
+    background:#c48aff;
+
+    box-shadow:
+        0 0 8px #a85aff,
+        0 0 18px rgba(159,76,255,.8);
+
+    animation:eyePulse 2s ease-in-out infinite;
+}
+
+.nex-eye.left{
+    left:17px;
+}
+
+.nex-eye.right{
+    right:17px;
+}
+
+/* Boca */
+
+.nex-mouth{
+    position:absolute;
+
+    left:50%;
+    bottom:10px;
+
+    width:23px;
+    height:4px;
+
+    transform:translateX(-50%);
+
+    border-radius:20px;
+
+    background:#9851e9;
+
+    box-shadow:0 0 8px #9145e5;
+}
+
+/* Antena */
+
+.nex-antenna{
+    position:absolute;
+
+    left:50%;
+    top:-27px;
+
+    width:2px;
+    height:25px;
+
+    transform:translateX(-50%);
+
+    background:
+        linear-gradient(
+            to top,
+            #8b3fe5,
+            transparent
+        );
+
+    box-shadow:0 0 7px #9b4fff;
+}
+
+.nex-antenna:before{
+    content:"";
+
+    position:absolute;
+
+    top:-4px;
+    left:50%;
+
+    width:7px;
+    height:7px;
+
+    transform:translateX(-50%);
+
+    border-radius:50%;
+
+    background:#c18aff;
+
+    box-shadow:
+        0 0 8px #a557ff,
+        0 0 18px #8737e6;
+
+    animation:antennaPulse 1.2s infinite;
+}
+
+/* Pequenos pontos laterais */
+
+.nex-dot{
+    position:absolute;
+
+    width:5px;
+    height:5px;
+
+    border-radius:50%;
+
+    background:#a85aff;
+
+    box-shadow:0 0 8px #963cff;
+}
+
+.nex-dot.one{
+    left:-15px;
+    top:45px;
+}
+
+.nex-dot.two{
+    right:-15px;
+    top:70px;
+}
+
+.nex-dot.three{
+    left:-10px;
+    bottom:32px;
+}
+
+.nex-dot.four{
+    right:-10px;
+    bottom:20px;
+}
+
+/* =========================================================
+   ENERGIA DO NEX
+========================================================= */
+
+.nex-energy{
+    position:absolute;
+
+    left:50%;
+    top:50%;
+
+    width:170px;
+    height:170px;
+
+    transform:translate(-50%,-50%);
+
+    border-radius:50%;
+
+    border:1px solid rgba(171,91,255,.18);
+
+    box-shadow:
+        0 0 30px rgba(139,53,255,.15);
+
+    animation:
+        nexEnergy 2.5s linear infinite;
+}
+
+.nex-energy:before,
+.nex-energy:after{
+    content:"";
+
+    position:absolute;
+
+    inset:15px;
+
+    border-radius:50%;
+
+    border:1px dashed rgba(183,112,255,.18);
+}
+
+.nex-energy:after{
+    inset:32px;
+
+    border-style:solid;
+
+    opacity:.5;
+}
+
+/* =========================================================
+   LINHA DE SCAN
+========================================================= */
+
+.scanLine{
+    position:absolute;
+
+    z-index:30;
+
+    left:50%;
+    top:15%;
+
+    width:min(340px,60vw);
+
+    height:2px;
+
+    transform:
+        translateX(-50%)
+        scaleX(0);
+
+    opacity:0;
+
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            #d6a4ff,
+            #7e2cff,
+            transparent
+        );
+
+    box-shadow:0 0 15px #a75aff;
+
+    animation:
+        scanLine 1s 2.1s ease-in-out forwards;
+}
+
+/* =========================================================
+   PARTÍCULAS TECNOLÓGICAS
+========================================================= */
+
+.techDot{
+    position:absolute;
+
+    width:5px;
+    height:5px;
+
+    border-radius:50%;
+
+    background:#bd7bff;
+
+    box-shadow:0 0 12px #9a48ff;
+
+    opacity:0;
+}
+
+.d1{
+    top:26%;
+    left:20%;
+
+    animation:
+        dotIn .5s 1.2s forwards,
+        floatDot 2s 1.7s ease-in-out infinite;
+}
+
+.d2{
+    top:62%;
+    right:19%;
+
+    animation:
+        dotIn .5s 1.35s forwards,
+        floatDot 2.4s 1.8s ease-in-out infinite;
+}
+
+.d3{
+    top:32%;
+    right:25%;
+
+    animation:
+        dotIn .5s 1.5s forwards,
+        floatDot 1.8s 1.9s ease-in-out infinite;
+}
+
+.d4{
+    bottom:25%;
+    left:27%;
+
+    animation:
+        dotIn .5s 1.65s forwards,
+        floatDot 2.2s 2s ease-in-out infinite;
+}
+
+/* =========================================================
+   TEXTO
+========================================================= */
+
+.content{
+    position:absolute;
+
+    z-index:100;
+
+    left:50%;
+    bottom:8%;
+
+    width:100%;
+
+    transform:translateX(-50%);
+
+    text-align:center;
+}
+
+.content small{
+    display:block;
+
+    color:#ad8ac6;
+
+    font-size:9px;
+    letter-spacing:5px;
+
+    margin-bottom:8px;
+
+    opacity:0;
+
+    animation:
+        textIn .6s 4.5s ease forwards;
+}
+
+.content h1{
+    font-family:'Bebas Neue',Impact,sans-serif;
+
+    font-size:clamp(42px,7vw,76px);
+
+    font-weight:400;
+
+    line-height:.85;
+
+    letter-spacing:6px;
+
+    color:#fff;
+
+    text-shadow:
+        0 0 22px rgba(143,62,255,.45);
+
+    opacity:0;
+
+    transform:translateY(12px);
+
+    animation:
+        textIn .7s 4.55s ease forwards;
+}
+
+.content p{
+    margin-top:11px;
+
+    color:#80698f;
+
+    font-size:9px;
+
+    letter-spacing:3px;
+
+    opacity:0;
+
+    animation:
+        textIn .6s 4.75s ease forwards;
+}
+
+/* =========================================================
+   PROGRESSO
+========================================================= */
+
+.skip{
+    position:absolute;
+
+    right:30px;
+    bottom:27px;
+
+    z-index:200;
+
+    border:1px solid rgba(185,137,255,.35);
+
+    background:rgba(10,5,18,.75);
+
+    color:white;
+
+    border-radius:999px;
+
+    padding:10px 17px;
+
+    font-size:9px;
+    font-weight:700;
+
+    letter-spacing:2px;
+
+    cursor:pointer;
+
+    backdrop-filter:blur(10px);
+
+    transition:.2s ease;
+}
+
+.skip:hover{
+    background:#6e31bc;
+
+    border-color:#c89aff;
+
+    transform:translateY(-2px);
+}
+
+.progress{
+    position:absolute;
+
+    left:30px;
+    bottom:31px;
+
+    width:150px;
+    height:2px;
+
+    background:#24142f;
+
+    border-radius:10px;
+
+    overflow:hidden;
+}
+
+.progress span{
+    display:block;
+
+    width:0;
+    height:100%;
+
+    background:
+        linear-gradient(
+            90deg,
+            #6620c5,
+            #c58aff
+        );
+
+    box-shadow:0 0 12px #a75aff;
+}
+
+.percent{
+    position:absolute;
+
+    left:30px;
+    bottom:40px;
+
+    color:#86649b;
+
+    font:9px monospace;
+}
+
+/* =========================================================
+   ANIMAÇÕES
+========================================================= */
+
+@keyframes auraIn{
+
+    0%{
+        opacity:0;
+        transform:scale(.4);
+    }
+
+    25%{
+        opacity:.4;
+    }
+
+    100%{
+        opacity:.75;
+        transform:scale(1.2);
+    }
+}
+
+@keyframes ringIn{
+
+    from{
+        opacity:0;
+        transform:
+            scale(.45)
+            rotateX(67deg);
+    }
+
+    to{
+        opacity:1;
+        transform:
+            scale(1)
+            rotateX(67deg);
+    }
+}
+
+@keyframes ringSpin{
+
+    to{
+        transform:
+            rotateX(67deg)
+            rotateZ(360deg);
+    }
+}
+
+@keyframes ringSpinReverse{
+
+    to{
+        transform:
+            rotateX(67deg)
+            rotateZ(-360deg);
+    }
+}
+
+@keyframes scannerIn{
+
+    from{
+        opacity:0;
+        transform:scale(.7);
+    }
+
+    to{
+        opacity:1;
+        transform:scale(1);
+    }
+}
+
+@keyframes scannerSpin{
+
+    to{
+        transform:rotate(360deg);
+    }
+}
+
+@keyframes grapeAppear{
+
+    0%{
+        opacity:0;
+
+        transform:
+            translateY(20px)
+            scale(.55)
+            rotateY(-16deg);
+
+        filter:
+            blur(12px)
+            brightness(.45);
+    }
+
+    55%{
+        opacity:1;
+
+        filter:
+            blur(2px)
+            brightness(.85);
+    }
+
+    100%{
+        opacity:1;
+
+        transform:
+            translateY(0)
+            scale(1)
+            rotateY(0);
+
+        filter:
+            blur(0)
+            brightness(1);
+    }
+}
+
+@keyframes grapeFloat{
+
+    0%,100%{
+        transform:
+            translateY(0)
+            rotateY(-3deg)
+            rotateX(1deg);
+    }
+
+    50%{
+        transform:
+            translateY(-7px)
+            rotateY(3deg)
+            rotateX(-1deg);
+    }
+}
+
+/* NEX ENTRANDO */
+
+@keyframes nexAppear{
+
+    0%{
+        opacity:0;
+
+        transform:
+            translateX(180px)
+            scale(.4)
+            rotateY(-25deg);
+
+        filter:
+            blur(15px)
+            brightness(.2);
+    }
+
+    55%{
+        opacity:1;
+
+        filter:
+            blur(2px)
+            brightness(.8);
+    }
+
+    100%{
+        opacity:1;
+
+        transform:
+            translateX(110px)
+            scale(1)
+            rotateY(0);
+
+        filter:
+            blur(0)
+            brightness(1);
+    }
+}
+
+@keyframes nexFloat{
+
+    0%,100%{
+        transform:
+            translateX(110px)
+            translateY(0)
+            rotateZ(0deg);
+    }
+
+    50%{
+        transform:
+            translateX(110px)
+            translateY(-8px)
+            rotateZ(2deg);
+    }
+}
+
+@keyframes nexPulse{
+
+    0%,100%{
+        opacity:.5;
+        transform:scale(1);
+    }
+
+    50%{
+        opacity:1;
+        transform:scale(1.025);
+    }
+}
+
+@keyframes eyePulse{
+
+    0%,100%{
+        opacity:.7;
+        transform:scaleY(1);
+    }
+
+    50%{
+        opacity:1;
+        transform:scaleY(.75);
+    }
+}
+
+@keyframes antennaPulse{
+
+    0%,100%{
+        opacity:.5;
+        transform:translateX(-50%) scale(.8);
+    }
+
+    50%{
+        opacity:1;
+        transform:translateX(-50%) scale(1.2);
+    }
+}
+
+@keyframes nexEnergy{
+
+    from{
+        transform:
+            translate(-50%,-50%)
+            rotate(0deg);
+    }
+
+    to{
+        transform:
+            translate(-50%,-50%)
+            rotate(360deg);
+    }
+}
+
+@keyframes scanLine{
+
+    0%{
+        opacity:0;
+
+        transform:
+            translateX(-50%)
+            translateY(0)
+            scaleX(0);
+    }
+
+    20%{
+        opacity:1;
+
+        transform:
+            translateX(-50%)
+            translateY(0)
+            scaleX(1);
+    }
+
+    100%{
+        opacity:0;
+
+        transform:
+            translateX(-50%)
+            translateY(210px)
+            scaleX(1);
+    }
+}
+
+@keyframes dotIn{
+
+    to{
+        opacity:.9;
+    }
+}
+
+@keyframes floatDot{
+
+    50%{
+        transform:translateY(-12px);
+        opacity:.45;
+    }
+}
+
+@keyframes textIn{
+
+    to{
+        opacity:1;
+        transform:translateY(0);
+    }
+}
+
+/* =========================================================
+   CELULAR
+========================================================= */
+
+@media(max-width:600px){
+
+    .brand{
+        left:20px;
+        top:22px;
+        font-size:14px;
+    }
+
+    .version{
+        right:20px;
+        top:25px;
+        font-size:7px;
+    }
+
+    .ring.one{
+        width:350px;
+        height:125px;
+    }
+
+    .ring.two{
+        width:295px;
+        height:105px;
+    }
+
+    .ring.three{
+        width:235px;
+        height:85px;
+    }
+
+    .scanner{
+        width:250px;
+        height:250px;
+    }
+
+    .nex{
+        width:130px;
+        height:130px;
+    }
+
+    .nex-core{
+        width:82px;
+        height:82px;
+
+        border-radius:25px;
+    }
+
+    .nex-face{
+        width:57px;
+        height:45px;
+    }
+
+    .nex-eye{
+        top:14px;
+
+        width:8px;
+        height:12px;
+    }
+
+    .nex-eye.left{
+        left:13px;
+    }
+
+    .nex-eye.right{
+        right:13px;
+    }
+
+    .nex-mouth{
+        bottom:8px;
+        width:18px;
+    }
+
+    .nex-energy{
+        width:125px;
+        height:125px;
+    }
+
+    .content{
+        bottom:12%;
+    }
+
+    .content h1{
+        letter-spacing:3px;
+    }
+
+    .content small{
+        letter-spacing:3px;
+    }
+
+    .content p{
+        letter-spacing:1.5px;
+    }
+
+    .progress{
+        left:20px;
+        width:105px;
+        bottom:22px;
+    }
+
+    .percent{
+        left:20px;
+        bottom:31px;
+    }
+
+    .skip{
+        right:20px;
+        bottom:18px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<section id="intro">
+
+    <canvas id="particles"></canvas>
+
+    <div class="brand">
+        GRAPE<span>DEV</span>
+    </div>
+
+    <div class="version">
+        DIGITAL STUDIO · 2026
+    </div>
+
+
+    <div class="stage">
+
+        <!-- AURA -->
+
+        <div class="aura"></div>
+
+
+        <!-- ANÉIS -->
+
+        <div class="ring one"></div>
+        <div class="ring two"></div>
+        <div class="ring three"></div>
+
+
+        <!-- SCANNER -->
+
+        <div class="scanner"></div>
+
+
+        <!-- PONTOS -->
+
+        <div class="techDot d1"></div>
+        <div class="techDot d2"></div>
+        <div class="techDot d3"></div>
+        <div class="techDot d4"></div>
+
+
+        <!-- UVA -->
+
+        <div class="grapeWrap">
+
+            <img
+                class="grape"
+                src="storage/images/uva-grapedev (2).png"
+                alt="GrapeDev"
+            >
+
+        </div>
+
+
+        <!-- NEX -->
+
+        <div class="nex">
+
+            <div class="nex-energy"></div>
+
+            <div class="nex-antenna"></div>
+
+            <div class="nex-core">
+
+                <div class="nex-face">
+
+                    <div class="nex-eye left"></div>
+                    <div class="nex-eye right"></div>
+
+                    <div class="nex-mouth"></div>
+
+                </div>
+
+            </div>
+
+            <div class="nex-dot one"></div>
+            <div class="nex-dot two"></div>
+            <div class="nex-dot three"></div>
+            <div class="nex-dot four"></div>
+
+        </div>
+
+
+        <!-- SCAN -->
+
+        <div class="scanLine"></div>
+
+    </div>
+
+
+    <!-- TEXTO -->
+
+    <div class="content">
+
+        <small>
+            TECNOLOGIA · CRIATIVIDADE · CÓDIGO
+        </small>
+
+        <h1>
+            CREATE THE EXPERIENCE
+        </h1>
+
+        <p>
+            INOVANDO IDEIAS · TRANSFORMANDO POSSIBILIDADES
+        </p>
+
+    </div>
+
+
+    <!-- PORCENTAGEM -->
+
+    <div
+        class="percent"
+        id="percent"
+    >
+        00%
+    </div>
+
+
+    <!-- BARRA -->
+
+    <div class="progress">
+
+        <span id="progressBar"></span>
+
+    </div>
+
+
+    <!-- PULAR -->
+
+    <button
+        class="skip"
+        id="skip"
+    >
+        PULAR INTRO&nbsp; →
+    </button>
+
+</section>
+
+
+<script>
+
+/* =========================================================
+   ELEMENTOS
+========================================================= */
+
+const intro =
+    document.getElementById("intro");
+
+const progressBar =
+    document.getElementById("progressBar");
+
+const percent =
+    document.getElementById("percent");
+
+const canvas =
+    document.getElementById("particles");
+
+const ctx =
+    canvas.getContext("2d");
+
+
+/* =========================================================
+   CANVAS
+========================================================= */
+
+let W = 0;
+let H = 0;
+
+let dpr =
+    Math.min(
+        window.devicePixelRatio || 1,
+        2
+    );
+
+let particles = [];
+
+let finished = false;
+
+
+/* =========================================================
+   RESIZE
+========================================================= */
+
+function resize(){
+
+    W =
+        window.innerWidth;
+
+    H =
+        window.innerHeight;
+
+    dpr =
+        Math.min(
+            window.devicePixelRatio || 1,
+            2
+        );
+
+
+    canvas.width =
+        W * dpr;
+
+    canvas.height =
+        H * dpr;
+
+
+    canvas.style.width =
+        W + "px";
+
+    canvas.style.height =
+        H + "px";
+
+
+    ctx.setTransform(
+        dpr,
+        0,
+        0,
+        dpr,
+        0,
+        0
+    );
+}
+
+window.addEventListener(
+    "resize",
+    resize
+);
+
+resize();
+
+
+/* =========================================================
+   CRIAR PARTÍCULAS
+========================================================= */
+
+for(
+    let i = 0;
+    i < 190;
+    i++
+){
+
+    const angle =
+        Math.random() *
+        Math.PI *
+        2;
+
+
+    const distance =
+        170 +
+        Math.random() *
+        Math.max(W,H) *
+        .48;
+
+
+    particles.push({
+
+        x:
+            W / 2 +
+            Math.cos(angle) *
+            distance,
+
+        y:
+            H * .45 +
+            Math.sin(angle) *
+            distance,
+
+        size:
+            .5 +
+            Math.random() *
+            1.5,
+
+        speed:
+            .004 +
+            Math.random() *
+            .009,
+
+        offset:
+            Math.random() *
+            100
+    });
+}
+
+
+/* =========================================================
+   TEMPO DA INTRO
+========================================================= */
+
+const start =
+    performance.now();
+
+const duration =
+    6000;
+
+
+/* =========================================================
+   ANIMAÇÃO DAS PARTÍCULAS
+========================================================= */
+
+function animateParticles(now){
+
+    if(finished)
+        return;
+
+
+    const elapsed =
+        now - start;
+
+
+    const gather =
+        Math.min(
+            Math.max(
+                (elapsed - 350) / 1150,
+                0
+            ),
+            1
+        );
+
+
+    const eased =
+        1 -
+        Math.pow(
+            1 - gather,
+            3
+        );
+
+
+    ctx.clearRect(
+        0,
+        0,
+        W,
+        H
+    );
+
+
+    for(
+        const p of particles
+    ){
+
+        const targetX =
+            W / 2 +
+            Math.sin(p.offset) *
+            115;
+
+
+        const targetY =
+            H * .45 +
+            Math.cos(p.offset) *
+            145;
+
+
+        if(gather > 0){
+
+            p.x +=
+                (targetX - p.x) *
+                (
+                    .008 +
+                    eased * .035
+                );
+
+
+            p.y +=
+                (targetY - p.y) *
+                (
+                    .008 +
+                    eased * .035
+                );
+        }
+
+
+        p.offset +=
+            p.speed;
+
+
+        const alpha =
+            .15 +
+            Math.sin(
+                p.offset * 4
+            ) * .12 +
+            eased * .35;
+
+
+        ctx.beginPath();
+
+
+        ctx.arc(
+            p.x,
+            p.y,
+            p.size,
+            0,
+            Math.PI * 2
+        );
+
+
+        ctx.fillStyle =
+            `rgba(
+                181,
+                104,
+                255,
+                ${Math.max(.05,alpha)}
+            )`;
+
+
+        ctx.fill();
+
+
+        if(eased > .35){
+
+            ctx.beginPath();
+
+
+            ctx.moveTo(
+                p.x,
+                p.y
+            );
+
+
+            ctx.lineTo(
+
+                p.x +
+                (
+                    W / 2 -
+                    p.x
+                ) * .035,
+
+                p.y +
+                (
+                    H * .45 -
+                    p.y
+                ) * .035
+
+            );
+
+
+            ctx.strokeStyle =
+                `rgba(
+                    146,
+                    66,
+                    255,
+                    ${eased * .07}
+                )`;
+
+
+            ctx.lineWidth =
+                .5;
+
+
+            ctx.stroke();
+        }
+    }
+
+
+    requestAnimationFrame(
+        animateParticles
+    );
+}
+
+
+requestAnimationFrame(
+    animateParticles
+);
+
+
+/* =========================================================
+   IR PARA HOME
+========================================================= */
+
+function goHome(){
+
+    if(finished)
+        return;
+
+
+    finished = true;
+
+
+    progressBar.style.width =
+        "100%";
+
+
+    percent.textContent =
+        "100%";
+
+
+    intro.classList.add(
+        "saindo"
+    );
+
+
+    setTimeout(() => {
+
+        window.location.replace(
+            "public/pages/home.html"
+        );
+
+    },350);
+}
+
+
+/* =========================================================
+   PROGRESSO
+========================================================= */
+
+function updateProgress(now){
+
+    if(finished)
+        return;
+
+
+    const progress =
+        Math.min(
+            (now - start) /
+            duration,
+            1
+        );
+
+
+    progressBar.style.width =
+        (progress * 100) +
+        "%";
+
+
+    percent.textContent =
+        String(
+            Math.floor(
+                progress * 100
+            )
+        ).padStart(
+            2,
+            "0"
+        ) + "%";
+
+
+    if(progress >= 1){
+
+        goHome();
+
+        return;
+    }
+
+
+    requestAnimationFrame(
+        updateProgress
+    );
+}
+
+
+requestAnimationFrame(
+    updateProgress
+);
+
+
+/* =========================================================
+   BOTÃO PULAR
+========================================================= */
+
+document
+    .getElementById("skip")
+    .addEventListener(
+        "click",
+        goHome
+    );
+
+
+/* =========================================================
+   ESC
+========================================================= */
+
+document.addEventListener(
+    "keydown",
+    (event) => {
+
+        if(
+            event.key ===
+            "Escape"
+        ){
+
+            goHome();
+        }
+
+    }
+);
+
+</script>
+
+</body>
+</html>

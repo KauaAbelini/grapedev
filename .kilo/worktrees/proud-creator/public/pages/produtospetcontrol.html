@@ -1,0 +1,2222 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>PetControl | GrapeDev</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+
+    <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: "Nunito", sans-serif;
+            background: #08070d;
+            color: #fff;
+            transition: .3s ease;
+            overflow-x: hidden;
+        }
+
+        body.light {
+            background: #f5f4f8;
+            color: #17131d;
+        }
+
+        /* ================= HEADER ================= */
+
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 78px;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            padding: 0 6%;
+
+            background: rgba(8, 7, 13, .78);
+            backdrop-filter: blur(18px);
+
+            border-bottom: 1px solid rgba(255,255,255,.07);
+
+            z-index: 1000;
+        }
+
+        body.light .header {
+            background: rgba(255,255,255,.82);
+            border-bottom: 1px solid rgba(0,0,0,.08);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+
+            text-decoration: none;
+            color: #fff;
+        }
+
+        body.light .logo {
+            color: #18131e;
+        }
+
+        .logo-grape {
+            width: 31px;
+            height: 31px;
+
+            object-fit: contain;
+            object-position: center;
+
+            display: block;
+            flex-shrink: 0;
+        }
+
+        .logo-text {
+            font-size: 22px;
+            font-weight: 900;
+            letter-spacing: -.5px;
+        }
+
+        .logo-text span {
+            color: #8247e5;
+        }
+
+        .menu {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+        }
+
+        .menu a {
+            position: relative;
+
+            color: #d8d5df;
+            text-decoration: none;
+
+            font-size: 12px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1.1px;
+
+            transition: .3s;
+        }
+
+        body.light .menu a {
+            color: #514b58;
+        }
+
+        .menu a:hover,
+        .menu a.active {
+            color: #fff;
+        }
+
+        body.light .menu a:hover,
+        body.light .menu a.active {
+            color: #8247e5;
+        }
+
+        .menu a.active::after {
+            content: "";
+
+            position: absolute;
+            left: 0;
+            bottom: -9px;
+
+            width: 100%;
+            height: 2px;
+
+            background: #8247e5;
+            border-radius: 10px;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 13px;
+        }
+
+        .search,
+        .theme-toggle,
+        .menu-mobile {
+            border: none;
+            background: transparent;
+
+            width: 39px;
+            height: 39px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            cursor: pointer;
+
+            border-radius: 50%;
+
+            color: #fff;
+
+            transition: .3s;
+        }
+
+        body.light .search,
+        body.light .theme-toggle,
+        body.light .menu-mobile {
+            color: #17131d;
+        }
+
+        .search:hover,
+        .theme-toggle:hover,
+        .menu-mobile:hover {
+            background: rgba(130,71,229,.14);
+            transform: translateY(-2px);
+        }
+
+        .theme-toggle {
+            overflow: hidden;
+        }
+
+        .theme-toggle img {
+            width: 21px !important;
+            height: 21px !important;
+
+            max-width: 21px !important;
+            max-height: 21px !important;
+
+            min-width: 21px !important;
+            min-height: 21px !important;
+
+            display: block !important;
+            object-fit: contain !important;
+
+            flex-shrink: 0;
+        }
+
+        .login-button {
+            text-decoration: none;
+
+            padding: 10px 19px;
+
+            border-radius: 8px;
+
+            background: #8247e5;
+            color: #fff;
+
+            font-size: 12px;
+            font-weight: 900;
+
+            transition: .3s;
+        }
+
+        .login-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(130,71,229,.35);
+        }
+
+        .menu-mobile {
+            display: none;
+            font-size: 23px;
+        }
+
+        /* ================= SEARCH ================= */
+
+        .search-overlay {
+            position: fixed;
+            inset: 0;
+
+            background: rgba(0,0,0,.72);
+            backdrop-filter: blur(12px);
+
+            z-index: 2000;
+
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+
+            padding-top: 130px;
+
+            opacity: 0;
+            visibility: hidden;
+
+            transition: .3s;
+        }
+
+        .search-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .search-box {
+            width: min(650px, 90%);
+
+            display: flex;
+            align-items: center;
+            gap: 15px;
+
+            padding: 16px 20px;
+
+            background: #17131f;
+
+            border: 1px solid rgba(130,71,229,.45);
+
+            border-radius: 15px;
+
+            box-shadow: 0 20px 70px rgba(0,0,0,.45);
+        }
+
+        body.light .search-box {
+            background: #fff;
+        }
+
+        .search-box > i {
+            color: #8247e5;
+            font-size: 20px;
+        }
+
+        .search-box input {
+            flex: 1;
+
+            border: none;
+            outline: none;
+
+            background: transparent;
+
+            color: #fff;
+
+            font-family: "Nunito";
+            font-size: 16px;
+        }
+
+        body.light .search-box input {
+            color: #17131d;
+        }
+
+        .search-box input::placeholder {
+            color: #77717e;
+        }
+
+        #closeSearch {
+            border: none;
+            background: transparent;
+
+            color: #aaa;
+
+            font-size: 18px;
+
+            cursor: pointer;
+        }
+
+        .search-results {
+            width: min(650px, 90%);
+            margin-top: 12px;
+
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .search-result {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+
+            padding: 15px 18px;
+
+            background: #17131f;
+
+            border: 1px solid rgba(255,255,255,.06);
+
+            border-radius: 12px;
+
+            text-decoration: none;
+
+            transition: .25s;
+        }
+
+        body.light .search-result {
+            background: #fff;
+            border-color: rgba(0,0,0,.07);
+        }
+
+        .search-result:hover {
+            transform: translateX(5px);
+            border-color: #8247e5;
+        }
+
+        .search-result strong {
+            color: #fff;
+            font-size: 15px;
+        }
+
+        body.light .search-result strong {
+            color: #17131d;
+        }
+
+        .search-result span {
+            color: #999;
+            font-size: 12px;
+        }
+
+        .search-empty {
+            padding: 20px;
+
+            text-align: center;
+
+            color: #aaa;
+
+            background: #17131f;
+            border-radius: 12px;
+        }
+
+        body.light .search-empty {
+            background: #fff;
+        }
+
+        /* ================= HERO ================= */
+
+        .hero {
+            min-height: 100vh;
+
+            padding: 150px 8% 90px;
+
+            display: grid;
+            grid-template-columns: 1.05fr .95fr;
+            align-items: center;
+            gap: 70px;
+
+            position: relative;
+
+            background:
+                radial-gradient(circle at 80% 30%, rgba(255,116,43,.12), transparent 30%),
+                radial-gradient(circle at 20% 60%, rgba(130,71,229,.13), transparent 35%);
+        }
+
+        .hero::before {
+            content: "";
+
+            position: absolute;
+            inset: 0;
+
+            background-image:
+                linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
+
+            background-size: 55px 55px;
+
+            mask-image: linear-gradient(to bottom, black, transparent);
+            pointer-events: none;
+        }
+
+        body.light .hero {
+            background:
+                radial-gradient(circle at 80% 30%, rgba(255,116,43,.10), transparent 30%),
+                radial-gradient(circle at 20% 60%, rgba(130,71,229,.10), transparent 35%);
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero-kicker {
+            color: #ff7430;
+
+            font-size: 12px;
+            font-weight: 900;
+
+            letter-spacing: 3px;
+
+            margin-bottom: 17px;
+        }
+
+        .hero h1 {
+            font-family: "Bebas Neue", sans-serif;
+
+            font-size: clamp(65px, 9vw, 130px);
+
+            line-height: .85;
+
+            letter-spacing: 2px;
+
+            margin-bottom: 25px;
+        }
+
+        .hero h1 span {
+            color: #ff7430;
+        }
+
+        .hero-description {
+            max-width: 620px;
+
+            color: #aaa4b1;
+
+            font-size: 16px;
+            line-height: 1.8;
+
+            margin-bottom: 30px;
+        }
+
+        body.light .hero-description {
+            color: #68616e;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 13px;
+            flex-wrap: wrap;
+        }
+
+        .hero-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+
+            padding: 14px 22px;
+
+            border-radius: 9px;
+
+            text-decoration: none;
+
+            font-size: 13px;
+            font-weight: 900;
+
+            transition: .3s;
+        }
+
+        .hero-button.primary {
+            background: #ff7430;
+            color: #fff;
+
+            box-shadow: 0 10px 35px rgba(255,116,48,.22);
+        }
+
+        .hero-button.secondary {
+            color: #fff;
+
+            border: 1px solid rgba(255,255,255,.12);
+            background: rgba(255,255,255,.035);
+        }
+
+        body.light .hero-button.secondary {
+            color: #17131d;
+            border-color: rgba(0,0,0,.1);
+            background: rgba(0,0,0,.025);
+        }
+
+        .hero-button:hover {
+            transform: translateY(-3px);
+        }
+
+        .hero-visual {
+            position: relative;
+
+            min-height: 480px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .visual-glow {
+            position: absolute;
+
+            width: 370px;
+            height: 370px;
+
+            border-radius: 50%;
+
+            background: radial-gradient(circle, rgba(255,116,48,.20), transparent 65%);
+
+            filter: blur(10px);
+        }
+
+        .pet-panel {
+            position: relative;
+
+            width: min(460px, 100%);
+
+            padding: 28px;
+
+            background: rgba(21,18,28,.85);
+
+            border: 1px solid rgba(255,255,255,.09);
+
+            border-radius: 24px;
+
+            box-shadow: 0 30px 80px rgba(0,0,0,.4);
+
+            transform: rotate(2deg);
+        }
+
+        body.light .pet-panel {
+            background: rgba(255,255,255,.9);
+            border-color: rgba(0,0,0,.07);
+            box-shadow: 0 25px 70px rgba(50,30,70,.13);
+        }
+
+        .panel-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            margin-bottom: 25px;
+        }
+
+        .panel-title {
+            font-size: 13px;
+            font-weight: 900;
+        }
+
+        .online {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+
+            font-size: 10px;
+            font-weight: 800;
+
+            color: #51db8b;
+        }
+
+        .online::before {
+            content: "";
+
+            width: 7px;
+            height: 7px;
+
+            border-radius: 50%;
+
+            background: #51db8b;
+
+            box-shadow: 0 0 10px #51db8b;
+        }
+
+        .pet-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .pet-stat {
+            padding: 18px;
+
+            background: rgba(255,255,255,.035);
+
+            border: 1px solid rgba(255,255,255,.06);
+
+            border-radius: 15px;
+        }
+
+        body.light .pet-stat {
+            background: #f6f4f8;
+            border-color: rgba(0,0,0,.05);
+        }
+
+        .pet-stat i {
+            color: #ff7430;
+            font-size: 21px;
+        }
+
+        .pet-stat strong {
+            display: block;
+
+            font-family: "Bebas Neue";
+
+            font-size: 34px;
+
+            margin-top: 8px;
+        }
+
+        .pet-stat span {
+            color: #999;
+
+            font-size: 11px;
+        }
+
+        .panel-chart {
+            margin-top: 13px;
+
+            padding: 18px;
+
+            background: rgba(130,71,229,.08);
+
+            border-radius: 15px;
+        }
+
+        .chart-label {
+            display: flex;
+            justify-content: space-between;
+
+            font-size: 11px;
+            color: #999;
+
+            margin-bottom: 12px;
+        }
+
+        .chart-bars {
+            height: 90px;
+
+            display: flex;
+            align-items: end;
+            gap: 9px;
+        }
+
+        .chart-bars span {
+            flex: 1;
+
+            border-radius: 5px 5px 2px 2px;
+
+            background: linear-gradient(to top, #8247e5, #ff7430);
+
+            opacity: .8;
+        }
+
+        .chart-bars span:nth-child(1) { height: 38%; }
+        .chart-bars span:nth-child(2) { height: 55%; }
+        .chart-bars span:nth-child(3) { height: 48%; }
+        .chart-bars span:nth-child(4) { height: 72%; }
+        .chart-bars span:nth-child(5) { height: 64%; }
+        .chart-bars span:nth-child(6) { height: 88%; }
+        .chart-bars span:nth-child(7) { height: 78%; }
+
+        /* ================= ANALYTICS ================= */
+
+        .analytics {
+            padding: 110px 8%;
+
+            background: #0d0b13;
+        }
+
+        body.light .analytics {
+            background: #ebe9ef;
+        }
+
+        .section-label {
+            display: block;
+
+            color: #ff7430;
+
+            font-size: 11px;
+            font-weight: 900;
+
+            letter-spacing: 3px;
+
+            margin-bottom: 12px;
+        }
+
+        .section-title {
+            font-family: "Bebas Neue";
+
+            font-size: clamp(45px, 6vw, 72px);
+
+            line-height: .95;
+
+            margin-bottom: 25px;
+        }
+
+        .analytics-header {
+            max-width: 800px;
+            margin-bottom: 55px;
+        }
+
+        .analytics-header p {
+            color: #aaa4b1;
+
+            font-size: 15px;
+            line-height: 1.8;
+        }
+
+        body.light .analytics-header p {
+            color: #68616e;
+        }
+
+        .analytics-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .analytics-card {
+            position: relative;
+
+            padding: 32px;
+
+            min-height: 245px;
+
+            border-radius: 18px;
+
+            background: #15121d;
+
+            border: 1px solid rgba(255,255,255,.06);
+
+            overflow: hidden;
+
+            transition: .35s;
+        }
+
+        body.light .analytics-card {
+            background: #fff;
+            border-color: rgba(0,0,0,.06);
+        }
+
+        .analytics-card::after {
+            content: "";
+
+            position: absolute;
+
+            width: 140px;
+            height: 140px;
+
+            right: -60px;
+            bottom: -60px;
+
+            border-radius: 50%;
+
+            background: rgba(255,116,48,.09);
+        }
+
+        .analytics-card:hover {
+            transform: translateY(-7px);
+            border-color: rgba(255,116,48,.4);
+        }
+
+        .analytics-icon {
+            width: 52px;
+            height: 52px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 14px;
+
+            background: rgba(255,116,48,.1);
+
+            color: #ff7430;
+
+            font-size: 23px;
+
+            margin-bottom: 24px;
+        }
+
+        .analytics-card h3 {
+            font-size: 19px;
+            margin-bottom: 9px;
+        }
+
+        .analytics-card p {
+            color: #96909d;
+
+            font-size: 13px;
+        }
+
+        .analytics-number {
+            position: absolute;
+
+            right: 25px;
+            bottom: 23px;
+
+            font-family: "Bebas Neue";
+
+            font-size: 42px;
+
+            color: #8247e5;
+        }
+
+        /* ================= PRODUCTS ================= */
+
+        .products {
+            padding: 120px 8%;
+        }
+
+        .products-header {
+            max-width: 700px;
+            margin-bottom: 55px;
+        }
+
+        .products-header p {
+            color: #aaa4b1;
+
+            font-size: 15px;
+            line-height: 1.7;
+        }
+
+        body.light .products-header p {
+            color: #68616e;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 22px;
+        }
+
+        .product-card {
+            overflow: hidden;
+
+            border-radius: 20px;
+
+            background: #13101a;
+
+            border: 1px solid rgba(255,255,255,.07);
+
+            transition: .35s;
+        }
+
+        body.light .product-card {
+            background: #fff;
+            border-color: rgba(0,0,0,.07);
+        }
+
+        .product-card:hover {
+            transform: translateY(-8px);
+
+            border-color: rgba(255,116,48,.45);
+
+            box-shadow: 0 25px 60px rgba(0,0,0,.2);
+        }
+
+        .product-image {
+            width: 100%;
+            height: 270px;
+
+            background: #0c0a10;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            overflow: hidden;
+        }
+
+        body.light .product-image {
+            background: #f2eff5;
+        }
+
+        .product-image img {
+            width: 100%;
+            height: 100%;
+
+            object-fit: cover;
+
+            display: block;
+
+            transition: .5s;
+        }
+
+        .product-card:hover .product-image img {
+            transform: scale(1.05);
+        }
+
+        .product-info {
+            padding: 25px;
+        }
+
+        .product-info h3 {
+            font-size: 21px;
+
+            margin-bottom: 8px;
+        }
+
+        .product-info p {
+            color: #99939f;
+
+            font-size: 13px;
+
+            line-height: 1.6;
+
+            min-height: 42px;
+        }
+
+        .product-bottom {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            margin-top: 23px;
+
+            padding-top: 18px;
+
+            border-top: 1px solid rgba(255,255,255,.07);
+        }
+
+        body.light .product-bottom {
+            border-color: rgba(0,0,0,.07);
+        }
+
+        .product-price {
+            font-family: "Bebas Neue";
+
+            font-size: 28px;
+
+            color: #ff7430;
+        }
+
+        .buy-button {
+            padding: 10px 17px;
+
+            border-radius: 8px;
+
+            background: #8247e5;
+
+            color: #fff;
+
+            text-decoration: none;
+
+            font-size: 12px;
+            font-weight: 900;
+
+            transition: .3s;
+        }
+
+        .buy-button:hover {
+            background: #9a64ef;
+
+            transform: translateY(-2px);
+        }
+
+        /* ================= CTA ================= */
+
+        .cta {
+            margin: 40px 8% 100px;
+
+            padding: 70px 8%;
+
+            position: relative;
+            overflow: hidden;
+
+            border-radius: 25px;
+
+            background:
+                radial-gradient(circle at 90% 20%, rgba(255,116,48,.35), transparent 30%),
+                linear-gradient(120deg, #28143e, #17101f);
+
+            border: 1px solid rgba(255,255,255,.08);
+        }
+
+        body.light .cta {
+            background:
+                radial-gradient(circle at 90% 20%, rgba(255,116,48,.2), transparent 30%),
+                linear-gradient(120deg, #eee5f7, #f7f3fa);
+
+            border-color: rgba(0,0,0,.06);
+        }
+
+        .cta h2 {
+            font-family: "Bebas Neue";
+
+            font-size: clamp(48px, 6vw, 75px);
+
+            line-height: .9;
+
+            max-width: 700px;
+
+            margin-bottom: 18px;
+        }
+
+        .cta h2 span {
+            color: #ff7430;
+        }
+
+        .cta p {
+            color: #aaa4b1;
+
+            max-width: 600px;
+
+            font-size: 14px;
+
+            line-height: 1.7;
+
+            margin-bottom: 25px;
+        }
+
+        body.light .cta p {
+            color: #68616e;
+        }
+
+        .cta-button {
+            display: inline-flex;
+
+            align-items: center;
+            gap: 9px;
+
+            padding: 14px 22px;
+
+            border-radius: 9px;
+
+            background: #ff7430;
+
+            color: #fff;
+
+            text-decoration: none;
+
+            font-size: 13px;
+            font-weight: 900;
+
+            transition: .3s;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-3px);
+        }
+
+        /* ================= FOOTER ================= */
+
+        footer {
+            padding: 45px 8% 30px;
+
+            background: #050409;
+
+            border-top: 1px solid rgba(255,255,255,.06);
+        }
+
+        body.light footer {
+            background: #22182b;
+        }
+
+        .footer-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            padding-bottom: 30px;
+
+            border-bottom: 1px solid rgba(255,255,255,.08);
+        }
+
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+
+            color: #fff;
+
+            text-decoration: none;
+
+            font-size: 20px;
+            font-weight: 900;
+        }
+
+        .footer-logo img {
+            width: 28px;
+            height: 28px;
+
+            object-fit: contain;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 25px;
+        }
+
+        .footer-links a {
+            color: #aaa;
+
+            text-decoration: none;
+
+            font-size: 12px;
+            font-weight: 700;
+
+            transition: .3s;
+        }
+
+        .footer-links a:hover {
+            color: #ff7430;
+        }
+
+        .footer-bottom {
+            display: flex;
+            justify-content: space-between;
+
+            padding-top: 25px;
+
+            color: #777;
+
+            font-size: 11px;
+        }
+
+        /* ================= RESPONSIVO ================= */
+
+        @media (max-width: 1000px) {
+
+            .menu {
+                display: none;
+
+                position: absolute;
+
+                top: 78px;
+                left: 0;
+
+                width: 100%;
+
+                padding: 25px;
+
+                background: #0d0b13;
+
+                flex-direction: column;
+
+                gap: 22px;
+
+                border-bottom: 1px solid rgba(255,255,255,.08);
+            }
+
+            body.light .menu {
+                background: #fff;
+            }
+
+            .menu.active {
+                display: flex;
+            }
+
+            .menu-mobile {
+                display: flex;
+            }
+
+            .hero {
+                grid-template-columns: 1fr;
+                padding-top: 130px;
+            }
+
+            .hero-content {
+                text-align: center;
+            }
+
+            .hero-description {
+                margin-left: auto;
+                margin-right: auto;
+            }
+
+            .hero-buttons {
+                justify-content: center;
+            }
+
+            .analytics-grid,
+            .products-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+        }
+
+        @media (max-width: 650px) {
+
+            .header {
+                padding: 0 20px;
+            }
+
+            .logo-text {
+                font-size: 19px;
+            }
+
+            .login-button {
+                display: none;
+            }
+
+            .search,
+            .theme-toggle {
+                display: flex !important;
+            }
+
+            .hero {
+                padding: 120px 20px 70px;
+            }
+
+            .hero h1 {
+                font-size: 72px;
+            }
+
+            .hero-visual {
+                min-height: 380px;
+            }
+
+            .pet-panel {
+                transform: none;
+                padding: 20px;
+            }
+
+            .analytics,
+            .products {
+                padding: 80px 20px;
+            }
+
+            .analytics-grid,
+            .products-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .product-image {
+                height: 240px;
+            }
+
+            .cta {
+                margin: 20px 20px 70px;
+                padding: 50px 25px;
+            }
+
+            .footer-top,
+            .footer-bottom {
+                flex-direction: column;
+                gap: 22px;
+                align-items: flex-start;
+            }
+
+            .footer-links {
+                flex-wrap: wrap;
+            }
+
+        }
+
+    </style>
+</head>
+
+<body>
+
+    <!-- ================= HEADER ================= -->
+
+    <header class="header">
+
+        <a href="home.html" class="logo">
+
+            <img
+                src="fotos/icone uva sem fundo.png"
+                class="logo-grape"
+                alt="GrapeDev"
+            >
+
+            <span class="logo-text">
+                Grape<span>Dev</span>
+            </span>
+
+        </a>
+
+        <nav class="menu" id="menu">
+
+            <a href="home.html">
+                Início
+            </a>
+
+            <a href="projetos.html" class="active">
+                Projetos
+            </a>
+
+            <a href="sobre_nos.html">
+                Sobre nós
+            </a>
+
+            <a href="cartao.html">
+                Cartão de Visita
+            </a>
+
+            <a href="contato.html">
+                Contato
+            </a>
+
+        </nav>
+
+        <div class="header-actions">
+
+            <button
+                class="search"
+                id="searchButton"
+                type="button"
+                aria-label="Pesquisar"
+            >
+                <i class="bi bi-search"></i>
+            </button>
+
+            <a href="backend/auth/login.php" class="login-button">
+                Login
+            </a>
+
+            <button
+                class="theme-toggle"
+                id="themeToggle"
+                type="button"
+                aria-label="Alterar tema"
+            >
+
+                <img
+                    src="fotos/icone uva sem fundo.png"
+                    alt="Alterar tema"
+                >
+
+            </button>
+
+            <button
+                class="menu-mobile"
+                id="menuMobile"
+                type="button"
+                aria-label="Abrir menu"
+            >
+
+                <i class="bi bi-list"></i>
+
+            </button>
+
+        </div>
+
+    </header>
+
+
+    <!-- ================= PESQUISA ================= -->
+
+    <div class="search-overlay" id="searchOverlay">
+
+        <div class="search-box">
+
+            <i class="bi bi-search"></i>
+
+            <input
+                type="search"
+                id="searchInput"
+                placeholder="Pesquisar no site..."
+                autocomplete="off"
+            >
+
+            <button
+                type="button"
+                id="closeSearch"
+                aria-label="Fechar pesquisa"
+            >
+
+                <i class="bi bi-x-lg"></i>
+
+            </button>
+
+        </div>
+
+        <div
+            class="search-results"
+            id="searchResults"
+        ></div>
+
+    </div>
+
+
+    <!-- ================= HERO ================= -->
+
+    <section class="hero">
+
+        <div class="hero-content">
+
+            <div class="hero-kicker">
+                SMART PET MANAGEMENT
+            </div>
+
+            <h1>
+                PET<span>CONTROL</span>
+            </h1>
+
+            <p class="hero-description">
+
+                O PetControl é uma plataforma desenvolvida para modernizar
+                a gestão de pet shops e clínicas veterinárias, oferecendo
+                controle completo de clientes, pets, agendamentos e serviços.
+
+                <br><br>
+
+                O sistema centraliza informações importantes, melhora o
+                atendimento e aumenta a produtividade da equipe através
+                de recursos automatizados e relatórios inteligentes.
+
+            </p>
+
+            <div class="hero-buttons">
+
+                <a href="#recursos" class="hero-button primary">
+
+                    Conhecer recursos
+
+                    <i class="bi bi-arrow-down"></i>
+
+                </a>
+
+                <a href="#produtos" class="hero-button secondary">
+
+                    Ver soluções
+
+                    <i class="bi bi-arrow-right"></i>
+
+                </a>
+
+            </div>
+
+        </div>
+
+
+        <div class="hero-visual">
+
+            <div class="visual-glow"></div>
+
+            <div class="pet-panel">
+
+                <div class="panel-top">
+
+                    <div class="panel-title">
+                        PetControl Dashboard
+                    </div>
+
+                    <div class="online">
+                        Sistema online
+                    </div>
+
+                </div>
+
+
+                <div class="pet-stats">
+
+                    <div class="pet-stat">
+
+                        <i class="bi bi-heart-pulse"></i>
+
+                        <strong>1.248</strong>
+
+                        <span>Pets cadastrados</span>
+
+                    </div>
+
+                    <div class="pet-stat">
+
+                        <i class="bi bi-calendar-check"></i>
+
+                        <strong>86</strong>
+
+                        <span>Agendamentos</span>
+
+                    </div>
+
+                    <div class="pet-stat">
+
+                        <i class="bi bi-people"></i>
+
+                        <strong>934</strong>
+
+                        <span>Clientes</span>
+
+                    </div>
+
+                    <div class="pet-stat">
+
+                        <i class="bi bi-graph-up"></i>
+
+                        <strong>95%</strong>
+
+                        <span>Eficiência</span>
+
+                    </div>
+
+                </div>
+
+
+                <div class="panel-chart">
+
+                    <div class="chart-label">
+
+                        <span>Atendimentos da semana</span>
+
+                        <span>+18%</span>
+
+                    </div>
+
+                    <div class="chart-bars">
+
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                        <span></span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- ================= ANALYTICS ================= -->
+
+    <section class="analytics" id="recursos">
+
+        <div class="analytics-header">
+
+            <span class="section-label">
+                SMART PET MANAGEMENT
+            </span>
+
+            <h2 class="section-title">
+                Gestão inteligente para pet shops.
+            </h2>
+
+            <p>
+
+                Com tecnologia moderna e fácil utilização, o PetControl
+                transforma a administração do negócio em uma experiência
+                mais organizada e eficiente.
+
+            </p>
+
+        </div>
+
+
+        <div class="analytics-grid">
+
+            <div class="analytics-card">
+
+                <div class="analytics-icon">
+                    <i class="bi bi-heart-pulse"></i>
+                </div>
+
+                <h3>
+                    Pet Records
+                </h3>
+
+                <p>
+                    Histórico completo dos animais.
+                </p>
+
+                <span class="analytics-number">
+                    100%
+                </span>
+
+            </div>
+
+
+            <div class="analytics-card">
+
+                <div class="analytics-icon">
+                    <i class="bi bi-calendar-check"></i>
+                </div>
+
+                <h3>
+                    Smart Scheduling
+                </h3>
+
+                <p>
+                    Agendamento rápido e organizado.
+                </p>
+
+                <span class="analytics-number">
+                    24/7
+                </span>
+
+            </div>
+
+
+            <div class="analytics-card">
+
+                <div class="analytics-icon">
+                    <i class="bi bi-bar-chart-line"></i>
+                </div>
+
+                <h3>
+                    Sales Reports
+                </h3>
+
+                <p>
+                    Relatórios completos de vendas.
+                </p>
+
+                <span class="analytics-number">
+                    +95%
+                </span>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- ================= PRODUTOS ================= -->
+
+    <section class="products" id="produtos">
+
+        <div class="products-header">
+
+            <span class="section-label">
+                SMART SERVICES
+            </span>
+
+            <h2 class="section-title">
+                Ferramentas para seu pet shop.
+            </h2>
+
+            <p>
+
+                Recursos inteligentes desenvolvidos para facilitar o
+                gerenciamento completo de estabelecimentos pet.
+
+            </p>
+
+        </div>
+
+
+        <div class="products-grid">
+
+
+            <!-- PRODUTO 1 -->
+
+            <div class="product-card">
+
+                <div class="product-image">
+
+                    <img
+                        src="fotos/petsystem.png"
+                        alt="Cadastro de Pets"
+                    >
+
+                </div>
+
+                <div class="product-info">
+
+                    <h3>
+                        Pet Manager
+                    </h3>
+
+                    <p>
+                        Cadastro completo de clientes e animais.
+                    </p>
+
+                    <div class="product-bottom">
+
+                        <span class="product-price">
+                            R$ 79,90
+                        </span>
+
+                        <a
+                            href="backend/auth/login.php"
+                            class="buy-button"
+                        >
+                            Comprar
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- PRODUTO 2 -->
+
+            <div class="product-card">
+
+                <div class="product-image">
+
+                    <img
+                        src="fotos/agendamentopet.png"
+                        alt="Agendamento"
+                    >
+
+                </div>
+
+                <div class="product-info">
+
+                    <h3>
+                        Smart Booking
+                    </h3>
+
+                    <p>
+                        Agendamento de banho, tosa e consultas.
+                    </p>
+
+                    <div class="product-bottom">
+
+                        <span class="product-price">
+                            R$ 99,90
+                        </span>
+
+                        <a
+                            href="backend/auth/login.php"
+                            class="buy-button"
+                        >
+                            Comprar
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- PRODUTO 3 -->
+
+            <div class="product-card">
+
+                <div class="product-image">
+
+                    <img
+                        src="fotos/dashboardpet.png"
+                        alt="Dashboard"
+                    >
+
+                </div>
+
+                <div class="product-info">
+
+                    <h3>
+                        Pet Dashboard
+                    </h3>
+
+                    <p>
+                        Painel completo para análise administrativa.
+                    </p>
+
+                    <div class="product-bottom">
+
+                        <span class="product-price">
+                            R$ 119,90
+                        </span>
+
+                        <a
+                            href="backend/auth/login.php"
+                            class="buy-button"
+                        >
+                            Comprar
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+        </div>
+
+    </section>
+
+
+    <!-- ================= CTA ================= -->
+
+    <section class="cta">
+
+        <h2>
+            Transforme a gestão do seu
+            <span>pet shop.</span>
+        </h2>
+
+        <p>
+
+            Organize seus clientes, pets, serviços e agendamentos
+            em uma única plataforma desenvolvida pela GrapeDev.
+
+        </p>
+
+        <a href="backend/auth/login.php" class="cta-button">
+
+            Começar agora
+
+            <i class="bi bi-arrow-right"></i>
+
+        </a>
+
+    </section>
+
+
+    <!-- ================= FOOTER ================= -->
+
+    <footer>
+
+        <div class="footer-top">
+
+            <a href="home.html" class="footer-logo">
+
+                <img
+                    src="../../storage/images/icone_uva_sem_fundo.png"
+                    alt="GrapeDev"
+                >
+
+                Grape<span style="color:#8247e5;">Dev</span>
+
+            </a>
+
+
+            <div class="footer-links">
+
+                <a href="home.html">
+                    Início
+                </a>
+
+                <a href="projetos.html">
+                    Projetos
+                </a>
+
+                <a href="sobre_nos.html">
+                    Sobre nós
+                </a>
+
+                <a href="contato.html">
+                    Contato
+                </a>
+
+            </div>
+
+        </div>
+
+
+        <div class="footer-bottom">
+
+            <span>
+                © 2026 GrapeDev. Todos os direitos reservados.
+            </span>
+
+            <span>
+                PetControl • Smart Pet Management
+            </span>
+
+        </div>
+
+    </footer>
+
+
+    <script>
+
+        /* ================= TEMA ================= */
+
+        const themeToggle =
+            document.getElementById("themeToggle");
+
+        const savedTheme =
+            localStorage.getItem("grapeTheme");
+
+        if (savedTheme === "light") {
+            document.body.classList.add("light");
+        }
+
+        themeToggle.addEventListener("click", () => {
+
+            document.body.classList.toggle("light");
+
+            localStorage.setItem(
+                "grapeTheme",
+                document.body.classList.contains("light")
+                    ? "light"
+                    : "dark"
+            );
+
+        });
+
+
+        /* ================= MENU MOBILE ================= */
+
+        const menuMobile =
+            document.getElementById("menuMobile");
+
+        const menu =
+            document.getElementById("menu");
+
+        menuMobile.addEventListener("click", () => {
+
+            menu.classList.toggle("active");
+
+            const icon =
+                menuMobile.querySelector("i");
+
+            if (menu.classList.contains("active")) {
+
+                icon.className = "bi bi-x-lg";
+
+            } else {
+
+                icon.className = "bi bi-list";
+
+            }
+
+        });
+
+
+        document.querySelectorAll(".menu a")
+            .forEach(link => {
+
+                link.addEventListener("click", () => {
+
+                    menu.classList.remove("active");
+
+                    const icon =
+                        menuMobile.querySelector("i");
+
+                    icon.className = "bi bi-list";
+
+                });
+
+            });
+
+
+        /* ================= PESQUISA ================= */
+
+        const searchButton =
+            document.getElementById("searchButton");
+
+        const searchOverlay =
+            document.getElementById("searchOverlay");
+
+        const searchInput =
+            document.getElementById("searchInput");
+
+        const closeSearch =
+            document.getElementById("closeSearch");
+
+        const searchResults =
+            document.getElementById("searchResults");
+
+
+        const paginas = [
+
+            {
+                titulo: "Início",
+                descricao: "Conheça a GrapeDev e nossas soluções digitais.",
+                link: "home.html"
+            },
+
+            {
+                titulo: "Projetos",
+                descricao: "Conheça os projetos desenvolvidos pela GrapeDev.",
+                link: "projetos.html"
+            },
+
+            {
+                titulo: "AquaFlow",
+                descricao: "Sistema inteligente de monitoramento e controle de água.",
+                link: "aquaflow.html"
+            },
+
+            {
+                titulo: "Bem-Estar",
+                descricao: "Plataforma inteligente para academias.",
+                link: "produtosbemestar.html"
+            },
+
+            {
+                titulo: "PetControl",
+                descricao: "Sistema inteligente para pet shops e clínicas veterinárias.",
+                link: "petcontrol.html"
+            },
+
+            {
+                titulo: "Sobre nós",
+                descricao: "Conheça a equipe e a história da GrapeDev.",
+                link: "sobre_nos.html"
+            },
+
+            {
+                titulo: "Cartão de Visita",
+                descricao: "Conheça o cartão digital da GrapeDev.",
+                link: "cartao.html"
+            },
+
+            {
+                titulo: "Contato",
+                descricao: "Entre em contato com a equipe GrapeDev.",
+                link: "contato.html"
+            },
+
+            {
+                titulo: "Dashboard",
+                descricao: "Acesse o painel do AquaFlow.",
+                link: "dashboard.php"
+            }
+
+        ];
+
+
+        function mostrarResultados() {
+
+            const termo =
+                searchInput.value
+                    .trim()
+                    .toLowerCase();
+
+
+            if (!termo) {
+
+                searchResults.innerHTML = `
+                    <div class="search-empty">
+                        Digite algo para pesquisar no site.
+                    </div>
+                `;
+
+                return;
+
+            }
+
+
+            const encontrados =
+                paginas.filter(pagina =>
+
+                    pagina.titulo
+                        .toLowerCase()
+                        .includes(termo)
+
+                    ||
+
+                    pagina.descricao
+                        .toLowerCase()
+                        .includes(termo)
+
+                );
+
+
+            if (!encontrados.length) {
+
+                searchResults.innerHTML = `
+                    <div class="search-empty">
+                        Nenhum resultado encontrado.
+                    </div>
+                `;
+
+                return;
+
+            }
+
+
+            searchResults.innerHTML = "";
+
+
+            encontrados.forEach(pagina => {
+
+                const link =
+                    document.createElement("a");
+
+                link.className = "search-result";
+
+                link.href = pagina.link;
+
+
+                const titulo =
+                    document.createElement("strong");
+
+                titulo.textContent =
+                    pagina.titulo;
+
+
+                const descricao =
+                    document.createElement("span");
+
+                descricao.textContent =
+                    pagina.descricao;
+
+
+                link.appendChild(titulo);
+
+                link.appendChild(descricao);
+
+                searchResults.appendChild(link);
+
+            });
+
+        }
+
+
+        function abrirPesquisa() {
+
+            searchOverlay.classList.add("active");
+
+            document.body.style.overflow = "hidden";
+
+            searchInput.value = "";
+
+            mostrarResultados();
+
+            setTimeout(() => {
+
+                searchInput.focus();
+
+            }, 100);
+
+        }
+
+
+        function fecharPesquisa() {
+
+            searchOverlay.classList.remove("active");
+
+            document.body.style.overflow = "";
+
+            searchInput.value = "";
+
+            searchResults.innerHTML = "";
+
+        }
+
+
+        searchButton.addEventListener(
+            "click",
+            abrirPesquisa
+        );
+
+
+        closeSearch.addEventListener(
+            "click",
+            fecharPesquisa
+        );
+
+
+        searchInput.addEventListener(
+            "input",
+            mostrarResultados
+        );
+
+
+        searchOverlay.addEventListener(
+            "click",
+            evento => {
+
+                if (
+                    evento.target === searchOverlay
+                ) {
+
+                    fecharPesquisa();
+
+                }
+
+            }
+        );
+
+
+        document.addEventListener(
+            "keydown",
+            evento => {
+
+                if (
+                    evento.key === "Escape" &&
+                    searchOverlay.classList.contains("active")
+                ) {
+
+                    fecharPesquisa();
+
+                }
+
+            }
+        );
+
+    </script>
+
+</body>
+</html>

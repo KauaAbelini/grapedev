@@ -1,0 +1,5990 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>GrapeDev City | AquaFlow</title>
+
+
+<link
+    rel="stylesheet"
+    href="/grapedev/nex/assets/nex-jarvis.css"
+>
+
+<script
+    src="/grapedev/nex/assets/nex-jarvis.js"
+    defer
+></script>
+
+<!-- =========================================================
+     IMPORT MAP
+     CORREÇÃO DO ERRO DO THREE.JS
+========================================================= -->
+
+<script type="importmap">
+{
+    "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.161.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.161.0/examples/jsm/"
+    }
+}
+</script>
+
+
+<style>
+
+/* =========================================================
+   RESET
+========================================================= */
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+
+html,
+body{
+
+    width:100%;
+    height:100%;
+
+    overflow:hidden;
+
+    background:#02050b;
+
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+
+    color:white;
+}
+
+
+canvas{
+
+    position:fixed;
+
+    inset:0;
+
+    width:100%;
+    height:100%;
+
+}
+
+
+/* =========================================================
+   LOADING
+========================================================= */
+
+#loading{
+
+    position:fixed;
+
+    inset:0;
+
+    z-index:9999;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    flex-direction:column;
+
+    background:
+        radial-gradient(
+            circle at center,
+            #24104a,
+            #080914 45%,
+            #02040a
+        );
+
+    transition:.6s;
+
+}
+
+
+#loading.hidden{
+
+    opacity:0;
+
+    pointer-events:none;
+
+}
+
+
+.loading-logo{
+
+    font-size:36px;
+
+    font-weight:900;
+
+    letter-spacing:7px;
+
+}
+
+
+.loading-logo span{
+
+    color:#a855f7;
+
+}
+
+
+.loading-text{
+
+    margin-top:14px;
+
+    color:#9ca3af;
+
+    font-size:11px;
+
+    letter-spacing:3px;
+
+}
+
+
+.loader{
+
+    width:240px;
+
+    height:4px;
+
+    margin-top:25px;
+
+    overflow:hidden;
+
+    border-radius:20px;
+
+    background:#222;
+
+}
+
+
+.loader div{
+
+    width:40%;
+
+    height:100%;
+
+    background:
+        linear-gradient(
+            90deg,
+            #7c3aed,
+            #00c8ff
+        );
+
+    animation:
+        loading 1.2s infinite;
+
+}
+
+
+@keyframes loading{
+
+    from{
+        transform:translateX(-150%);
+    }
+
+    to{
+        transform:translateX(350%);
+    }
+
+}
+
+
+/* =========================================================
+   SIDEBAR
+========================================================= */
+
+.sidebar{
+
+    position:fixed;
+
+    left:0;
+    top:0;
+    bottom:0;
+
+    width:82px;
+
+    z-index:50;
+
+    background:
+        rgba(3,5,14,.92);
+
+    border-right:
+        1px solid
+        rgba(168,85,247,.2);
+
+    backdrop-filter:
+        blur(15px);
+
+    display:flex;
+
+    flex-direction:column;
+
+    align-items:center;
+
+}
+
+
+.logo{
+
+    margin-top:18px;
+
+    width:48px;
+    height:48px;
+
+    display:flex;
+
+    align-items:center;
+    justify-content:center;
+
+    border-radius:14px;
+
+    font-size:23px;
+
+    font-weight:900;
+
+    background:
+        linear-gradient(
+            135deg,
+            #7c3aed,
+            #c026ff
+        );
+
+    box-shadow:
+        0 0 30px
+        rgba(139,92,246,.5);
+
+}
+
+
+.logo-text{
+
+    margin-top:7px;
+
+    font-size:9px;
+
+    font-weight:bold;
+
+    letter-spacing:1px;
+
+}
+
+
+.logo-text span{
+
+    color:#a855f7;
+
+}
+
+
+.menu{
+
+    width:100%;
+
+    margin-top:25px;
+
+    padding:10px;
+
+}
+
+
+.menu button{
+
+    width:100%;
+
+    height:65px;
+
+    border:0;
+
+    background:transparent;
+
+    color:#7e879d;
+
+    border-radius:13px;
+
+    cursor:pointer;
+
+    margin-bottom:5px;
+
+    transition:.25s;
+
+}
+
+
+.menu button:hover,
+.menu button.active{
+
+    color:white;
+
+    background:
+        linear-gradient(
+            135deg,
+            #7135df,
+            #9238e8
+        );
+
+    box-shadow:
+        0 0 25px
+        rgba(124,58,237,.35);
+
+}
+
+
+.menu-icon{
+
+    font-size:20px;
+
+}
+
+
+.menu-label{
+
+    display:block;
+
+    margin-top:5px;
+
+    font-size:9px;
+
+}
+
+
+/* =========================================================
+   TÍTULO
+========================================================= */
+
+.title{
+
+    position:fixed;
+
+    left:105px;
+
+    top:20px;
+
+    z-index:40;
+
+    padding:15px 22px;
+
+    border-radius:15px;
+
+    background:
+        rgba(3,5,14,.72);
+
+    border:
+        1px solid
+        rgba(168,85,247,.25);
+
+    backdrop-filter:
+        blur(15px);
+
+}
+
+
+.title h1{
+
+    font-size:20px;
+
+    letter-spacing:5px;
+
+}
+
+
+.title h1 span{
+
+    color:#a855f7;
+
+}
+
+
+.title p{
+
+    margin-top:5px;
+
+    color:#8992a7;
+
+    font-size:8px;
+
+    letter-spacing:3px;
+
+}
+
+
+/* =========================================================
+   RAIO-X
+========================================================= */
+
+.xray{
+
+    position:fixed;
+
+    top:20px;
+
+    right:390px;
+
+    z-index:60;
+
+    padding:12px 18px;
+
+    border:
+        1px solid
+        rgba(0,200,255,.4);
+
+    border-radius:25px;
+
+    background:
+        rgba(2,7,17,.85);
+
+    color:#8fa4b8;
+
+    cursor:pointer;
+
+    backdrop-filter:
+        blur(15px);
+
+}
+
+
+.xray.active{
+
+    color:white;
+
+    background:
+        linear-gradient(
+            135deg,
+            #0077ff,
+            #00c8ff
+        );
+
+    box-shadow:
+        0 0 30px
+        rgba(0,190,255,.45);
+
+}
+
+
+/* =========================================================
+   DIA / NOITE
+========================================================= */
+
+.mode{
+
+    position:fixed;
+
+    top:20px;
+
+    right:20px;
+
+    z-index:60;
+
+    padding:5px;
+
+    border-radius:30px;
+
+    background:
+        rgba(2,5,14,.85);
+
+    border:
+        1px solid
+        rgba(255,255,255,.12);
+
+}
+
+
+.mode button{
+
+    border:0;
+
+    padding:10px 15px;
+
+    border-radius:20px;
+
+    background:transparent;
+
+    color:#788196;
+
+    cursor:pointer;
+
+}
+
+
+.mode button.active{
+
+    color:white;
+
+    background:
+        linear-gradient(
+            135deg,
+            #7c3aed,
+            #2563eb
+        );
+
+}
+
+
+/* =========================================================
+   LABELS
+========================================================= */
+
+.region-label{
+
+    position:fixed;
+
+    z-index:30;
+
+    transform:
+        translate(-50%,-50%);
+
+    padding:7px 12px;
+
+    border-radius:20px;
+
+    background:
+        rgba(3,6,15,.84);
+
+    border:
+        1px solid
+        rgba(255,255,255,.2);
+
+    backdrop-filter:
+        blur(12px);
+
+    font-size:10px;
+
+    font-weight:bold;
+
+    white-space:nowrap;
+
+    pointer-events:none;
+
+    transition:opacity .2s;
+
+}
+
+
+.region-label span{
+
+    display:inline-flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    width:19px;
+
+    height:19px;
+
+    margin-right:5px;
+
+    border-radius:50%;
+
+    background:
+        rgba(255,255,255,.1);
+
+}
+
+
+/* =========================================================
+   PAINEL
+========================================================= */
+
+.panel{
+
+    position:fixed;
+
+    right:0;
+
+    top:0;
+
+    bottom:0;
+
+    z-index:50;
+
+    width:350px;
+
+    padding:25px 18px;
+
+    overflow-y:auto;
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(3,9,22,.98),
+            rgba(2,5,14,.97)
+        );
+
+    border-left:
+        1px solid
+        rgba(0,174,255,.2);
+
+}
+
+
+.aqua-header{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:12px;
+
+    padding-bottom:22px;
+
+    border-bottom:
+        1px solid
+        rgba(255,255,255,.06);
+
+}
+
+
+.aqua-icon{
+
+    width:52px;
+
+    height:52px;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    border-radius:15px;
+
+    font-size:27px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #008cff,
+            #635bff
+        );
+
+}
+
+
+.aqua-title{
+
+    color:#22baff;
+
+    font-size:20px;
+
+    letter-spacing:4px;
+
+}
+
+
+.aqua-sub{
+
+    margin-top:5px;
+
+    color:#66748a;
+
+    font-size:8px;
+
+}
+
+
+.panel-title{
+
+    margin:22px 0 12px;
+
+    color:#d76aff;
+
+    font-size:12px;
+
+    letter-spacing:2px;
+
+}
+
+
+.product{
+
+    padding:13px;
+
+    margin-bottom:10px;
+
+    border-radius:14px;
+
+    border:
+        1px solid
+        rgba(0,153,255,.2);
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(7,27,52,.9),
+            rgba(3,12,27,.9)
+        );
+
+    cursor:pointer;
+
+    transition:.25s;
+
+}
+
+
+.product:hover{
+
+    transform:
+        translateX(-4px);
+
+    border-color:#00bfff;
+
+    box-shadow:
+        0 0 25px
+        rgba(0,174,255,.2);
+
+}
+
+
+.product strong{
+
+    display:block;
+
+    color:#fff;
+
+    font-size:13px;
+
+}
+
+
+.product small{
+
+    display:block;
+
+    margin-top:5px;
+
+    color:#8492a8;
+
+    line-height:1.4;
+
+}
+
+
+.product-tags{
+
+    display:flex;
+
+    flex-wrap:wrap;
+
+    gap:5px;
+
+    margin-top:8px;
+
+}
+
+
+.product-tags span{
+
+    padding:3px 6px;
+
+    border-radius:5px;
+
+    color:#2bc9ff;
+
+    background:
+        rgba(0,174,255,.08);
+
+    font-size:7px;
+
+}
+
+
+/* =========================================================
+   MODAL
+========================================================= */
+
+.info{
+
+    position:fixed;
+
+    left:50%;
+
+    top:50%;
+
+    width:470px;
+
+    max-width:90vw;
+
+    max-height:80vh;
+
+    overflow-y:auto;
+
+    z-index:100;
+
+    padding:28px;
+
+    border-radius:22px;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(10,8,28,.98),
+            rgba(2,9,22,.98)
+        );
+
+    border:
+        1px solid
+        rgba(0,180,255,.4);
+
+    box-shadow:
+        0 30px 100px
+        rgba(0,0,0,.8);
+
+    transform:
+        translate(-50%,-50%)
+        scale(.9);
+
+    opacity:0;
+
+    pointer-events:none;
+
+    transition:.25s;
+
+}
+
+
+.info.show{
+
+    opacity:1;
+
+    pointer-events:auto;
+
+    transform:
+        translate(-50%,-50%)
+        scale(1);
+
+}
+
+
+.close{
+
+    position:absolute;
+
+    right:14px;
+
+    top:14px;
+
+    width:30px;
+
+    height:30px;
+
+    border:0;
+
+    border-radius:50%;
+
+    background:
+        rgba(255,255,255,.08);
+
+    color:white;
+
+    cursor:pointer;
+
+}
+
+
+.info h2{
+
+    color:#22c7ff;
+
+    font-size:24px;
+
+}
+
+
+.info h3{
+
+    margin-top:20px;
+
+    margin-bottom:7px;
+
+    color:#bd62ff;
+
+    font-size:13px;
+
+}
+
+
+.info p{
+
+    color:#aab4c6;
+
+    font-size:12px;
+
+    line-height:1.7;
+
+}
+
+
+/* =========================================================
+   CONTROLES
+========================================================= */
+
+.controls{
+
+    position:fixed;
+
+    left:50%;
+
+    bottom:20px;
+
+    transform:
+        translateX(-50%);
+
+    z-index:40;
+
+    display:flex;
+
+    gap:4px;
+
+    padding:5px;
+
+    border-radius:30px;
+
+    background:
+        rgba(3,5,14,.88);
+
+    border:
+        1px solid
+        rgba(255,255,255,.1);
+
+}
+
+
+.controls button{
+
+    padding:11px 17px;
+
+    border:0;
+
+    border-radius:23px;
+
+    background:transparent;
+
+    color:#818ba0;
+
+    cursor:pointer;
+
+}
+
+
+.controls button.active,
+.controls button:hover{
+
+    color:white;
+
+    background:
+        linear-gradient(
+            135deg,
+            #7135df,
+            #2468d8
+        );
+
+}
+
+
+/* =========================================================
+   ERRO
+========================================================= */
+
+#errorBox{
+
+    display:none;
+
+    position:fixed;
+
+    left:50%;
+
+    top:50%;
+
+    transform:
+        translate(-50%,-50%);
+
+    z-index:20000;
+
+    width:520px;
+
+    max-width:90vw;
+
+    padding:25px;
+
+    border-radius:18px;
+
+    background:#100810;
+
+    border:
+        1px solid
+        #ff416c;
+
+    box-shadow:
+        0 30px 100px
+        #000;
+
+}
+
+
+#errorBox.show{
+
+    display:block;
+
+}
+
+
+#errorBox h2{
+
+    color:#ff5f7a;
+
+    margin-bottom:10px;
+
+}
+
+
+#errorBox p{
+
+    color:#c7aeb5;
+
+    line-height:1.6;
+
+    font-size:13px;
+
+}
+
+
+#errorBox code{
+
+    display:block;
+
+    margin-top:15px;
+
+    padding:12px;
+
+    background:#050307;
+
+    color:#ffb4c0;
+
+    border-radius:8px;
+
+    white-space:pre-wrap;
+
+}
+
+
+/* =========================================================
+   RESPONSIVO
+========================================================= */
+
+@media(max-width:900px){
+
+    .panel{
+        width:290px;
+    }
+
+    .xray{
+        right:310px;
+    }
+
+}
+
+
+@media(max-width:700px){
+
+    .panel{
+        display:none;
+    }
+
+    .sidebar{
+        width:65px;
+    }
+
+    .title{
+        left:78px;
+    }
+
+    .xray{
+        right:10px;
+        top:80px;
+    }
+
+}
+
+/* =========================================================
+   CONTROLE POR GESTOS — CÂMERA INVISÍVEL
+========================================================= */
+
+#cameraBox{
+    position:fixed;
+    left:-100px;
+    top:-100px;
+    width:1px;
+    height:1px;
+    opacity:0;
+    pointer-events:none;
+    overflow:hidden;
+}
+
+#gestureVideo{
+    width:1px;
+    height:1px;
+}
+
+#cameraButton{
+    display:none !important;
+}
+
+#gestureHint{
+    position:fixed;
+    left:50%;
+    bottom:72px;
+    transform:translateX(-50%);
+    z-index:45;
+    padding:8px 14px;
+    border-radius:18px;
+    background:rgba(3,5,14,.72);
+    border:1px solid rgba(168,85,247,.18);
+    color:#aab3c4;
+    font-size:9px;
+    letter-spacing:.5px;
+    backdrop-filter:blur(12px);
+    pointer-events:none;
+    white-space:nowrap;
+}
+
+#gestureHint strong{
+    color:#d9b3ff;
+}
+
+@media(max-width:700px){
+    #gestureHint{
+        bottom:72px;
+        max-width:calc(100vw - 90px);
+        white-space:normal;
+        text-align:center;
+        line-height:1.5;
+    }
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<!-- =========================================================
+     LOADING
+========================================================= -->
+
+<div id="loading">
+
+    <div class="loading-logo">
+        GRAPE<span>DEV</span>
+    </div>
+
+    <div class="loading-text">
+        INICIALIZANDO GRAPEDEV CITY
+    </div>
+
+    <div class="loader">
+        <div></div>
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     ERRO
+========================================================= -->
+
+<div id="errorBox">
+
+    <h2>Erro ao iniciar a cidade</h2>
+
+    <p>
+        O sistema 3D encontrou um erro.
+        Veja os detalhes abaixo.
+    </p>
+
+    <code id="errorText"></code>
+
+</div>
+
+<!-- =========================================================
+     CONTROLE POR GESTOS
+     A câmera funciona somente em segundo plano.
+========================================================= -->
+
+<div id="cameraBox" aria-hidden="true">
+    <video
+        id="gestureVideo"
+        autoplay
+        playsinline
+        muted
+    ></video>
+    <div id="cameraStatus"></div>
+</div>
+
+<div id="gestureHint">
+    <strong>✋ Gestos:</strong> mover a mão gira • ↕ inclina • 🤏 abrir/fechar a pinça faz zoom • ✊ pausa
+</div>
+
+<canvas id="city"></canvas>
+
+
+<!-- =========================================================
+     SIDEBAR
+========================================================= -->
+
+<aside class="sidebar">
+
+    <div class="logo">
+        G
+    </div>
+
+    <div class="logo-text">
+        GRAPE<span>DEV</span>
+    </div>
+
+
+    <nav class="menu">
+
+        <button class="active">
+            <div class="menu-icon">⌂</div>
+            <span class="menu-label">Início</span>
+        </button>
+
+
+        <button>
+            <div class="menu-icon">⌕</div>
+            <span class="menu-label">Explorar</span>
+        </button>
+
+
+        <button>
+            <div class="menu-icon">▦</div>
+            <span class="menu-label">Catálogo</span>
+        </button>
+
+
+        <button>
+            <div class="menu-icon">◇</div>
+            <span class="menu-label">Ambientes</span>
+        </button>
+
+
+        <button>
+            <div class="menu-icon">💧</div>
+            <span class="menu-label">AquaFlow</span>
+        </button>
+
+
+        <button>
+            <div class="menu-icon">✦</div>
+            <span class="menu-label">Nex</span>
+        </button>
+
+    </nav>
+
+</aside>
+
+
+<!-- =========================================================
+     TÍTULO
+========================================================= -->
+
+<div class="title">
+
+    <h1>
+        GRAPE<span>DEV</span> CITY
+    </h1>
+
+    <p>
+        AQUAFLOW SMART CITY
+    </p>
+
+</div>
+
+
+<button
+    class="xray"
+    id="xrayButton"
+>
+    🔬 RAIO-X
+</button>
+
+
+<div class="mode">
+
+    <button
+        id="dayButton"
+        class="active"
+    >
+        ☀ Dia
+    </button>
+
+    <button id="nightButton">
+        🌙 Noite
+    </button>
+
+</div>
+
+
+<!-- =========================================================
+     LABELS
+========================================================= -->
+
+<div
+    class="region-label"
+    id="businessLabel"
+>
+    <span>🏢</span>
+    CENTRO EMPRESARIAL
+</div>
+
+
+<div
+    class="region-label"
+    id="residentialLabel"
+>
+    <span>🏙</span>
+    CENTRO URBANO
+</div>
+
+
+<div
+    class="region-label"
+    id="mansionsLabel"
+>
+    <span>🏰</span>
+    BAIRRO RESIDENCIAL
+</div>
+
+
+<div
+    class="region-label"
+    id="agroLabel"
+>
+    <span>🌾</span>
+    FAZENDA AQUAFLOW
+</div>
+
+
+<div
+    class="region-label"
+    id="clubLabel"
+>
+    <span>🏟</span>
+    CLUBE AQUAFLOW
+</div>
+
+
+<!-- =========================================================
+     PAINEL
+========================================================= -->
+
+<aside class="panel">
+
+    <div class="aqua-header">
+
+        <div class="aqua-icon">
+            💧
+        </div>
+
+        <div>
+
+            <div class="aqua-title">
+                AQUAFLOW
+            </div>
+
+            <div class="aqua-sub">
+                SMART WATER TECHNOLOGY
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="panel-title">
+        SOLUÇÕES AQUAFLOW
+    </div>
+
+
+    <div
+        class="product"
+        onclick="openProduct('sensor')"
+    >
+
+        <strong>
+            🔵 Smart Sensor
+        </strong>
+
+        <small>
+            Monitora fluxo, consumo e possíveis
+            anormalidades no sistema hidráulico.
+        </small>
+
+        <div class="product-tags">
+            <span>CASAS</span>
+            <span>EMPRESAS</span>
+            <span>INDÚSTRIAS</span>
+        </div>
+
+    </div>
+
+
+    <div
+        class="product"
+        onclick="openProduct('meter')"
+    >
+
+        <strong>
+            📊 Digital Meter
+        </strong>
+
+        <small>
+            Mede e registra o consumo de água
+            em diferentes ambientes.
+        </small>
+
+        <div class="product-tags">
+            <span>MEDIÇÃO</span>
+            <span>CONSUMO</span>
+        </div>
+
+    </div>
+
+
+    <div
+        class="product"
+        onclick="openProduct('dashboard')"
+    >
+
+        <strong>
+            🖥 AquaFlow Dashboard
+        </strong>
+
+        <small>
+            Centraliza dados, consumo e alertas.
+        </small>
+
+        <div class="product-tags">
+            <span>MONITORAMENTO</span>
+            <span>ALERTAS</span>
+        </div>
+
+    </div>
+
+
+    <div
+        class="product"
+        onclick="openProduct('shower')"
+    >
+
+        <strong>
+            🚿 Eco Shower
+        </strong>
+
+        <small>
+            Acompanhamento do consumo
+            durante o banho.
+        </small>
+
+        <div class="product-tags">
+            <span>CASAS</span>
+            <span>HOTÉIS</span>
+            <span>CLUBES</span>
+        </div>
+
+    </div>
+
+</aside>
+
+
+<!-- =========================================================
+     INFO
+========================================================= -->
+
+<div
+    class="info"
+    id="info"
+>
+
+    <button
+        class="close"
+        onclick="closeProduct()"
+    >
+        ×
+    </button>
+
+    <h2 id="infoTitle">
+        Produto
+    </h2>
+
+    <div id="infoContent"></div>
+
+</div>
+
+
+<!-- =========================================================
+     CONTROLES
+========================================================= -->
+
+<div class="controls">
+
+    <button
+        id="exploreButton"
+        class="active"
+    >
+        ◉ Explorar
+    </button>
+
+
+    <button id="rotateButton">
+        ◌ Rotacionar
+    </button>
+
+
+    <button id="resetButton">
+        ⌂ Cidade
+    </button>
+
+</div>
+
+
+<!-- =========================================================
+     THREE.JS
+========================================================= -->
+
+<script type="module">
+
+import * as THREE from "three";
+
+import {
+    OrbitControls
+} from "three/addons/controls/OrbitControls.js";
+
+
+/* =========================================================
+   ERRO
+========================================================= */
+
+window.addEventListener(
+    "error",
+    function(event){
+
+        console.error(
+            event.error ||
+            event.message
+        );
+
+        const box =
+            document.getElementById(
+                "errorBox"
+            );
+
+        const text =
+            document.getElementById(
+                "errorText"
+            );
+
+        if(box && text){
+
+            box.classList.add("show");
+
+            text.textContent =
+                event.error?.stack ||
+                event.message ||
+                "Erro desconhecido";
+
+        }
+
+        document
+            .getElementById("loading")
+            ?.classList.add("hidden");
+
+    }
+);
+
+
+/* =========================================================
+   CANVAS
+========================================================= */
+
+const canvas =
+    document.getElementById("city");
+
+
+/* =========================================================
+   CENA
+========================================================= */
+
+const scene =
+    new THREE.Scene();
+
+
+scene.background =
+    new THREE.Color(
+        0x9ac7df
+    );
+
+
+scene.fog =
+    new THREE.Fog(
+        0x9ac7df,
+        500,
+        1700
+    );
+
+
+/* =========================================================
+   CAMERA
+========================================================= */
+
+const camera =
+    new THREE.PerspectiveCamera(
+        55,
+        window.innerWidth /
+        window.innerHeight,
+        .1,
+        3000
+    );
+
+
+camera.position.set(
+    720,
+    560,
+    720
+);
+
+
+/* =========================================================
+   RENDERER
+========================================================= */
+
+const renderer =
+    new THREE.WebGLRenderer({
+
+        canvas:canvas,
+
+        antialias:true
+
+    });
+
+
+renderer.setPixelRatio(
+    Math.min(
+        window.devicePixelRatio,
+        1.5
+    )
+);
+
+
+renderer.setSize(
+    window.innerWidth,
+    window.innerHeight
+);
+
+
+renderer.shadowMap.enabled = true;
+
+
+renderer.shadowMap.type =
+    THREE.PCFSoftShadowMap;
+
+
+/* =========================================================
+   CONTROLES
+========================================================= */
+
+const controls =
+    new OrbitControls(
+        camera,
+        renderer.domElement
+    );
+
+/* Ponte entre a cidade e o controle por gestos. */
+window.aquaControls = controls;
+
+
+controls.enableDamping = true;
+
+controls.dampingFactor = .06;
+
+controls.minDistance = 170;
+
+controls.maxDistance = 1250;
+
+controls.maxPolarAngle =
+    Math.PI / 2.08;
+
+
+controls.target.set(
+    40,
+    0,
+    0
+);
+
+
+/* =========================================================
+   ILUMINAÇÃO
+========================================================= */
+
+const ambient =
+    new THREE.HemisphereLight(
+        0xdceeff,
+        0x334433,
+        2.4
+    );
+
+
+scene.add(ambient);
+
+
+const sun =
+    new THREE.DirectionalLight(
+        0xffffff,
+        4
+    );
+
+
+sun.position.set(
+    350,
+    700,
+    400
+);
+
+
+sun.castShadow = true;
+
+
+sun.shadow.mapSize.set(
+    2048,
+    2048
+);
+
+
+scene.add(sun);
+
+
+const cityGlow =
+    new THREE.PointLight(
+        0x7040ff,
+        2,
+        900
+    );
+
+
+cityGlow.position.set(
+    100,
+    180,
+    0
+);
+
+
+scene.add(cityGlow);
+
+
+/* =========================================================
+   MATERIAIS
+========================================================= */
+
+const grass =
+    new THREE.MeshStandardMaterial({
+
+        color:0x477b4b,
+
+        roughness:.95
+
+    });
+
+
+const grassDark =
+    new THREE.MeshStandardMaterial({
+
+        color:0x315f38,
+
+        roughness:.95
+
+    });
+
+
+const road =
+    new THREE.MeshStandardMaterial({
+
+        color:0x252b35,
+
+        roughness:.9
+
+    });
+
+
+const sidewalk =
+    new THREE.MeshStandardMaterial({
+
+        color:0x858b91,
+
+        roughness:.85
+
+    });
+
+
+const water =
+    new THREE.MeshPhysicalMaterial({
+
+        color:0x087fc4,
+
+        transparent:true,
+
+        opacity:.82,
+
+        roughness:.08,
+
+        metalness:.18
+
+    });
+
+
+/* =========================================================
+   TERRENO GERAL
+========================================================= */
+
+const ground =
+    new THREE.Mesh(
+
+        new THREE.BoxGeometry(
+            1500,
+            10,
+            1400
+        ),
+
+        grass
+
+    );
+
+
+ground.position.y = -5;
+
+ground.receiveShadow = true;
+
+scene.add(ground);
+
+
+/* =========================================================
+   RIO CURVADO
+========================================================= */
+
+const riverGroup =
+    new THREE.Group();
+
+
+scene.add(riverGroup);
+
+
+/* margem */
+
+const riverShape =
+    new THREE.Shape();
+
+
+riverShape.moveTo(
+    -620,
+    -700
+);
+
+
+riverShape.lineTo(
+    -430,
+    -700
+);
+
+
+riverShape.lineTo(
+    -395,
+    -500
+);
+
+
+riverShape.lineTo(
+    -450,
+    -300
+);
+
+
+riverShape.lineTo(
+    -410,
+    -100
+);
+
+
+riverShape.lineTo(
+    -455,
+    100
+);
+
+
+riverShape.lineTo(
+    -400,
+    300
+);
+
+
+riverShape.lineTo(
+    -445,
+    500
+);
+
+
+riverShape.lineTo(
+    -390,
+    700
+);
+
+
+riverShape.lineTo(
+    -620,
+    700
+);
+
+
+riverShape.closePath();
+
+
+const riverGeometry =
+    new THREE.ShapeGeometry(
+        riverShape
+    );
+
+
+const river =
+    new THREE.Mesh(
+        riverGeometry,
+        water
+    );
+
+
+river.rotation.x =
+    -Math.PI / 2;
+
+
+river.position.y =
+    .4;
+
+
+riverGroup.add(
+    river
+);
+
+
+/* margem escura */
+
+const bankShape =
+    new THREE.Shape();
+
+
+bankShape.moveTo(
+    -630,
+    -700
+);
+
+
+bankShape.lineTo(
+    -420,
+    -700
+);
+
+
+bankShape.lineTo(
+    -385,
+    -500
+);
+
+
+bankShape.lineTo(
+    -440,
+    -300
+);
+
+
+bankShape.lineTo(
+    -400,
+    -100
+);
+
+
+bankShape.lineTo(
+    -445,
+    100
+);
+
+
+bankShape.lineTo(
+    -390,
+    300
+);
+
+
+bankShape.lineTo(
+    -435,
+    500
+);
+
+
+bankShape.lineTo(
+    -380,
+    700
+);
+
+
+bankShape.lineTo(
+    -630,
+    700
+);
+
+
+bankShape.closePath();
+
+
+const bankGeometry =
+    new THREE.ShapeGeometry(
+        bankShape
+    );
+
+
+const bank =
+    new THREE.Mesh(
+
+        bankGeometry,
+
+        new THREE.MeshStandardMaterial({
+            color:0x344b36,
+            roughness:1
+        })
+
+    );
+
+
+bank.rotation.x =
+    -Math.PI / 2;
+
+
+bank.position.y =
+    .15;
+
+
+riverGroup.add(
+    bank
+);
+
+
+/* pedras nas margens */
+
+function riverRock(
+    x,
+    z,
+    scale=1
+){
+
+    const rock =
+        new THREE.Mesh(
+
+            new THREE.DodecahedronGeometry(
+                3 * scale,
+                0
+            ),
+
+            new THREE.MeshStandardMaterial({
+                color:0x6d7673,
+                roughness:1
+            })
+
+        );
+
+
+    rock.position.set(
+        x,
+        2,
+        z
+    );
+
+
+    rock.rotation.y =
+        Math.random();
+
+
+    scene.add(
+        rock
+    );
+
+}
+
+
+[
+    [-425,-540],
+    [-455,-350],
+    [-425,-160],
+    [-465,40],
+    [-425,240],
+    [-450,450],
+    [-405,610]
+].forEach(
+    p => riverRock(
+        p[0],
+        p[1],
+        .8 + Math.random()*.7
+    )
+);
+
+
+/* =========================================================
+   ESTRADAS
+========================================================= */
+
+function roadMesh(
+    x,
+    z,
+    w,
+    d,
+    main=true
+){
+
+    const mesh =
+        new THREE.Mesh(
+
+            new THREE.BoxGeometry(
+                w,
+                .8,
+                d
+            ),
+
+            road
+
+        );
+
+
+    mesh.position.set(
+        x,
+        .4,
+        z
+    );
+
+
+    mesh.receiveShadow = true;
+
+    scene.add(
+        mesh
+    );
+
+
+    if(main){
+
+        const line =
+            new THREE.Mesh(
+
+                new THREE.BoxGeometry(
+                    w > d ? w : 1.5,
+                    .08,
+                    w > d ? 1.5 : d
+                ),
+
+                new THREE.MeshBasicMaterial({
+                    color:0xf3d85d
+                })
+
+            );
+
+
+        line.position.set(
+            x,
+            .85,
+            z
+        );
+
+
+        scene.add(
+            line
+        );
+
+    }
+
+}
+
+
+/* avenidas principais */
+
+roadMesh(
+    -300,
+    0,
+    28,
+    1150
+);
+
+
+roadMesh(
+    280,
+    0,
+    30,
+    1150
+);
+
+
+roadMesh(
+    0,
+    -300,
+    700,
+    30
+);
+
+
+roadMesh(
+    0,
+    300,
+    700,
+    30
+);
+
+
+/* ruas urbanas */
+
+roadMesh(
+    -160,
+    0,
+    16,
+    570,
+    false
+);
+
+
+roadMesh(
+    -40,
+    0,
+    14,
+    570,
+    false
+);
+
+
+roadMesh(
+    100,
+    0,
+    14,
+    570,
+    false
+);
+
+
+roadMesh(
+    200,
+    0,
+    14,
+    570,
+    false
+);
+
+
+roadMesh(
+    0,
+    -180,
+    480,
+    14,
+    false
+);
+
+
+roadMesh(
+    0,
+    -60,
+    480,
+    14,
+    false
+);
+
+
+roadMesh(
+    0,
+    70,
+    480,
+    14,
+    false
+);
+
+
+roadMesh(
+    0,
+    180,
+    480,
+    14,
+    false
+);
+
+
+/* =========================================================
+   CALÇADAS
+========================================================= */
+
+function sidewalkBlock(
+    x,
+    z,
+    w,
+    d
+){
+
+    const mesh =
+        new THREE.Mesh(
+
+            new THREE.BoxGeometry(
+                w,
+                .25,
+                d
+            ),
+
+            sidewalk
+
+        );
+
+
+    mesh.position.set(
+        x,
+        .85,
+        z
+    );
+
+
+    scene.add(
+        mesh
+    );
+
+}
+
+
+/* =========================================================
+   PRÉDIOS
+========================================================= */
+
+const buildings = [];
+
+
+const windowMaterial =
+    new THREE.MeshStandardMaterial({
+
+        color:0x6bdcff,
+
+        emissive:0x0877a5,
+
+        emissiveIntensity:.6
+
+    });
+
+
+function createBuilding(
+    x,
+    z,
+    w,
+    d,
+    h,
+    color
+){
+
+    const group =
+        new THREE.Group();
+
+
+    const body =
+        new THREE.Mesh(
+
+            new THREE.BoxGeometry(
+                w,
+                h,
+                d
+            ),
+
+            new THREE.MeshStandardMaterial({
+
+                color:color,
+
+                roughness:.55,
+
+                metalness:.2
+
+            })
+
+        );
+
+
+    body.position.y =
+        h / 2;
+
+
+    body.castShadow = true;
+
+    body.receiveShadow = true;
+
+
+    group.add(
+        body
+    );
+
+
+    /* cobertura */
+
+    const roof =
+        new THREE.Mesh(
+
+            new THREE.BoxGeometry(
+                w + 3,
+                2,
+                d + 3
+            ),
+
+            new THREE.MeshStandardMaterial({
+                color:0x151a26,
+                metalness:.5
+            })
+
+        );
+
+
+    roof.position.y =
+        h + 1;
+
+
+    group.add(
+        roof
+    );
+
+
+    /* janelas frente */
+
+    const cols =
+        Math.max(
+            2,
+            Math.floor(w / 5)
+        );
+
+
+    const rows =
+        Math.max(
+            2,
+            Math.floor(h / 8)
+        );
+
+
+    for(
+        let row=0;
+        row<rows;
+        row++
+    ){
+
+        for(
+            let col=0;
+            col<cols;
+            col++
+        ){
+
+            const win =
+                new THREE.Mesh(
+
+                    new THREE.BoxGeometry(
+                        1.8,
+                        3,
+                        .18
+                    ),
+
+                    windowMaterial.clone()
+
+                );
+
+
+            win.position.set(
+
+                -w/2 + 3 +
+                col *
+                ((w-6) /
+                Math.max(cols-1,1)),
+
+                6 +
+                row * 8,
+
+                d/2 + .12
+
+            );
+
+
+            win.userData.window =
+                true;
+
+
+            group.add(
+                win
+            );
+
+
+            const back =
+                win.clone();
+
+
+            back.position.z =
+                -d/2 - .12;
+
+
+            group.add(
+                back
+            );
+
+        }
+
+    }
+
+
+    group.position.set(
+        x,
+        0,
+        z
+    );
+
+
+    scene.add(
+        group
+    );
+
+
+    buildings.push(
+        group
+    );
+
+
+    return group;
+
+}
+
+
+/* =========================================================
+   CENTRO EMPRESARIAL
+========================================================= */
+
+const businessBuildings = [
+
+    [-250,-250,40,42,150],
+    [-180,-250,36,38,105],
+    [-105,-250,45,40,180],
+
+    [-250,-175,32,36,95],
+    [-180,-175,45,42,135],
+    [-100,-175,38,40,110],
+
+    [-250,-100,45,42,170],
+    [-180,-100,32,35,90],
+    [-100,-100,44,40,145]
+
+];
+
+
+businessBuildings.forEach(
+    b => {
+
+        createBuilding(
+            b[0],
+            b[1],
+            b[2],
+            b[3],
+            b[4],
+            Math.random() > .5
+                ? 0x2d405d
+                : 0x354d6b
+        );
+
+    }
+);
+
+
+/* torre principal */
+
+createBuilding(
+    -30,
+    -230,
+    58,
+    58,
+    280,
+    0x172b48
+);
+
+
+/* torre menor */
+
+createBuilding(
+    50,
+    -230,
+    42,
+    42,
+    190,
+    0x273e5d
+);
+
+
+/* =========================================================
+   CASAS URBANAS
+========================================================= */
+
+function house(
+    x,
+    z,
+    rotation=0
+){
+
+    const group =
+        new THREE.Group();
+
+
+    /* terreno */
+
+    const garden =
+        new THREE.Mesh(
+
+            new THREE.BoxGeometry(
+                32,
+                .25,
+                28
+            ),
+
+            new THREE.MeshStandardMaterial({
+                color:0x3b7041
+            })
+
+        );
+
+
+    garden.position.y =
+        .12;
+
+
+    group.add(
+        garden
+    );
+
+
+    /* casa */
+
+    const body =
+        new THREE.Mesh(
+
+            new THREE.BoxGeometry(
+                22,
+                12,
+                18
+            ),
+
+            new THREE.MeshStandardMaterial({
+                color:0xdde3e7,
+                roughness:.7
+            })
+
+        );
+
+
+    body.position.y =
+        6;
+
+
+    body.castShadow = true;
+
+
+    group.add(
+        body
+    );
+
+
+    /* segundo andar */
+
+    const upper =
+        new THREE.Mesh(
+
+            new THREE.BoxGeometry(
+                16,
+                7,
+                15
+            ),
+
+            new THREE.MeshStandardMaterial({
+                color:0xf1f2f2
+            })
+
+        );
+
+
+    upper.position.set(
+        -1,
+        15,
+        0
+    );
+
+
+    group.add(
+        upper
+    );
+
+
+    /* telhado */
+
+    const roof =
+        new THREE.Mesh(
+
+            new THREE.ConeGeometry(
+                14,
+                7,
+                4
+            ),
+
+            new THREE.MeshStandardMaterial({
+                color:0x343b49
+            })
+
+        );
+
+
+    roof.rotation.y =
+        Math.PI / 4;
+
+
+    roof.position.y =
+        21;
+
+
+    group.add(
+        roof
+    );
+
+
+    /* piscina pequena */
+
+    const pool =
+        new THREE.Mesh(
+
+            new THREE.BoxGeometry(
+                10,
+                .5,
+                5
+            ),
+
+            water
+
+        );
+
+
+    pool.position.set(
+        8,
+        .4,
+        8
+    );
+
+
+    group.add(
+        pool
+    );
+
+
+    group.position.set(
+        x,
+        0,
+        z
+    );
+
+
+    group.rotation.y =
+        rotation;
+
+
+    scene.add(
+        group
+    );
+
+}
+
+
+/* casas misturadas com os prédios */
+
+const urbanHousePositions = [
+
+    [-285,-55],
+    [-245,-55],
+    [-205,-55],
+
+    [-145,-55],
+    [-95,-55],
+    [-50,-55],
+
+    [15,-55],
+    [65,-55],
+    [115,-55],
+
+    [-285,25],
+    [-235,25],
+
+    [-150,25],
+    [-100,25],
+
+    [-35,25],
+    [25,25],
+
+    [95,25],
+    [145,25],
+
+    [-285,110],
+    [-235,110],
+
+    [-165,110],
+    [-115,110],
+
+    [-35,110],
+    [20,110],
+
+    [90,110],
+    [145,110],
+
+    [-270,200],
+    [-215,200],
+
+    [-140,200],
+    [-80,200],
+
+    [0,200],
+    [60,200],
+
+    [125,200],
+    [185,200]
+
+];
+
+
+urbanHousePositions.forEach(
+    (p,i) =>
+        house(
+            p[0],
+            p[1],
+            i % 2 === 0
+                ? 0
+                : Math.PI / 2
+        )
+);
+
+
+/* =========================================================
+   BAIRRO DE MANSÕES
+========================================================= */
+
+function mansion(
+    x,
+    z
+){
+
+    const group =
+        new THREE.Group();
+
+
+    const land =
+        new THREE.Mesh(
+
+            new THREE.BoxGeometry(
+                78,
+                .3,
+                72
+            ),
+
+            new THREE.MeshStandardMaterial({
+                color:0x315e38
+            })
+
+        );
+
+
+    land.position.y =
+        .15;
+
+
+    group.add(
+        land
+    );
+
+
+    const base =
+        new THREE.Mesh(
+
+            new THREE.BoxGeometry(
+                42,
+                16,
+                30
+            ),
+
+            new THREE.MeshStandardMaterial({
+                color:0xe9e1d5
+            })
+
+        );
+
+
+    base.position.y =
+        8;
+
+
+    base.castShadow = true;
+
+
+    group.add(
+        base
+    );
+
+
+    const upper =
+        new THREE.Mesh(
+
+            new THREE.BoxGeometry(
+                32,
+                11,
+                24
+            ),
+
+            new THREE.MeshStandardMaterial({
+                color:0xf4f1eb
+            })
+
+        );
+
+
+    upper.position.set(
+        2,
+        21,
+        0
+    );
+
+
+    group.add(
+        upper
+    );
+
+
+    const pool =
+        new THREE.Mesh(
+
+            new THREE.BoxGeometry(
+                28,
+                .8,
+                10
+            ),
+
+            water
+
+        );
+
+
+    pool.position.set(
+        0,
+        .7,
+        25
+    );
+
+
+    group.add(
+        pool
+    );
+
+
+    const deck =
+        new THREE.Mesh(
+
+            new THREE.BoxGeometry(
+                34,
+                .3,
+                16
+            ),
+
+            new THREE.MeshStandardMaterial({
+                color:0xb6a88f
+            })
+
+        );
+
+
+    deck.position.set(
+        0,
+        .35,
+        22
+    );
+
+
+    group.add(
+        deck
+    );
+
+
+    group.position.set(
+        x,
+        0,
+        z
+    );
+
+
+    scene.add(
+        group
+    );
+
+}
+
+
+/* mansões no lado superior da cidade */
+
+mansion(
+    -250,
+    340
+);
+
+
+mansion(
+    -150,
+    340
+);
+
+
+mansion(
+    -50,
+    340
+);
+
+
+mansion(
+    50,
+    340
+);
+
+
+/* =========================================================
+   FAZENDA GRANDE
+========================================================= */
+
+const farmGroup =
+    new THREE.Group();
+
+
+scene.add(
+    farmGroup
+);
+
+
+/* grande terreno */
+
+const farmGround =
+    new THREE.Mesh(
+
+        new THREE.BoxGeometry(
+            500,
+            .5,
+            390
+        ),
+
+        new THREE.MeshStandardMaterial({
+            color:0x315f35
+        })
+
+    );
+
+
+farmGround.position.set(
+    360,
+    .25,
+    430
+);
+
+
+farmGroup.add(
+    farmGround
+);
+
+
+/* campos */
+
+const cropColors = [
+    0x6d9638,
+    0x789f3c,
+    0x5e8732,
+    0x88a943
+];
+
+
+for(
+    let row=0;
+    row<7;
+    row++
+){
+
+    for(
+        let col=0;
+        col<6;
+        col++
+    ){
+
+        const crop =
+            new THREE.Mesh(
+
+                new THREE.BoxGeometry(
+                    55,
+                    .7,
+                    32
+                ),
+
+                new THREE.MeshStandardMaterial({
+                    color:
+                        cropColors[
+                            (row+col) %
+                            cropColors.length
+                        ]
+                })
+
+            );
+
+
+        crop.position.set(
+
+            155 +
+            col * 70,
+
+            .8,
+
+            300 +
+            row * 50
+
+        );
+
+
+        farmGroup.add(
+            crop
+        );
+
+
+        /* linhas */
+
+        for(
+            let k=-23;
+            k<=23;
+            k+=8
+        ){
+
+            const line =
+                new THREE.Mesh(
+
+                    new THREE.BoxGeometry(
+                        1.5,
+                        1,
+                        27
+                    ),
+
+                    new THREE.MeshStandardMaterial({
+                        color:0xa6bd59
+                    })
+
+                );
+
+
+            line.position.set(
+
+                155 +
+                col * 70 +
+                k,
+
+                1.3,
+
+                300 +
+                row * 50
+
+            );
+
+
+            farmGroup.add(
+                line
+            );
+
+        }
+
+    }
+
+}
+
+
+/* =========================================================
+   ESTRADA DA FAZENDA
+========================================================= */
+
+const farmRoad =
+    new THREE.Mesh(
+
+        new THREE.BoxGeometry(
+            470,
+            .8,
+            22
+        ),
+
+        new THREE.MeshStandardMaterial({
+            color:0x8b6846
+        })
+
+    );
+
+
+farmRoad.position.set(
+    360,
+    .5,
+    270
+);
+
+
+farmGroup.add(
+    farmRoad
+);
+
+
+/* =========================================================
+   CELEIRO
+========================================================= */
+
+const barn =
+    new THREE.Mesh(
+
+        new THREE.BoxGeometry(
+            75,
+            28,
+            48
+        ),
+
+        new THREE.MeshStandardMaterial({
+            color:0x9d3c35
+        })
+
+    );
+
+
+barn.position.set(
+    520,
+    14,
+    570
+);
+
+
+barn.castShadow = true;
+
+
+farmGroup.add(
+    barn
+);
+
+
+/* telhado celeiro */
+
+const barnRoof =
+    new THREE.Mesh(
+
+        new THREE.ConeGeometry(
+            45,
+            20,
+            4
+        ),
+
+        new THREE.MeshStandardMaterial({
+            color:0x553b31
+        })
+
+    );
+
+
+barnRoof.rotation.y =
+    Math.PI / 4;
+
+
+barnRoof.position.set(
+    520,
+    38,
+    570
+);
+
+
+farmGroup.add(
+    barnRoof
+);
+
+
+/* =========================================================
+   SILOS
+========================================================= */
+
+for(
+    let x of [445,475,505]
+){
+
+    const silo =
+        new THREE.Mesh(
+
+            new THREE.CylinderGeometry(
+                11,
+                11,
+                38,
+                24
+            ),
+
+            new THREE.MeshStandardMaterial({
+                color:0xbcc2c8,
+                metalness:.5,
+                roughness:.35
+            })
+
+        );
+
+
+    silo.position.set(
+        x,
+        19,
+        495
+    );
+
+
+    farmGroup.add(
+        silo
+    );
+
+}
+
+
+/* =========================================================
+   CASA DA FAZENDA
+========================================================= */
+
+const farmHouse =
+    new THREE.Mesh(
+
+        new THREE.BoxGeometry(
+            55,
+            22,
+            40
+        ),
+
+        new THREE.MeshStandardMaterial({
+            color:0xd8c9a7
+        })
+
+    );
+
+
+farmHouse.position.set(
+    190,
+    11,
+    575
+);
+
+
+farmGroup.add(
+    farmHouse
+);
+
+
+/* =========================================================
+   CLUBE ESPORTIVO COMPLETO
+========================================================= */
+
+function createClub(){
+
+    const club =
+        new THREE.Group();
+
+
+    scene.add(
+        club
+    );
+
+
+    /* terreno */
+
+    const area =
+        new THREE.Mesh(
+
+            new THREE.BoxGeometry(
+                300,
+                .3,
+                270
+            ),
+
+            new THREE.MeshStandardMaterial({
+                color:0x285d37
+            })
+
+        );
+
+
+    area.position.set(
+        330,
+        .15,
+        -190
+    );
+
+
+    club.add(
+        area
+    );
+
+
+    /* =====================================================
+       PRÉDIO PRINCIPAL
+    ===================================================== */
+
+    const building =
+        new THREE.Mesh(
+
+            new THREE.BoxGeometry(
+                105,
+                32,
+                58
+            ),
+
+            new THREE.MeshStandardMaterial({
+                color:0xe5e8eb
+            })
+
+        );
+
+
+    building.position.set(
+        330,
+        16,
+        -80
+    );
+
+
+    building.castShadow = true;
+
+
+    club.add(
+        building
+    );
+
+
+    /* cobertura */
+
+    const roof =
+        new THREE.Mesh(
+
+            new THREE.BoxGeometry(
+                112,
+                3,
+                65
+            ),
+
+            new THREE.MeshStandardMaterial({
+                color:0x252d39
+            })
+
+        );
+
+
+    roof.position.set(
+        330,
+        33,
+        -80
+    );
+
+
+    club.add(
+        roof
+    );
+
+
+    /* =====================================================
+       CAMPO DE FUTEBOL
+    ===================================================== */
+
+    const field =
+        new THREE.Mesh(
+
+            new THREE.BoxGeometry(
+                145,
+                .5,
+                82
+            ),
+
+            new THREE.MeshStandardMaterial({
+                color:0x24783e
+            })
+
+        );
+
+
+    field.position.set(
+        330,
+        .5,
+        -205
+    );
+
+
+    club.add(
+        field
+    );
+
+
+    /* linhas */
+
+    const white =
+        new THREE.MeshBasicMaterial({
+            color:0xffffff
+        });
+
+
+    const fieldMiddle =
+        new THREE.Mesh(
+
+            new THREE.BoxGeometry(
+                2,
+                .7,
+                82
+            ),
+
+            white
+
+        );
+
+
+    fieldMiddle.position.set(
+        330,
+        1,
+        -205
+    );
+
+
+    club.add(
+        fieldMiddle
+    );
+
+
+    const fieldBox =
+        new THREE.Mesh(
+
+            new THREE.BoxGeometry(
+                125,
+                .7,
+                2
+            ),
+
+            white
+
+        );
+
+
+    fieldBox.position.set(
+        330,
+        1,
+        -205
+    );
+
+
+    club.add(
+        fieldBox
+    );
+
+
+    /* =====================================================
+       TRAVES
+    ===================================================== */
+
+    function goal(
+        x,
+        z
+    ){
+
+        const material =
+            new THREE.MeshStandardMaterial({
+                color:0xffffff
+            });
+
+
+        const post1 =
+            new THREE.Mesh(
+                new THREE.CylinderGeometry(
+                    .7,
+                    .7,
+                    12,
+                    8
+                ),
+                material
+            );
+
+
+        post1.position.set(
+            x,
+            6,
+            z
+        );
+
+
+        club.add(
+            post1
+        );
+
+
+        const post2 =
+            post1.clone();
+
+
+        post2.position.x += 12;
+
+
+        club.add(
+            post2
+        );
+
+
+        const cross =
+            new THREE.Mesh(
+
+                new THREE.BoxGeometry(
+                    12,
+                    .7,
+                    .7
+                ),
+
+                material
+
+            );
+
+
+        cross.position.set(
+            x+6,
+            12,
+            z
+        );
+
+
+        club.add(
+            cross
+        );
+
+    }
+
+
+    goal(
+        267,
+        -205
+    );
+
+
+    goal(
+        369,
+        -205
+    );
+
+
+    /* =====================================================
+       ARQUIBANCADAS
+    ===================================================== */
+
+    for(
+        let i=0;
+        i<4;
+        i++
+    ){
+
+        const stand =
+            new THREE.Mesh(
+
+                new THREE.BoxGeometry(
+                    135,
+                    4+i*3,
+                    6
+                ),
+
+                new THREE.MeshStandardMaterial({
+                    color:
+                        i%2===0
+                        ? 0x303947
+                        : 0x414b5b
+                })
+
+            );
+
+
+        stand.position.set(
+            330,
+            3+i*3,
+            -260+i*7
+        );
+
+
+        club.add(
+            stand
+        );
+
+    }
+
+
+    /* =====================================================
+       PISCINA
+    ===================================================== */
+
+    const poolArea =
+        new THREE.Mesh(
+
+            new THREE.BoxGeometry(
+                90,
+                .5,
+                45
+            ),
+
+            new THREE.MeshStandardMaterial({
+                color:0x5e6c70
+            })
+
+        );
+
+
+    poolArea.position.set(
+        205,
+        .6,
+        -95
+    );
+
+
+    club.add(
+        poolArea
+    );
+
+
+    const pool =
+        new THREE.Mesh(
+
+            new THREE.BoxGeometry(
+                72,
+                1,
+                28
+            ),
+
+            water
+
+        );
+
+
+    pool.position.set(
+        205,
+        1.2,
+        -95
+    );
+
+
+    club.add(
+        pool
+    );
+
+
+    /* piscina infantil */
+
+    const smallPool =
+        new THREE.Mesh(
+
+            new THREE.BoxGeometry(
+                28,
+                1,
+                16
+            ),
+
+            water
+
+        );
+
+
+    smallPool.position.set(
+        250,
+        1.2,
+        -125
+    );
+
+
+    club.add(
+        smallPool
+    );
+
+
+    /* =====================================================
+       QUADRAS DE TÊNIS
+    ===================================================== */
+
+    for(
+        let i=0;
+        i<3;
+        i++
+    ){
+
+        const tennis =
+            new THREE.Mesh(
+
+                new THREE.BoxGeometry(
+                    42,
+                    .5,
+                    24
+                ),
+
+                new THREE.MeshStandardMaterial({
+                    color:0x2779a7
+                })
+
+            );
+
+
+        tennis.position.set(
+            455,
+            .6,
+            -120 +
+            i*35
+        );
+
+
+        club.add(
+            tennis
+        );
+
+
+        /* rede */
+
+        const net =
+            new THREE.Mesh(
+
+                new THREE.BoxGeometry(
+                    1,
+                    4,
+                    24
+                ),
+
+                new THREE.MeshBasicMaterial({
+                    color:0xffffff,
+                    transparent:true,
+                    opacity:.6
+                })
+
+            );
+
+
+        net.position.set(
+            455,
+            2.5,
+            -120 +
+            i*35
+        );
+
+
+        club.add(
+            net
+        );
+
+    }
+
+
+    /* =====================================================
+       ACADEMIA
+    ===================================================== */
+
+    const gym =
+        new THREE.Mesh(
+
+            new THREE.BoxGeometry(
+                60,
+                20,
+                35
+            ),
+
+            new THREE.MeshStandardMaterial({
+                color:0x39424e
+            })
+
+        );
+
+
+    gym.position.set(
+        205,
+        10,
+        -165
+    );
+
+
+    club.add(
+        gym
+    );
+
+
+    /* =====================================================
+       QUADRA MULTIUSO
+    ===================================================== */
+
+    const court =
+        new THREE.Mesh(
+
+            new THREE.BoxGeometry(
+                70,
+                .5,
+                40
+            ),
+
+            new THREE.MeshStandardMaterial({
+                color:0x9c4f9c
+            })
+
+        );
+
+
+    court.position.set(
+        455,
+        .6,
+        -235
+    );
+
+
+    club.add(
+        court
+    );
+
+
+    /* =====================================================
+       ESTACIONAMENTO
+    ===================================================== */
+
+    const parking =
+        new THREE.Mesh(
+
+            new THREE.BoxGeometry(
+                120,
+                .4,
+                45
+            ),
+
+            new THREE.MeshStandardMaterial({
+                color:0x252a30
+            })
+
+        );
+
+
+    parking.position.set(
+        230,
+        .5,
+        -20
+    );
+
+
+    club.add(
+        parking
+    );
+
+
+    /* vagas */
+
+    for(
+        let i=0;
+        i<8;
+        i++
+    ){
+
+        const line =
+            new THREE.Mesh(
+
+                new THREE.BoxGeometry(
+                    1,
+                    .5,
+                    35
+                ),
+
+                white
+
+            );
+
+
+        line.position.set(
+            185 +
+            i*13,
+            .8,
+            -20
+        );
+
+
+        club.add(
+            line
+        );
+
+    }
+
+}
+
+
+createClub();
+
+
+/* =========================================================
+   PONTE MODERNA
+========================================================= */
+
+function createBridge(){
+
+    const bridge =
+        new THREE.Group();
+
+
+    scene.add(
+        bridge
+    );
+
+
+    /* posição no rio */
+
+    const z =
+        80;
+
+
+    /* deck */
+
+    const deck =
+        new THREE.Mesh(
+
+            new THREE.BoxGeometry(
+                185,
+                5,
+                28
+            ),
+
+            new THREE.MeshStandardMaterial({
+                color:0x343b47,
+                metalness:.45,
+                roughness:.35
+            })
+
+        );
+
+
+    deck.position.set(
+        -410,
+        9,
+        z
+    );
+
+
+    deck.castShadow = true;
+
+
+    bridge.add(
+        deck
+    );
+
+
+    /* faixa central */
+
+    const centerLine =
+        new THREE.Mesh(
+
+            new THREE.BoxGeometry(
+                175,
+                .3,
+                1.4
+            ),
+
+            new THREE.MeshBasicMaterial({
+                color:0xf2d35c
+            })
+
+        );
+
+
+    centerLine.position.set(
+        -410,
+        11.6,
+        z
+    );
+
+
+    bridge.add(
+        centerLine
+    );
+
+
+    /* pilares */
+
+    const pillarMaterial =
+        new THREE.MeshStandardMaterial({
+            color:0x687482,
+            metalness:.6,
+            roughness:.3
+        });
+
+
+    for(
+        const x of [-475,-345]
+    ){
+
+        const pillar =
+            new THREE.Mesh(
+
+                new THREE.BoxGeometry(
+                    7,
+                    45,
+                    7
+                ),
+
+                pillarMaterial
+
+            );
+
+
+        pillar.position.set(
+            x,
+            22,
+            z
+        );
+
+
+        bridge.add(
+            pillar
+        );
+
+    }
+
+
+    /* cabos */
+
+    const cableMaterial =
+        new THREE.LineBasicMaterial({
+            color:0x9b59ff
+        });
+
+
+    function cable(
+        x1,
+        x2
+    ){
+
+        const points=[];
+
+
+        for(
+            let i=0;
+            i<=40;
+            i++
+        ){
+
+            const t =
+                i / 40;
+
+
+            const x =
+                x1 +
+                (x2-x1) *
+                t;
+
+
+            const y =
+                52 -
+                Math.sin(
+                    t*Math.PI
+                ) * 27;
+
+
+            points.push(
+
+                new THREE.Vector3(
+                    x,
+                    y,
+                    z
+                )
+
+            );
+
+        }
+
+
+        const geometry =
+            new THREE.BufferGeometry()
+                .setFromPoints(
+                    points
+                );
+
+
+        bridge.add(
+
+            new THREE.Line(
+                geometry,
+                cableMaterial
+            )
+
+        );
+
+    }
+
+
+    cable(
+        -475,
+        -345
+    );
+
+
+    /* cabos verticais */
+
+    for(
+        let x=-465;
+        x<=-355;
+        x+=10
+    ){
+
+        const vertical =
+            new THREE.Mesh(
+
+                new THREE.CylinderGeometry(
+                    .15,
+                    .15,
+                    22,
+                    6
+                ),
+
+                new THREE.MeshStandardMaterial({
+                    color:0x9b59ff
+                })
+
+            );
+
+
+        vertical.position.set(
+            x,
+            27,
+            z
+        );
+
+
+        bridge.add(
+            vertical
+        );
+
+    }
+
+}
+
+
+createBridge();
+
+
+/* =========================================================
+   ÁRVORES
+========================================================= */
+
+function tree(
+    x,
+    z,
+    scale=1
+){
+
+    const trunk =
+        new THREE.Mesh(
+
+            new THREE.CylinderGeometry(
+                1,
+                1.4,
+                7,
+                8
+            ),
+
+            new THREE.MeshStandardMaterial({
+                color:0x553521
+            })
+
+        );
+
+
+    trunk.position.set(
+        x,
+        3.5,
+        z
+    );
+
+
+    trunk.scale.setScalar(
+        scale
+    );
+
+
+    scene.add(
+        trunk
+    );
+
+
+    const leaves =
+        new THREE.Mesh(
+
+            new THREE.SphereGeometry(
+                6,
+                10,
+                10
+            ),
+
+            new THREE.MeshStandardMaterial({
+                color:0x21713a
+            })
+
+        );
+
+
+    leaves.position.set(
+        x,
+        9,
+        z
+    );
+
+
+    leaves.scale.setScalar(
+        scale
+    );
+
+
+    scene.add(
+        leaves
+    );
+
+}
+
+
+/* árvores urbanas */
+
+const treePositions = [
+
+    [-330,-80],
+    [-330,-20],
+    [-330,40],
+    [-330,100],
+    [-330,160],
+
+    [-300,275],
+    [-220,275],
+    [-140,275],
+
+    [180,270],
+    [250,270],
+
+    [590,250],
+    [600,350],
+    [600,450],
+
+    [80,430],
+    [100,500]
+
+];
+
+
+treePositions.forEach(
+    p =>
+        tree(
+            p[0],
+            p[1],
+            .8 + Math.random()*.5
+        )
+);
+
+
+/* =========================================================
+   AQUAFLOW
+========================================================= */
+
+const pipes =
+    new THREE.Group();
+
+
+pipes.visible = false;
+
+
+scene.add(
+    pipes
+);
+
+
+const pipeMaterial =
+    new THREE.MeshStandardMaterial({
+
+        color:0x00c8ff,
+
+        emissive:0x006bff,
+
+        emissiveIntensity:1.8,
+
+        transparent:true,
+
+        opacity:.95
+
+    });
+
+
+function createPipe(
+    x1,
+    y1,
+    z1,
+    x2,
+    y2,
+    z2
+){
+
+    const start =
+        new THREE.Vector3(
+            x1,
+            y1,
+            z1
+        );
+
+
+    const end =
+        new THREE.Vector3(
+            x2,
+            y2,
+            z2
+        );
+
+
+    const direction =
+        new THREE.Vector3()
+            .subVectors(
+                end,
+                start
+            );
+
+
+    const length =
+        direction.length();
+
+
+    const mesh =
+        new THREE.Mesh(
+
+            new THREE.CylinderGeometry(
+                1.5,
+                1.5,
+                length,
+                10
+            ),
+
+            pipeMaterial
+        );
+
+
+    mesh.position
+        .copy(start)
+        .add(end)
+        .multiplyScalar(.5);
+
+
+    mesh.quaternion.setFromUnitVectors(
+
+        new THREE.Vector3(
+            0,
+            1,
+            0
+        ),
+
+        direction.normalize()
+
+    );
+
+
+    pipes.add(
+        mesh
+    );
+
+}
+
+
+/* rede horizontal */
+
+createPipe(
+    -300,
+    6,
+    -180,
+    500,
+    6,
+    -180
+);
+
+
+createPipe(
+    -300,
+    6,
+    70,
+    500,
+    6,
+    70
+);
+
+
+createPipe(
+    -300,
+    6,
+    180,
+    500,
+    6,
+    180
+);
+
+
+/* rede vertical */
+
+createPipe(
+    -180,
+    6,
+    -300,
+    -180,
+    6,
+    500
+);
+
+
+createPipe(
+    20,
+    6,
+    -300,
+    20,
+    6,
+    500
+);
+
+
+createPipe(
+    250,
+    6,
+    -300,
+    250,
+    6,
+    500
+);
+
+
+/* ramificações */
+
+for(
+    let x=-250;
+    x<=450;
+    x+=50
+){
+
+    createPipe(
+        x,
+        6,
+        -180,
+        x,
+        6,
+        180
+    );
+
+}
+
+
+/* fazenda */
+
+createPipe(
+    250,
+    6,
+    180,
+    360,
+    6,
+    300
+);
+
+
+createPipe(
+    360,
+    6,
+    300,
+    500,
+    6,
+    500
+);
+
+
+/* clube */
+
+createPipe(
+    250,
+    6,
+    -180,
+    330,
+    6,
+    -100
+);
+
+
+/* =========================================================
+   PONTOS AQUAFLOW
+========================================================= */
+
+const aquaPoints=[];
+
+
+function aquaPoint(
+    x,
+    y,
+    z
+){
+
+    const sphere =
+        new THREE.Mesh(
+
+            new THREE.SphereGeometry(
+                3.5,
+                12,
+                12
+            ),
+
+            new THREE.MeshStandardMaterial({
+
+                color:0x00c8ff,
+
+                emissive:0x008cff,
+
+                emissiveIntensity:3
+
+            })
+
+        );
+
+
+    sphere.position.set(
+        x,
+        y,
+        z
+    );
+
+
+    pipes.add(
+        sphere
+    );
+
+
+    aquaPoints.push(
+        sphere
+    );
+
+}
+
+
+aquaPoint(
+    -180,
+    8,
+    -180
+);
+
+
+aquaPoint(
+    20,
+    8,
+    70
+);
+
+
+aquaPoint(
+    250,
+    8,
+    180
+);
+
+
+aquaPoint(
+    360,
+    8,
+    300
+);
+
+
+aquaPoint(
+    330,
+    8,
+    -100
+);
+
+
+aquaPoint(
+    500,
+    8,
+    500
+);
+
+
+/* =========================================================
+   LUZES NOTURNAS
+========================================================= */
+
+const nightLights=[];
+
+
+function nightLight(
+    x,
+    y,
+    z,
+    color=0x9b5cff
+){
+
+    const light =
+        new THREE.PointLight(
+            color,
+            0,
+            60
+        );
+
+
+    light.position.set(
+        x,
+        y,
+        z
+    );
+
+
+    scene.add(
+        light
+    );
+
+
+    nightLights.push(
+        light
+    );
+
+}
+
+
+/* postes urbanos */
+
+for(
+    let x=-300;
+    x<=500;
+    x+=45
+){
+
+    for(
+        let z=-280;
+        z<=280;
+        z+=80
+    ){
+
+        nightLight(
+            x,
+            12,
+            z,
+            0x7c4dff
+        );
+
+    }
+
+}
+
+
+/* luz nos prédios */
+
+for(
+    const b of buildings
+){
+
+    const light =
+        new THREE.PointLight(
+            0x5abfff,
+            0,
+            45
+        );
+
+
+    light.position.set(
+        b.position.x,
+        25,
+        b.position.z
+    );
+
+
+    scene.add(
+        light
+    );
+
+
+    nightLights.push(
+        light
+    );
+
+}
+
+
+/* =========================================================
+   DIA
+========================================================= */
+
+let night = false;
+
+
+function setDay(){
+
+    night = false;
+
+
+    scene.background =
+        new THREE.Color(
+            0x9ac7df
+        );
+
+
+    scene.fog.color =
+        new THREE.Color(
+            0x9ac7df
+        );
+
+
+    ambient.intensity =
+        2.4;
+
+
+    sun.intensity =
+        4;
+
+
+    cityGlow.intensity =
+        2;
+
+
+    nightLights.forEach(
+        light => {
+
+            light.intensity =
+                0;
+
+        }
+    );
+
+
+    document
+        .getElementById(
+            "dayButton"
+        )
+        .classList.add(
+            "active"
+        );
+
+
+    document
+        .getElementById(
+            "nightButton"
+        )
+        .classList.remove(
+            "active"
+        );
+
+}
+
+
+/* =========================================================
+   NOITE
+========================================================= */
+
+function setNight(){
+
+    night = true;
+
+
+    scene.background =
+        new THREE.Color(
+            0x030719
+        );
+
+
+    scene.fog.color =
+        new THREE.Color(
+            0x030719
+        );
+
+
+    ambient.intensity =
+        .35;
+
+
+    sun.intensity =
+        .08;
+
+
+    cityGlow.intensity =
+        8;
+
+
+    nightLights.forEach(
+        light => {
+
+            light.intensity =
+                4;
+
+        }
+    );
+
+
+    document
+        .getElementById(
+            "nightButton"
+        )
+        .classList.add(
+            "active"
+        );
+
+
+    document
+        .getElementById(
+            "dayButton"
+        )
+        .classList.remove(
+            "active"
+        );
+
+}
+
+
+document
+    .getElementById(
+        "dayButton"
+    )
+    .onclick =
+        setDay;
+
+
+document
+    .getElementById(
+        "nightButton"
+    )
+    .onclick =
+        setNight;
+
+
+/* =========================================================
+   RAIO-X
+========================================================= */
+
+document
+    .getElementById(
+        "xrayButton"
+    )
+    .onclick =
+    function(){
+
+        pipes.visible =
+            !pipes.visible;
+
+
+        this.classList.toggle(
+            "active",
+            pipes.visible
+        );
+
+    };
+
+
+/* =========================================================
+   PRODUTOS
+========================================================= */
+
+window.openProduct =
+function(product){
+
+    const data = {
+
+        sensor:{
+
+            title:"Smart Sensor",
+
+            html:`
+
+                <h3>O que é?</h3>
+
+                <p>
+                    O Smart Sensor monitora
+                    o comportamento da água
+                    no sistema hidráulico.
+                </p>
+
+                <h3>O que monitora?</h3>
+
+                <p>
+                    Fluxo, consumo e possíveis
+                    alterações no sistema.
+                </p>
+
+                <h3>Onde atua?</h3>
+
+                <p>
+                    Casas, condomínios,
+                    empresas, clubes,
+                    hotéis e propriedades agrícolas.
+                </p>
+
+            `
+
+        },
+
+
+        meter:{
+
+            title:"Digital Meter",
+
+            html:`
+
+                <h3>O que é?</h3>
+
+                <p>
+                    Sistema responsável
+                    pela medição do consumo
+                    de água.
+                </p>
+
+                <h3>Função</h3>
+
+                <p>
+                    Registrar e disponibilizar
+                    dados de consumo.
+                </p>
+
+            `
+
+        },
+
+
+        dashboard:{
+
+            title:"AquaFlow Dashboard",
+
+            html:`
+
+                <h3>O que é?</h3>
+
+                <p>
+                    É a central digital
+                    do AquaFlow.
+                </p>
+
+                <h3>Informações</h3>
+
+                <p>
+                    Consumo, gastos,
+                    economia, dispositivos,
+                    alertas e histórico.
+                </p>
+
+            `
+
+        },
+
+
+        shower:{
+
+            title:"Eco Shower",
+
+            html:`
+
+                <h3>O que é?</h3>
+
+                <p>
+                    Solução voltada ao
+                    acompanhamento do consumo
+                    de água durante o banho.
+                </p>
+
+                <h3>Onde atua?</h3>
+
+                <p>
+                    Residências, hotéis,
+                    clubes e academias.
+                </p>
+
+            `
+
+        }
+
+    };
+
+
+    const item =
+        data[product];
+
+
+    if(!item)
+        return;
+
+
+    document
+        .getElementById(
+            "infoTitle"
+        )
+        .textContent =
+            item.title;
+
+
+    document
+        .getElementById(
+            "infoContent"
+        )
+        .innerHTML =
+            item.html;
+
+
+    document
+        .getElementById(
+            "info"
+        )
+        .classList.add(
+            "show"
+        );
+
+};
+
+
+window.closeProduct =
+function(){
+
+    document
+        .getElementById(
+            "info"
+        )
+        .classList.remove(
+            "show"
+        );
+
+};
+
+
+/* =========================================================
+   ROTAÇÃO
+========================================================= */
+
+document
+    .getElementById(
+        "rotateButton"
+    )
+    .onclick =
+    function(){
+
+        controls.autoRotate =
+            !controls.autoRotate;
+
+
+        this.classList.toggle(
+            "active",
+            controls.autoRotate
+        );
+
+    };
+
+
+/* =========================================================
+   RESET
+========================================================= */
+
+document
+    .getElementById(
+        "resetButton"
+    )
+    .onclick =
+    function(){
+
+        camera.position.set(
+            720,
+            560,
+            720
+        );
+
+
+        controls.target.set(
+            40,
+            0,
+            0
+        );
+
+
+        controls.update();
+
+    };
+
+
+/* =========================================================
+   LABELS
+========================================================= */
+
+const labels = [
+
+    {
+
+        element:
+            document.getElementById(
+                "businessLabel"
+            ),
+
+        position:
+            new THREE.Vector3(
+                -110,
+                300,
+                -230
+            )
+
+    },
+
+
+    {
+
+        element:
+            document.getElementById(
+                "residentialLabel"
+            ),
+
+        position:
+            new THREE.Vector3(
+                -10,
+                80,
+                80
+            )
+
+    },
+
+
+    {
+
+        element:
+            document.getElementById(
+                "mansionsLabel"
+            ),
+
+        position:
+            new THREE.Vector3(
+                -150,
+                55,
+                340
+            )
+
+    },
+
+
+    {
+
+        element:
+            document.getElementById(
+                "agroLabel"
+            ),
+
+        position:
+            new THREE.Vector3(
+                360,
+                65,
+                430
+            )
+
+    },
+
+
+    {
+
+        element:
+            document.getElementById(
+                "clubLabel"
+            ),
+
+        position:
+            new THREE.Vector3(
+                330,
+                55,
+                -190
+            )
+
+    }
+
+];
+
+
+function updateLabels(){
+
+    labels.forEach(
+        item => {
+
+            const vector =
+                item.position.clone();
+
+
+            vector.project(
+                camera
+            );
+
+
+            const x =
+                (vector.x*.5+.5) *
+                window.innerWidth;
+
+
+            const y =
+                (-vector.y*.5+.5) *
+                window.innerHeight;
+
+
+            item.element.style.left =
+                x + "px";
+
+
+            item.element.style.top =
+                y + "px";
+
+
+            item.element.style.opacity =
+                vector.z < 1
+                ? "1"
+                : "0";
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   RESIZE
+========================================================= */
+
+window.addEventListener(
+    "resize",
+    () => {
+
+        camera.aspect =
+            window.innerWidth /
+            window.innerHeight;
+
+
+        camera.updateProjectionMatrix();
+
+
+        renderer.setSize(
+            window.innerWidth,
+            window.innerHeight
+        );
+
+    }
+);
+
+
+/* =========================================================
+   ANIMAÇÃO
+========================================================= */
+
+function animate(){
+
+    requestAnimationFrame(
+        animate
+    );
+
+
+    controls.update();
+
+
+    updateLabels();
+
+
+    const time =
+        performance.now() *
+        .004;
+
+
+    aquaPoints.forEach(
+        (point,i) => {
+
+            const scale =
+                1 +
+                Math.sin(
+                    time + i
+                ) * .2;
+
+
+            point.scale.set(
+                scale,
+                scale,
+                scale
+            );
+
+        }
+    );
+
+
+    renderer.render(
+        scene,
+        camera
+    );
+
+}
+
+
+/* =========================================================
+   INICIAR
+========================================================= */
+
+setDay();
+
+animate();
+
+
+setTimeout(
+    () => {
+
+        document
+            .getElementById(
+                "loading"
+            )
+            .classList.add(
+                "hidden"
+            );
+
+    },
+    900
+);
+
+
+
+</script>
+
+<script type="module">
+
+/* =========================================================
+   GRAPEDEV CITY — CONTROLE POR GESTOS
+   Câmera invisível + MediaPipe Hand Landmarker
+========================================================= */
+
+import {
+    HandLandmarker,
+    FilesetResolver
+} from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.22/+esm";
+
+
+const video =
+    document.getElementById("gestureVideo");
+
+const cameraStatus =
+    document.getElementById("cameraStatus");
+
+
+let handLandmarker = null;
+let cameraStream = null;
+let cameraAtiva = false;
+let detectando = false;
+let ultimoVideoTime = -1;
+
+let ultimaMaoX = null;
+let ultimaMaoY = null;
+let ultimaDistanciaPinca = null;
+
+
+/* =========================================================
+   CARREGAR IA
+========================================================= */
+
+async function carregarDetector(){
+
+    const vision =
+        await FilesetResolver.forVisionTasks(
+            "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.22/wasm"
+        );
+
+    handLandmarker =
+        await HandLandmarker.createFromOptions(
+            vision,
+            {
+                baseOptions:{
+                    modelAssetPath:
+                        "https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task",
+                    delegate:"CPU"
+                },
+
+                runningMode:"VIDEO",
+                numHands:1,
+                minHandDetectionConfidence:.55,
+                minHandPresenceConfidence:.55,
+                minTrackingConfidence:.55
+            }
+        );
+
+}
+
+
+/* =========================================================
+   ABRIR CÂMERA AUTOMATICAMENTE
+========================================================= */
+
+async function iniciarCamera(){
+
+    try{
+
+        if(
+            !navigator.mediaDevices ||
+            !navigator.mediaDevices.getUserMedia
+        ){
+            throw new Error(
+                "A câmera não está disponível neste navegador/contexto."
+            );
+        }
+
+        /*
+         * Esta chamada é o que faz o Chrome mostrar
+         * a solicitação de permissão da câmera.
+         */
+        cameraStream =
+            await navigator.mediaDevices.getUserMedia({
+                video:{
+                    facingMode:"user",
+                    width:{ideal:640},
+                    height:{ideal:480},
+                    frameRate:{ideal:30,max:30}
+                },
+                audio:false
+            });
+
+        video.srcObject = cameraStream;
+        await video.play();
+
+        cameraAtiva = true;
+
+        cameraStatus.textContent =
+            "Câmera ativa — mostre a mão";
+
+        await carregarDetector();
+
+        detectarMao();
+
+    }
+    catch(error){
+
+        cameraAtiva = false;
+
+        console.error(
+            "Controle por gestos:",
+            error
+        );
+
+        cameraStatus.textContent =
+            "Câmera não autorizada";
+
+        /*
+         * Não abrimos alert() para não atrapalhar
+         * a apresentação da cidade.
+         */
+
+    }
+
+}
+
+
+/* =========================================================
+   LOOP DE RECONHECIMENTO
+========================================================= */
+
+async function detectarMao(){
+
+    if(!cameraAtiva || !handLandmarker){
+
+        requestAnimationFrame(detectarMao);
+        return;
+
+    }
+
+    if(
+        video.readyState >= 2 &&
+        video.currentTime !== ultimoVideoTime &&
+        !detectando
+    ){
+
+        ultimoVideoTime = video.currentTime;
+        detectando = true;
+
+        try{
+
+            const resultado =
+                handLandmarker.detectForVideo(
+                    video,
+                    performance.now()
+                );
+
+            if(
+                resultado &&
+                resultado.landmarks &&
+                resultado.landmarks.length > 0
+            ){
+
+                controlarCidade(
+                    resultado.landmarks[0]
+                );
+
+            }
+            else{
+
+                resetarPosicao();
+
+                cameraStatus.textContent =
+                    "Câmera ativa — mostre a mão";
+
+            }
+
+        }
+        catch(error){
+
+            console.error(
+                "Erro no reconhecimento da mão:",
+                error
+            );
+
+        }
+
+        detectando = false;
+
+    }
+
+    requestAnimationFrame(detectarMao);
+
+}
+
+
+/* =========================================================
+   DISTÂNCIA 3D
+========================================================= */
+
+function distancia(a,b){
+
+    const dx = a.x - b.x;
+    const dy = a.y - b.y;
+    const dz = a.z - b.z;
+
+    return Math.sqrt(
+        dx*dx +
+        dy*dy +
+        dz*dz
+    );
+
+}
+
+
+/* =========================================================
+   TAMANHO DA PALMA
+========================================================= */
+
+function tamanhoPalma(m){
+
+    return distancia(
+        m[0],
+        m[9]
+    );
+
+}
+
+
+/* =========================================================
+   PUNHO FECHADO
+========================================================= */
+
+function maoFechada(m){
+
+    const escala =
+        tamanhoPalma(m);
+
+    if(escala <= 0){
+        return false;
+    }
+
+    const dedos = [8,12,16,20];
+
+    let fechados = 0;
+
+    for(const ponta of dedos){
+
+        const distanciaDedo =
+            distancia(
+                m[0],
+                m[ponta]
+            );
+
+        /*
+         * Em uma mão fechada, as pontas ficam
+         * relativamente próximas ao punho.
+         */
+        if(
+            distanciaDedo < escala * 1.75
+        ){
+            fechados++;
+        }
+
+    }
+
+    return fechados >= 4;
+
+}
+
+
+/* =========================================================
+   CENTRO DA MÃO
+========================================================= */
+
+function centroMao(m){
+
+    const pontos = [
+        m[0],
+        m[5],
+        m[9],
+        m[13],
+        m[17]
+    ];
+
+    let x = 0;
+    let y = 0;
+
+    for(const ponto of pontos){
+        x += ponto.x;
+        y += ponto.y;
+    }
+
+    return {
+        x:x / pontos.length,
+        y:y / pontos.length
+    };
+
+}
+
+
+/* =========================================================
+   RESET DE MOVIMENTO
+========================================================= */
+
+function resetarPosicao(){
+
+    ultimaMaoX = null;
+    ultimaMaoY = null;
+    ultimaDistanciaPinca = null;
+
+}
+
+
+/* =========================================================
+   CONTROLE DA CIDADE
+========================================================= */
+
+function controlarCidade(m){
+
+    const controls =
+        window.aquaControls;
+
+    if(!controls){
+        return;
+    }
+
+    const centro =
+        centroMao(m);
+
+    const x = centro.x;
+    const y = centro.y;
+
+
+    /* =====================================================
+       PINÇA = ZOOM
+       Checamos antes do punho para evitar conflitos.
+    ===================================================== */
+
+    const distanciaPinca =
+        distancia(
+            m[4],
+            m[8]
+        );
+
+    const fazendoPinca =
+        distanciaPinca < .075;
+
+
+    if(fazendoPinca){
+
+        cameraStatus.textContent =
+            "🤏 ZOOM";
+
+        if(
+            ultimaDistanciaPinca !== null
+        ){
+
+            const delta =
+                distanciaPinca -
+                ultimaDistanciaPinca;
+
+            if(
+                Math.abs(delta) > .0025
+            ){
+
+                if(delta > 0){
+
+                    /* Abriu a pinça → afasta. */
+                    controls.dollyOut(1.035);
+
+                }
+                else{
+
+                    /* Fechou a pinça → aproxima. */
+                    controls.dollyIn(1.035);
+
+                }
+
+                controls.update();
+
+            }
+
+        }
+
+        ultimaDistanciaPinca =
+            distanciaPinca;
+
+        ultimaMaoX = x;
+        ultimaMaoY = y;
+
+        return;
+
+    }
+
+
+    ultimaDistanciaPinca = null;
+
+
+    /* =====================================================
+       PUNHO = PAUSAR
+    ===================================================== */
+
+    if(maoFechada(m)){
+
+        cameraStatus.textContent =
+            "✊ PAUSADO";
+
+        /*
+         * Atualizamos a posição de referência,
+         * mas não movemos a câmera.
+         */
+        ultimaMaoX = x;
+        ultimaMaoY = y;
+
+        return;
+
+    }
+
+
+    /* =====================================================
+       PRIMEIRA DETECÇÃO
+    ===================================================== */
+
+    if(
+        ultimaMaoX === null ||
+        ultimaMaoY === null
+    ){
+
+        ultimaMaoX = x;
+        ultimaMaoY = y;
+
+        cameraStatus.textContent =
+            "✋ CONTROLE ATIVO";
+
+        return;
+
+    }
+
+
+    /* =====================================================
+       MOVIMENTO
+    ===================================================== */
+
+    const dx =
+        x - ultimaMaoX;
+
+    const dy =
+        y - ultimaMaoY;
+
+
+    /*
+     * Sensibilidade deliberadamente moderada.
+     * O movimento da mão controla a câmera,
+     * não a posição absoluta da mão.
+     */
+    const sensibilidade = 7.0;
+
+
+    if(
+        Math.abs(dx) > .004
+    ){
+
+        controls.rotateLeft(
+            dx * sensibilidade
+        );
+
+    }
+
+
+    if(
+        Math.abs(dy) > .004
+    ){
+
+        controls.rotateUp(
+            dy * sensibilidade
+        );
+
+    }
+
+
+    controls.update();
+
+
+    ultimaMaoX = x;
+    ultimaMaoY = y;
+
+
+    cameraStatus.textContent =
+        "✋ CONTROLE ATIVO";
+
+}
+
+
+/* =========================================================
+   INICIAR AUTOMATICAMENTE
+========================================================= */
+
+window.addEventListener(
+    "load",
+    () => {
+
+        /*
+         * Pequeno atraso para não disputar recursos
+         * com o carregamento inicial do Three.js.
+         */
+        setTimeout(
+            iniciarCamera,
+            1800
+        );
+
+    },
+    {once:true}
+);
+
+
+/* =========================================================
+   ENCERRAR CÂMERA AO SAIR
+========================================================= */
+
+window.addEventListener(
+    "beforeunload",
+    () => {
+
+        if(cameraStream){
+
+            cameraStream
+                .getTracks()
+                .forEach(
+                    track => track.stop()
+                );
+
+        }
+
+    }
+);
+
+</script>
+</body>
+</html>
