@@ -130,64 +130,57 @@ body.light .logo{
 
 /* MENU */
 
-.menu{
-    position:absolute;
+/* =========================
+   NAVEGAÇÃO (.menu)
+========================= */
 
-    left:50%;
-
-    transform:translateX(-50%);
-
-    height:92px;
-
-    display:flex;
-    align-items:center;
-
-    gap:38px;
+.menu {
+    display: flex;
+    align-items: center;
+    gap: 34px;
 }
 
-.menu a{
-    position:relative;
-
-    color:#c9c6d5;
-
-    text-decoration:none;
-
-    font-size:13px;
-    font-weight:800;
-
-    transition:.25s;
+.menu a {
+    position: relative;
+    color: var(--text-soft, #c9c6d5);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: .11em;
+    font-family: "Nunito", sans-serif;
+    font-weight: 800;
+    text-decoration: none;
+    transition: color .25s ease;
 }
 
-.menu a:hover{
-    color:#fff;
+.menu a::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -8px;
+    width: 0;
+    height: 1px;
+    background: var(--purple-light, #963cff);
+    transition: width .25s ease;
 }
 
-body.light .menu a{
-    color:#574d61;
+.menu a:hover,
+.menu a.active {
+    color: var(--text, #ffffff);
 }
 
-body.light .menu a:hover{
-    color:#7022ca;
+.menu a:hover::after,
+.menu a.active::after {
+    width: 100%;
 }
 
-.menu a.active{
-    color:#963cff;
+/* Suporte ao Modo Claro (Light Mode) */
+body.light .menu a {
+    color: #574d61;
 }
 
-.menu a.active::after{
-    content:"";
-
-    position:absolute;
-
-    left:0;
-    bottom:-18px;
-
-    width:24px;
-    height:2px;
-
-    background:#963cff;
-
-    box-shadow:0 0 10px #963cff;
+body.light .menu a:hover,
+body.light .menu a.active {
+    color: #7022ca;
 }
 
 
@@ -1938,7 +1931,7 @@ body.light .final-section{
         </a>
 
         <a href="sobre_nos.html" class="active">
-            Sobre
+            Sobre nós
         </a>
 
         <a href="cartao.html">

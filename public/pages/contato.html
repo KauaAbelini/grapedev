@@ -9,18 +9,12 @@
 
     <link rel="icon" href="fotos/favicon-32x32.png" type="image/png">
 
-    <link
-        href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@300;400;600;700;800&display=swap"
-        rel="stylesheet"
-    >
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@300;400;600;700;800&display=swap"
+        rel="stylesheet">
 
-    <link
-        rel="stylesheet"
-        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"
-    >
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
 
     <style>
-
         * {
             margin: 0;
             padding: 0;
@@ -29,14 +23,14 @@
 
         :root {
             --bg: #090512;
-            --bg-card: rgba(255,255,255,0.035);
+            --bg-card: rgba(255, 255, 255, 0.035);
             --purple: #8d35ff;
             --purple-light: #c084fc;
             --purple-dark: #3d1d66;
             --white: #ffffff;
             --text: #eeeaf5;
-            --muted: rgba(255,255,255,.58);
-            --border: rgba(192,132,252,.16);
+            --muted: rgba(255, 255, 255, .58);
+            --border: rgba(192, 132, 252, .16);
         }
 
         html {
@@ -51,16 +45,12 @@
             color: var(--white);
 
             background:
-                radial-gradient(
-                    circle at 15% 20%,
+                radial-gradient(circle at 15% 20%,
                     rgba(111, 35, 220, .18),
-                    transparent 30%
-                ),
-                radial-gradient(
-                    circle at 85% 70%,
+                    transparent 30%),
+                radial-gradient(circle at 85% 70%,
                     rgba(93, 30, 180, .16),
-                    transparent 32%
-                ),
+                    transparent 32%),
                 var(--bg);
 
             overflow-x: hidden;
@@ -77,15 +67,11 @@
             opacity: .18;
 
             background-image:
-                linear-gradient(
-                    rgba(150,70,255,.08) 1px,
-                    transparent 1px
-                ),
-                linear-gradient(
-                    90deg,
-                    rgba(150,70,255,.08) 1px,
-                    transparent 1px
-                );
+                linear-gradient(rgba(150, 70, 255, .08) 1px,
+                    transparent 1px),
+                linear-gradient(90deg,
+                    rgba(150, 70, 255, .08) 1px,
+                    transparent 1px);
 
             background-size: 70px 70px;
 
@@ -121,7 +107,7 @@
             text-decoration: none;
         }
 
-        
+
         /* =========================
            HEADER
         ========================= */
@@ -137,7 +123,7 @@
             align-items: center;
             justify-content: space-between;
 
-            border-bottom: 1px solid rgba(192,132,252,.12);
+            border-bottom: 1px solid rgba(192, 132, 252, .12);
         }
 
         .brand {
@@ -156,7 +142,7 @@
             object-fit: contain;
 
             filter:
-                drop-shadow(0 0 8px rgba(141,53,255,.7));
+                drop-shadow(0 0 8px rgba(141, 53, 255, .7));
         }
 
         .brand span {
@@ -165,43 +151,65 @@
 
         nav {
             display: flex;
-            gap: 40px;
+            align-items: center;
+            gap: 34px;
         }
 
         nav a {
             position: relative;
 
-            color: rgba(255,255,255,.65);
+            color: var(--text-soft, rgba(255, 255, 255, .65));
 
+            font-family: "Nunito", sans-serif;
             font-size: 12px;
             font-weight: 800;
 
-            letter-spacing: .1em;
+            letter-spacing: .11em;
+            text-transform: uppercase;
+            text-decoration: none;
 
-            transition: .3s;
+            transition: color .25s ease;
         }
 
-        nav a:hover,
-        nav a.active {
-            color: white;
-        }
-
-        nav a.active::after {
+        /* Linha roxa invisível */
+        nav a::after {
             content: "";
 
             position: absolute;
 
             left: 0;
-            right: 0;
+            bottom: -8px;
 
-            bottom: -31px;
-
+            width: 0;
             height: 2px;
 
-            background: var(--purple-light);
+            background: var(--purple-light, #963cff);
 
-            box-shadow:
-                0 0 10px rgba(192,132,252,.8);
+            box-shadow: 0 0 10px rgba(150, 60, 255, .5);
+
+            transition: width .25s ease;
+        }
+
+        /* Efeito ao passar o mouse ou na página ativa */
+        nav a:hover,
+        nav a.active {
+            color: var(--text, #ffffff);
+        }
+
+        /* Animação da linha expandindo */
+        nav a:hover::after,
+        nav a.active::after {
+            width: 100%;
+        }
+
+        /* Suporte ao Modo Claro (Light Mode) */
+        body.light nav a {
+            color: rgba(36, 21, 47, .65);
+        }
+
+        body.light nav a:hover,
+        body.light nav a.active {
+            color: #24152f;
         }
 
         /* =========================
@@ -266,7 +274,7 @@
             background: var(--purple-light);
 
             box-shadow:
-                0 0 8px rgba(192,132,252,.7);
+                0 0 8px rgba(192, 132, 252, .7);
         }
 
         .hero h1 {
@@ -286,7 +294,7 @@
 
             color: transparent;
 
-            -webkit-text-stroke: 1px rgba(255,255,255,.3);
+            -webkit-text-stroke: 1px rgba(255, 255, 255, .3);
         }
 
         .hero-description {
@@ -306,13 +314,13 @@
 
             padding: 8px 15px;
 
-            border: 1px solid rgba(192,132,252,.22);
+            border: 1px solid rgba(192, 132, 252, .22);
 
             border-radius: 30px;
 
             color: var(--purple-light);
 
-            background: rgba(192,132,252,.06);
+            background: rgba(192, 132, 252, .06);
 
             font-size: 11px;
             font-weight: 700;
@@ -334,17 +342,15 @@
             border-radius: 24px;
 
             background:
-                linear-gradient(
-                    145deg,
-                    rgba(255,255,255,.055),
-                    rgba(255,255,255,.018)
-                );
+                linear-gradient(145deg,
+                    rgba(255, 255, 255, .055),
+                    rgba(255, 255, 255, .018));
 
             backdrop-filter: blur(25px);
 
             box-shadow:
-                0 30px 80px rgba(0,0,0,.25),
-                inset 0 1px 0 rgba(255,255,255,.04);
+                0 30px 80px rgba(0, 0, 0, .25),
+                inset 0 1px 0 rgba(255, 255, 255, .04);
 
             animation: cardIn 1s ease .15s both;
         }
@@ -393,7 +399,7 @@
             margin-bottom: 7px;
         }
 
-        .contact-card > p {
+        .contact-card>p {
             color: var(--muted);
 
             font-size: 13px;
@@ -441,7 +447,7 @@
             pointer-events: none;
         }
 
-        .input-box textarea + i {
+        .input-box textarea+i {
             top: 20px;
         }
 
@@ -452,13 +458,13 @@
 
             padding: 14px 16px 14px 45px;
 
-            border: 1px solid rgba(255,255,255,.09);
+            border: 1px solid rgba(255, 255, 255, .09);
 
             border-radius: 12px;
 
             outline: none;
 
-            background: rgba(0,0,0,.22);
+            background: rgba(0, 0, 0, .22);
 
             color: white;
 
@@ -490,19 +496,19 @@
 
         input::placeholder,
         textarea::placeholder {
-            color: rgba(255,255,255,.3);
+            color: rgba(255, 255, 255, .3);
         }
 
         input:focus,
         textarea:focus,
         select:focus {
-            border-color: rgba(192,132,252,.65);
+            border-color: rgba(192, 132, 252, .65);
 
-            background: rgba(0,0,0,.3);
+            background: rgba(0, 0, 0, .3);
 
             box-shadow:
-                0 0 0 3px rgba(141,53,255,.08),
-                0 0 20px rgba(141,53,255,.08);
+                0 0 0 3px rgba(141, 53, 255, .08),
+                0 0 20px rgba(141, 53, 255, .08);
         }
 
         .row {
@@ -530,11 +536,9 @@
             border-radius: 12px;
 
             background:
-                linear-gradient(
-                    90deg,
+                linear-gradient(90deg,
                     #6d24d9,
-                    #923cff
-                );
+                    #923cff);
 
             color: white;
 
@@ -554,7 +558,7 @@
             transform: translateY(-2px);
 
             box-shadow:
-                0 12px 30px rgba(141,53,255,.3);
+                0 12px 30px rgba(141, 53, 255, .3);
         }
 
         /* =========================
@@ -583,11 +587,11 @@
 
             padding: 23px;
 
-            border: 1px solid rgba(255,255,255,.07);
+            border: 1px solid rgba(255, 255, 255, .07);
 
             border-radius: 16px;
 
-            background: rgba(255,255,255,.025);
+            background: rgba(255, 255, 255, .025);
 
             transition: .3s;
         }
@@ -595,9 +599,9 @@
         .info-card:hover {
             transform: translateY(-5px);
 
-            border-color: rgba(192,132,252,.25);
+            border-color: rgba(192, 132, 252, .25);
 
-            background: rgba(192,132,252,.04);
+            background: rgba(192, 132, 252, .04);
         }
 
         .info-icon {
@@ -609,7 +613,7 @@
             display: grid;
             place-items: center;
 
-            border: 1px solid rgba(141,53,255,.5);
+            border: 1px solid rgba(141, 53, 255, .5);
 
             border-radius: 13px;
 
@@ -617,10 +621,10 @@
 
             font-size: 21px;
 
-            background: rgba(141,53,255,.07);
+            background: rgba(141, 53, 255, .07);
 
             box-shadow:
-                0 0 20px rgba(141,53,255,.08);
+                0 0 20px rgba(141, 53, 255, .08);
         }
 
         .info-card small {
@@ -628,7 +632,7 @@
 
             margin-bottom: 4px;
 
-            color: rgba(255,255,255,.38);
+            color: rgba(255, 255, 255, .38);
 
             font-size: 10px;
             font-weight: 700;
@@ -659,11 +663,9 @@
             overflow: hidden;
 
             background:
-                linear-gradient(
-                    180deg,
+                linear-gradient(180deg,
                     transparent,
-                    rgba(61,29,102,.32)
-                );
+                    rgba(61, 29, 102, .32));
         }
 
         .final::before {
@@ -680,11 +682,9 @@
             transform: translate(-50%, -50%);
 
             background:
-                radial-gradient(
-                    ellipse,
-                    rgba(126,44,230,.25),
-                    transparent 70%
-                );
+                radial-gradient(ellipse,
+                    rgba(126, 44, 230, .25),
+                    transparent 70%);
 
             pointer-events: none;
         }
@@ -701,7 +701,7 @@
 
             padding: 7px 16px;
 
-            border: 1px solid rgba(192,132,252,.25);
+            border: 1px solid rgba(192, 132, 252, .25);
 
             border-radius: 20px;
 
@@ -729,7 +729,7 @@
             color: var(--purple-light);
 
             text-shadow:
-                0 0 30px rgba(192,132,252,.2);
+                0 0 30px rgba(192, 132, 252, .2);
         }
 
         .final p {
@@ -749,7 +749,7 @@
         ========================= */
 
         footer {
-            border-top: 1px solid rgba(255,255,255,.07);
+            border-top: 1px solid rgba(255, 255, 255, .07);
 
             padding: 25px 5%;
 
@@ -757,7 +757,7 @@
             align-items: center;
             justify-content: space-between;
 
-            color: rgba(255,255,255,.4);
+            color: rgba(255, 255, 255, .4);
 
             font-size: 11px;
         }
@@ -821,7 +821,7 @@
 
         @media(max-width: 600px) {
 
-            
+
 
             header {
                 height: 65px;
@@ -896,7 +896,6 @@
                 text-align: center;
             }
         }
-
     </style>
 </head>
 
@@ -910,10 +909,7 @@
 
         <a href="home.html" class="brand">
 
-            <img
-                src="../../storage/images/icone uva sem fundo.png"
-                alt="GrapeDev"
-            >
+            <img src="../../storage/images/icone uva sem fundo.png" alt="GrapeDev">
 
             GrapeDev</span>
 
@@ -1009,13 +1005,7 @@
 
                                 <i class="bi bi-person"></i>
 
-                                <input
-                                    type="text"
-                                    id="nome"
-                                    name="nome"
-                                    placeholder="Digite seu nome"
-                                    required
-                                >
+                                <input type="text" id="nome" name="nome" placeholder="Digite seu nome" required>
 
                             </div>
 
@@ -1032,13 +1022,7 @@
 
                                 <i class="bi bi-envelope"></i>
 
-                                <input
-                                    type="email"
-                                    id="email"
-                                    name="email"
-                                    placeholder="seu@email.com"
-                                    required
-                                >
+                                <input type="email" id="email" name="email" placeholder="seu@email.com" required>
 
                             </div>
 
@@ -1100,22 +1084,15 @@
 
                             <i class="bi bi-pencil"></i>
 
-                            <textarea
-                                id="mensagem"
-                                name="mensagem"
-                                placeholder="Conte um pouco sobre sua ideia ou projeto..."
-                                required
-                            ></textarea>
+                            <textarea id="mensagem" name="mensagem"
+                                placeholder="Conte um pouco sobre sua ideia ou projeto..." required></textarea>
 
                         </div>
 
                     </div>
 
 
-                    <button
-                        type="submit"
-                        class="btn-enviar"
-                    >
+                    <button type="submit" class="btn-enviar">
 
                         <i class="bi bi-send"></i>
 
@@ -1247,7 +1224,7 @@
 
         const form = document.getElementById("contactForm");
 
-        form.addEventListener("submit", function(event) {
+        form.addEventListener("submit", function (event) {
 
             event.preventDefault();
 

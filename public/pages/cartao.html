@@ -52,47 +52,47 @@
         ========================= */
 
         .btn-voltar {
-            position: fixed;
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 999;
 
-            top: 20px;
-            left: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
 
-            z-index: 999;
+    padding: 0 20px;
+    height: 40px;
 
-            display: flex;
-            align-items: center;
-            gap: 8px;
+    color: #ddd8e7;
+    font-family: "Nunito", sans-serif;
+    font-size: 13px;
+    font-weight: 800;
+    text-decoration: none;
 
-            padding: 10px 20px;
+    background: transparent;
+    border: 1px solid #7620d5;
+    border-radius: 10px;
 
-            color: white;
+    transition: .25s ease;
+}
 
-            text-decoration: none;
+.btn-voltar:hover {
+    color: #ffffff;
+    border-color: #a744ff;
+    box-shadow: 0 0 20px rgba(150, 60, 255, .25);
+    transform: translateY(-2px);
+}
 
-            border: 1px solid rgba(145, 60, 255, .8);
+/* Suporte ao Modo Claro (Light Mode) */
+body.light .btn-voltar {
+    color: #5c496c;
+}
 
-            border-radius: 30px;
-
-            background: rgba(10, 5, 25, .7);
-
-            backdrop-filter: blur(10px);
-
-            font-size: 14px;
-            font-weight: bold;
-
-            transition: .3s;
-        }
-
-        .btn-voltar:hover {
-            background: #7528ff;
-
-            border-color: #a35cff;
-
-            box-shadow:
-                0 0 20px rgba(125, 35, 255, .5);
-
-            transform: translateY(-2px);
-        }
+body.light .btn-voltar:hover {
+    color: #24152f;
+}
 
         /* =========================
            CARTÃO
