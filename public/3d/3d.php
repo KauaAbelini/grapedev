@@ -2,12 +2,12 @@
 session_start();
 
 if (!isset($_SESSION["usuario_id"])) {
-    header("Location: login.php");
+    header("Location: ../../backend/auth/login.php");
     exit;
 }
 
-include("conexao.php");
-include("local_contexto.php");
+include("../../backend/database/conexao.php");
+include("../../backend/locais/local_contexto.php");
 
 $usuarioId = (int)$_SESSION["usuario_id"];
 $localAtual = obterLocalAtual($conexao, $usuarioId);
@@ -30,16 +30,6 @@ if ($tipoImovel === "") {
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>AquaFlow 3D</title>
-
-<link
-    rel="stylesheet"
-    href="/grapedev/nex/assets/nex-jarvis.css"
->
-
-<script
-    src="/grapedev/nex/assets/nex-jarvis.js"
-    defer
-></script>
 
 <style>
 
@@ -955,7 +945,7 @@ body {
 
     <div class="panel">
 
-        <a href="backend/dashboard/dashboard.php" class="dashboard-back" aria-label="Voltar para o Dashboard" title="Voltar para o Dashboard">
+        <a href="../../backend/dashboard/dashboard.php" class="dashboard-back" aria-label="Voltar para o Dashboard" title="Voltar para o Dashboard">
             <span class="back-icon">Voltar</span>
         </a>
 
@@ -3513,311 +3503,32 @@ function createResidentialBuildingEnvironment() {
     addEnvironmentMarkers("predio_residencial",group,environmentPoints.predio_residencial);
 }
 function createCompanyEnvironment() {
-    const group = new THREE.Group();
-    const shell = [], equipment = [], systems = [];
-
-    const concrete = 0x6f7785;
-    const dark = 0x0d1420;
-    const wall = 0x182333;
-    const glass = 0x2aa9e8;
-    const glassDark = 0x123b58;
-    const purple = 0x7654ff;
-    const floor = 0x303b4b;
-    const green = 0x274b35;
-    const wood = 0x735b43;
-
-    // Terreno e fachada frontal (frente = eixo Z negativo)
-    addEnvironmentBox(group, shell, "Terreno da empresa", "Área externa", 32, .20, 26, 0, .02, 0, 0x111a27);
-    addEnvironmentBox(group, shell, "Calçada frontal", "Acesso", 27, .10, 4.5, 0, .18, -11.0, 0x68727f);
-    addEnvironmentBox(group, shell, "Entrada de veículos", "Acesso", 5.0, .08, 7.5, -9.0, .25, -7.0, 0x4e5968);
-
-    // Estacionamento lateral
-    addEnvironmentBox(group, shell, "Estacionamento", "Área externa", 10.0, .08, 9.0, -10.0, .25, -2.5, 0x202a38);
-    [-12.5, -9.5, -6.5].forEach(x => {
-        addEnvironmentBox(group, equipment, "Vaga de estacionamento", "Estacionamento", 2.35, .035, 6.2, x, .30, -2.5, 0x3b4655);
-    });
-
-    // Jardim e paisagismo
-    addEnvironmentBox(group, shell, "Jardim frontal", "Paisagismo", 9.0, .08, 4.0, 9.5, .25, -8.2, green);
-    [7.0, 9.5, 12.0].forEach((x, i) => {
-        const trunk = new THREE.Mesh(new THREE.CylinderGeometry(.13, .18, 1.35, 10), makeMaterial(0x4b3526));
-        trunk.position.set(x, .95, -8.1 + i * .6);
-        trunk.castShadow = true;
-        group.add(trunk); shell.push(trunk);
-        const crown = new THREE.Mesh(new THREE.SphereGeometry(.78, 14, 10), makeMaterial(0x35663e));
-        crown.position.set(x, 2.0, -8.1 + i * .6);
-        crown.scale.y = 1.15;
-        crown.castShadow = true;
-        group.add(crown); shell.push(crown);
-    });
-
-    // Edifício térreo contemporâneo
-    addEnvironmentBox(group, shell, "Base da empresa", "Estrutura", 19.0, .30, 11.0, 1.0, .35, 0, dark);
-    addEnvironmentBox(group, shell, "Piso interno", "Piso", 18.5, .12, 10.5, 1.0, .58, 0, floor);
-    addEnvironmentBox(group, shell, "Parede traseira", "Estrutura", 18.5, 4.9, .28, 1.0, 2.9, 5.1, wall);
-    addEnvironmentBox(group, shell, "Parede lateral esquerda", "Estrutura", .28, 4.9, 10.2, -8.0, 2.9, 0, wall);
-    addEnvironmentBox(group, shell, "Parede lateral direita", "Estrutura", .28, 4.9, 10.2, 10.0, 2.9, 0, wall);
-
-    // Fachada frontal limpa e envidraçada
-    addEnvironmentBox(group, shell, "Moldura superior", "Fachada", 18.9, .25, .30, 1.0, 5.25, -5.15, dark);
-    addEnvironmentBox(group, shell, "Pilar esquerdo", "Estrutura", .28, 4.65, .34, -7.8, 2.9, -5.12, concrete);
-    addEnvironmentBox(group, shell, "Pilar direito", "Estrutura", .28, 4.65, .34, 9.8, 2.9, -5.12, concrete);
-
-    [-6.0, -3.8, -1.6, .6, 2.8, 5.0, 7.2, 9.0].forEach(x => {
-        addEnvironmentBox(group, equipment, "Painel de vidro da fachada", "Esquadria", 1.95, 3.85, .10, x, 2.95, -5.28, glassDark, {
-            emissive: 0x07599b, emissiveIntensity: .38
-        });
-    });
-
-    // Entrada central destacada
-    addEnvironmentBox(group, equipment, "Porta principal", "Acesso", 2.6, 3.55, .12, 1.0, 2.35, -5.38, glass, {
-        emissive: 0x0878bd, emissiveIntensity: .7
-    });
-    addEnvironmentBox(group, equipment, "Moldura da entrada", "Acesso", 3.25, 3.95, .16, 1.0, 2.65, -5.48, purple, {
-        emissive: purple, emissiveIntensity: 1.2
-    });
-    addEnvironmentBox(group, equipment, "Marquise", "Cobertura", 5.8, .22, 2.4, 1.0, 5.25, -5.85, dark);
-    addEnvironmentBox(group, equipment, "Faixa de identidade", "Identificação", 8.5, .12, .12, 1.0, 4.72, -5.47, purple, {
-        emissive: purple, emissiveIntensity: 2.0,
-        details: "Identidade visual GrapeDev / AquaFlow."
-    });
-
-    // Hall e divisórias de vidro
-    addEnvironmentBox(group, shell, "Divisória do hall", "Divisória", .12, 2.7, 7.0, -3.5, 1.9, -.2, glassDark, {
-        emissive: 0x07599b, emissiveIntensity: .15
-    });
-    addEnvironmentBox(group, shell, "Divisória sala de reunião", "Divisória", 6.4, 2.7, .12, 5.0, 1.9, 2.1, glassDark, {
-        emissive: 0x07599b, emissiveIntensity: .15
-    });
-
-    // Recepção premium
-    addEnvironmentBox(group, equipment, "Balcão da recepção", "Administrativo", 3.5, 1.05, 1.0, -5.3, 1.15, -2.9, 0x344253);
-    addEnvironmentBox(group, equipment, "Painel da recepção", "Administrativo", 4.0, 2.65, .10, -5.3, 2.25, 3.95, dark);
-    addEnvironmentBox(group, equipment, "Logo da recepção", "Identificação", 2.2, .55, .08, -5.3, 2.65, 3.88, purple, {
-        emissive: purple, emissiveIntensity: 1.4
-    });
-    addEnvironmentBox(group, equipment, "Sofá", "Mobiliário", 3.1, .72, 1.0, -5.4, 1.0, 1.8, 0x4c5969);
-    addEnvironmentBox(group, equipment, "Mesa de apoio", "Mobiliário", 1.2, .70, .7, -2.7, .96, 2.1, wood);
-
-    // Área de trabalho aberta
-    addEnvironmentBox(group, equipment, "Mesa de trabalho 1", "Administrativo", 6.2, .72, 1.25, 2.0, .98, -2.6, 0x465364);
-    addEnvironmentBox(group, equipment, "Mesa de trabalho 2", "Administrativo", 6.2, .72, 1.25, 2.0, .98, .8, 0x465364);
-    [[-.2,-2.6],[2.0,-2.6],[4.2,-2.6],[-.2,.8],[2.0,.8],[4.2,.8]].forEach(([x,z]) => {
-        addEnvironmentBox(group, equipment, "Estação de trabalho", "Mobiliário", .85, .78, .65, x, 1.42, z, 0x202a37);
-        addEnvironmentBox(group, equipment, "Monitor", "Equipamento", .50, .34, .08, x, 1.95, z - .06, glass, {
-            emissive: 0x0878bd, emissiveIntensity: .7
-        });
-    });
-
-    // Sala de reunião executiva
-    addEnvironmentBox(group, equipment, "Mesa de reunião", "Administrativo", 4.5, .72, 2.1, 5.0, .98, 3.65, wood);
-    [-1.8, 0, 1.8].forEach(x => {
-        addEnvironmentBox(group, equipment, "Cadeira de reunião", "Mobiliário", .55, .72, .55, 5.0 + x, 1.0, 2.15, 0x303b4a);
-        addEnvironmentBox(group, equipment, "Cadeira de reunião", "Mobiliário", .55, .72, .55, 5.0 + x, 1.0, 5.15, 0x303b4a);
-    });
-    addEnvironmentBox(group, equipment, "Tela da sala de reunião", "Equipamento", 3.0, 1.5, .08, 5.0, 2.4, 4.98, glass, {
-        emissive: 0x0878bd, emissiveIntensity: .65
-    });
-
-    // Copa moderna
-    addEnvironmentBox(group, equipment, "Bancada da copa", "Copa", 3.6, .85, 1.0, 5.8, 1.02, -2.7, 0x65717f);
-    addEnvironmentBox(group, equipment, "Armário da copa", "Copa", 3.6, 1.9, .65, 5.8, 1.75, -4.05, 0x242e3c);
-    addEnvironmentBox(group, equipment, "Geladeira", "Copa", 1.0, 2.2, .85, 8.0, 1.7, -2.7, 0x7a8591);
-    addEnvironmentBox(group, equipment, "Mesa da copa", "Copa", 2.2, .72, 1.2, 5.7, .98, -.95, wood);
-
-    // Banheiro
-    addEnvironmentBox(group, equipment, "Bancada do banheiro", "Banheiro", 2.5, .82, .7, -5.3, 1.0, -1.0, 0x7a8490);
-    addEnvironmentBox(group, equipment, "Cabine sanitária", "Banheiro", 2.5, 2.1, .12, -5.3, 1.65, .2, 0x3f4956);
-    addEnvironmentBox(group, equipment, "Espelho", "Banheiro", 1.7, 1.1, .06, -5.3, 2.05, -1.38, glass, {
-        emissive: 0x0878bd, emissiveIntensity: .25
-    });
-
-    // Iluminação linear
-    [[-3.5,-2.0],[1.0,-2.0],[5.5,-2.0],[-3.5,2.6],[1.0,2.6],[5.5,2.6]].forEach(([x,z]) => {
-        const mat = new THREE.MeshStandardMaterial({color: 0xdcecff, emissive: 0x6caeff, emissiveIntensity: 1.6, roughness: .25, metalness: .05});
-        const lamp = new THREE.Mesh(new THREE.BoxGeometry(2.3, .06, .12), mat);
-        lamp.position.set(x, 4.72, z);
-        group.add(lamp); equipment.push(lamp); aquaGlowMaterials.push(mat);
-    });
-
-    // Cobertura e reservatório visível
-    addEnvironmentBox(group, shell, "Cobertura técnica", "Cobertura", 19.0, .20, 11.0, 1.0, 5.30, 0, dark);
-    addEnvironmentBox(group, shell, "Platibanda frontal", "Cobertura", 19.2, .55, .25, 1.0, 5.55, -5.22, wall);
-    const tank = new THREE.Mesh(new THREE.CylinderGeometry(1.05, 1.05, 1.45, 24), makeMaterial(0x6d7887, 0x142238, .25));
-    tank.position.set(7.2, 6.15, 3.4); tank.castShadow = true; group.add(tank); equipment.push(tank);
-    tank.userData.aquaComponent = {name:"Reservatório", type:"Reservatório", details:"Reservatório de abastecimento do escritório."};
-
-    [-11.5, 12.5].forEach(x => addEnvironmentLightPole(group, x, -9.3, 4.5, "Iluminação externa do escritório"));
-
-    // Hidráulica
-    createSystemPipe(group, systems, [[7.2, 5.9, 3.4], [7.2, 1.0, 3.4]]);
-    createSystemPipe(group, systems, [[7.2, 1.0, 3.4], [-5.3, 1.0, 3.4]]);
-    createSystemPipe(group, systems, [[-5.3, 1.0, 3.4], [-5.3, 1.0, -1.0]]);
-    createSystemPipe(group, systems, [[7.2, 1.0, 3.4], [5.8, 1.0, 3.4]]);
-    createSystemPipe(group, systems, [[5.8, 1.0, 3.4], [5.8, 1.0, -2.7]]);
-
+    const group=new THREE.Group();
+    const shell=[],equipment=[],systems=[];
+    createSimpleBuilding(group,shell,14,9,4.2,0x4d5665);
+    addEnvironmentBox(group,equipment,"Recepção","Administrativo",5.5,2.0,2.4,-3.2,1.0,1.5,0x242d3b);
+    addEnvironmentBox(group,equipment,"Sala de reunião","Administrativo",5.5,2.0,2.4,3.2,1.0,1.5,0x242d3b);
+    addEnvironmentBox(group,equipment,"Copa","Copa",4.0,1.0,3.0,4.0,.5,-2.3,0x303a48);
+    addEnvironmentBox(group,equipment,"Banheiro","Banheiro",4.0,1.0,3.0,-4.0,.5,-2.3,0x303a48);
+    createSystemPipe(group,systems,[[0,3.5,3.5],[0,1.0,3.5],[-4.2,1.0,3.5]]);
+    createSystemPipe(group,systems,[[0,1.0,3.5],[4.2,1.0,3.5]]);
     scene.add(group);
-    environmentGroups.empresa = group;
-    environmentSystems.empresa = {shell, equipment, systems, flow: []};
-    addEnvironmentMarkers("empresa", group, environmentPoints.empresa);
+    environmentGroups.empresa=group;
+    environmentSystems.empresa={shell,equipment,systems,flow:[]};
+    addEnvironmentMarkers("empresa",group,environmentPoints.empresa);
 }
 
 function createCommercialBuildingEnvironment() {
-    const group = new THREE.Group();
-    const shell = [], equipment = [], systems = [];
-
-    const W = 16;
-    const D = 10;
-    const H = 3.25;
-    const floors = 3;
-    const body = 0x3a4656;
-    const dark = 0x101722;
-    const concrete = 0x687585;
-    const glass = 0x248fd1;
-    const glassDark = 0x173b56;
-    const purple = 0x7654ff;
-    const floorMat = 0x252f3c;
-    const sidewalk = 0x4b535e;
-
-    // Terreno e acesso: tudo apoiado no mesmo nível para evitar peças flutuando.
-    addEnvironmentBox(group, shell, "Terreno comercial", "Terreno", 34, .20, 30, 0, .10, 0, 0x20262f);
-    addEnvironmentBox(group, shell, "Calçada frontal", "Acesso", 28, .12, 4.2, 0, .26, -12.1, sidewalk);
-    addEnvironmentBox(group, shell, "Calçada lateral", "Acesso", 4.0, .12, 18, 10.1, .26, -1.5, sidewalk);
-    addEnvironmentBox(group, shell, "Faixa de jardim", "Paisagismo", 7.0, .08, 8.5, -11.0, .22, -7.0, 0x294631);
-    addEnvironmentBox(group, shell, "Estacionamento", "Área externa", 12.0, .08, 7.0, 9.0, .21, -7.0, 0x303740);
-
-    // Base única do edifício. Os três pavimentos começam exatamente sobre ela.
-    const baseY = .30;
-    addEnvironmentBox(group, shell, "Base estrutural", "Estrutura", W + .50, .35, D + .50, 0, baseY, 0, 0x1a212a);
-
-    for (let f = 0; f < floors; f++) {
-        const yBottom = baseY + .35 + f * H;
-        const yCenter = yBottom + H / 2;
-        const floorName = f === 0 ? "Térreo" : `${f + 1}º andar`;
-
-        // Volume estrutural fechado, sem vãos entre os pavimentos.
-        addEnvironmentBox(group, shell, `Estrutura — ${floorName}`, "Estrutura", W, H, D, 0, yCenter, 0, body);
-
-        // Lajes reais entre os pavimentos, encaixadas na altura correta.
-        if (f > 0) {
-            addEnvironmentBox(group, shell, `Laje — ${floorName}`, "Estrutura", W + .08, .16, D + .08, 0, yBottom, 0, floorMat);
-        }
-
-        // Fachada frontal moderna (frente = Z negativo).
-        addEnvironmentBox(group, equipment, `Faixa de vidro — ${floorName}`, "Fachada", 13.8, 2.05, .12, 0, yCenter + .05, -D/2 - .08, glassDark, {
-            emissive: 0x07599b, emissiveIntensity: .28
-        });
-        [-5.3, -1.8, 1.8, 5.3].forEach((x, i) => {
-            addEnvironmentBox(group, equipment, `Janela ${f + 1}-${i + 1}`, "Esquadria", 2.75, 1.55, .10, x, yCenter + .08, -D/2 - .18, glass, {
-                emissive: 0x0878bd, emissiveIntensity: .65
-            });
-        });
-
-        // Laterais envidraçadas para dar profundidade sem deixar paredes soltas.
-        addEnvironmentBox(group, equipment, `Vidro lateral esquerdo — ${floorName}`, "Esquadria", .10, 1.75, 6.6, -W/2 - .08, yCenter + .05, 0, glassDark, {
-            emissive: 0x07599b, emissiveIntensity: .22
-        });
-        addEnvironmentBox(group, equipment, `Vidro lateral direito — ${floorName}`, "Esquadria", .10, 1.75, 6.6, W/2 + .08, yCenter + .05, 0, glassDark, {
-            emissive: 0x07599b, emissiveIntensity: .22
-        });
-
-        // Friso luminoso apoiado na própria fachada.
-        addEnvironmentBox(group, equipment, `Iluminação da fachada — ${floorName}`, "Iluminação", 14.2, .07, .10, 0, yBottom + H - .16, -D/2 - .22, purple, {
-            emissive: purple, emissiveIntensity: 1.8
-        });
-
-        // Sacada técnica estreita, apoiada no pavimento e com guarda-corpo.
-        addEnvironmentBox(group, equipment, `Sacada técnica — ${floorName}`, "Sacada", 14.0, .16, 1.0, 0, yBottom + .10, -D/2 - .55, floorMat);
-        addEnvironmentBox(group, equipment, `Guarda-corpo — ${floorName}`, "Sacada", 13.7, .72, .07, 0, yBottom + .52, -D/2 - 1.02, glass, {
-            emissive: 0x07599b, emissiveIntensity: .28
-        });
-
-        // Pequenas divisórias internas para o prédio não parecer um bloco vazio.
-        addEnvironmentBox(group, shell, `Núcleo interno — ${floorName}`, "Divisória", .16, H - .35, 5.8, 0, yCenter, 1.25, dark);
-        addEnvironmentBox(group, shell, `Divisória esquerda — ${floorName}`, "Divisória", 5.0, H - .35, .12, -5.0, yCenter, 1.25, dark);
-        addEnvironmentBox(group, shell, `Divisória direita — ${floorName}`, "Divisória", 5.0, H - .35, .12, 5.0, yCenter, 1.25, dark);
-    }
-
-    // Entrada principal: todos os elementos encostados no térreo e na fachada.
-    const frontZ = -D/2 - .18;
-    addEnvironmentBox(group, shell, "Hall de entrada", "Acesso", 5.8, 3.0, .24, 0, baseY + 1.75, frontZ, dark);
-    addEnvironmentBox(group, equipment, "Portal da entrada", "Acesso", 4.3, 2.95, .14, 0, baseY + 1.72, frontZ - .10, concrete);
-    addEnvironmentBox(group, equipment, "Porta automática", "Acesso", 2.25, 2.55, .08, 0, baseY + 1.48, frontZ - .20, glass, {
-        emissive: 0x0878bd, emissiveIntensity: .8
-    });
-    addEnvironmentBox(group, equipment, "Marquise principal", "Cobertura", 7.0, .22, 2.0, 0, baseY + 3.15, frontZ - .75, purple, {
-        emissive: purple, emissiveIntensity: .45
-    });
-    addEnvironmentBox(group, equipment, "Letreiro do prédio", "Identificação", 5.6, .58, .10, 0, baseY + 2.75, frontZ - .28, dark);
-    addEnvironmentBox(group, equipment, "Letreiro GRAPEDEV", "Identificação", 3.9, .18, .06, 0, baseY + 2.86, frontZ - .35, glass, {
-        emissive: 0x168cff, emissiveIntensity: 1.2
-    });
-
-    // Portaria/receptivo no térreo.
-    addEnvironmentBox(group, equipment, "Balcão da portaria", "Recepção", 4.6, .82, 1.1, 0, baseY + 1.05, -1.8, 0x586474);
-    addEnvironmentBox(group, equipment, "Painel da recepção", "Recepção", 3.5, 1.7, .10, 0, baseY + 2.0, 1.0, glassDark, {
-        emissive: 0x0878bd, emissiveIntensity: .4
-    });
-
-    // Cobertura correta: fica imediatamente acima do terceiro pavimento.
-    const topY = baseY + .35 + floors * H;
-    const roofY = topY + .16;
-    addEnvironmentBox(group, shell, "Laje da cobertura", "Cobertura", W + .40, .24, D + .40, 0, roofY, 0, dark);
-    addEnvironmentBox(group, shell, "Platibanda frontal", "Cobertura", W + .35, .55, .24, 0, roofY + .38, -D/2 - .08, body);
-    addEnvironmentBox(group, shell, "Platibanda traseira", "Cobertura", W + .35, .55, .24, 0, roofY + .38, D/2 + .08, body);
-    addEnvironmentBox(group, shell, "Platibanda esquerda", "Cobertura", .24, .55, D + .35, -W/2 - .08, roofY + .38, 0, body);
-    addEnvironmentBox(group, shell, "Platibanda direita", "Cobertura", .24, .55, D + .35, W/2 + .08, roofY + .38, 0, body);
-
-    // Casa de máquinas e reservatório apoiados diretamente na cobertura.
-    addEnvironmentBox(group, equipment, "Casa de máquinas", "Cobertura", 4.2, 1.35, 3.4, -4.0, roofY + .78, 1.0, floorMat);
-    const tank = new THREE.Mesh(
-        new THREE.CylinderGeometry(1.25, 1.25, 1.65, 28),
-        makeMaterial(0x718092, 0x142238, .25)
-    );
-    tank.position.set(4.6, roofY + 1.0, 1.8);
-    tank.castShadow = true;
-    tank.receiveShadow = true;
-    group.add(tank);
-    equipment.push(tank);
-    tank.userData.aquaComponent = {
-        name: "Reservatório superior",
-        type: "Reservatório",
-        details: "Reservatório principal de abastecimento do prédio comercial."
-    };
-
-    // Área externa funcional: estacionamento, jardim e postes.
-    [-7.5, -2.5, 2.5, 7.5].forEach(x => {
-        addEnvironmentBox(group, equipment, "Vaga de estacionamento", "Estacionamento", 3.8, .04, 5.2, x, .25, -7.0, 0x3a414b);
-    });
-    [-10.5, 10.5].forEach(x => addEnvironmentLightPole(group, x, -9.0, 5.0, "Poste do prédio comercial"));
-    [-11.5, 11.5].forEach(x => addEnvironmentLightPole(group, x, 7.0, 4.0, "Iluminação lateral"));
-
-    // Rede hidráulica completa: prumada vertical + ramais em cada pavimento + pontos monitorados.
-    const mainX = 3.8;
-    const mainZ = 2.0;
-    createSystemPipe(group, systems, [
-        [mainX, baseY + .35, mainZ],
-        [mainX, topY + .10, mainZ]
-    ]);
-
-    for (let f = 0; f < floors; f++) {
-        const y = baseY + .35 + f * H + .95;
-        // Ramal principal do pavimento.
-        createSystemPipe(group, systems, [[mainX, y, mainZ], [-4.8, y, mainZ]]);
-        createSystemPipe(group, systems, [[-4.8, y, mainZ], [-4.8, y, -3.2]]);
-        createSystemPipe(group, systems, [[mainX, y, mainZ], [4.8, y, mainZ]]);
-        createSystemPipe(group, systems, [[4.8, y, mainZ], [4.8, y, -3.2]]);
-        // Ramais visíveis no Raio-X até os pontos da fachada.
-        createSystemPipe(group, systems, [[-4.8, y, -3.2], [-4.8, y, -4.85]],);
-        createSystemPipe(group, systems, [[4.8, y, -3.2], [4.8, y, -4.85]],);
-    }
-    // Alimentação do reservatório.
-    createSystemPipe(group, systems, [[mainX, topY + .10, mainZ], [4.6, topY + .18, 1.8]]);
-
+    const group=new THREE.Group();
+    const shell=[],equipment=[],systems=[];
+    createMultiFloorBuilding(group,shell,equipment,{floors:3,width:14,depth:9.5,floorHeight:3.4,facade:0x465267,accent:0x168cff,title:"Prédio comercial"});
+    addEnvironmentBox(group,equipment,"Calçada frontal","Área externa",18,.18,4,0,.1,-7.1,0x343b48);
+    addEnvironmentBox(group,equipment,"Marquise de entrada","Cobertura",6,.25,2.2,0,3.35,-5.5,0x7654ff);
+    [-6,0,6].forEach(x=>addEnvironmentLightPole(group,x,-9.0,5.0,"Poste do prédio comercial"));
     scene.add(group);
-    environmentGroups.predio_comercial = group;
-    environmentSystems.predio_comercial = {shell, equipment, systems, flow: []};
-    addEnvironmentMarkers("predio_comercial", group, environmentPoints.predio_comercial);
+    environmentGroups.predio_comercial=group;
+    environmentSystems.predio_comercial={shell,equipment,systems,flow:[]};
+    addEnvironmentMarkers("predio_comercial",group,environmentPoints.predio_comercial);
 }
 
 function createAdvancedEnvironments() {
@@ -4819,7 +4530,7 @@ function setEnvironment(env) {
     const targets = {
         casa:[1,3,0],
         predio_residencial:[0,5.5,-1],
-        empresa:[0,2.1,-0.5],
+        empresa:[0,2.5,0],
         predio_comercial:[0,5,0],
         escola:[0,3.2,0],
         industria:[0,3,0],
@@ -4827,12 +4538,8 @@ function setEnvironment(env) {
     };
     controls.target.set(...(targets[env] || [0,3,0]));
 
-    if(env === "predio_residencial") {
+    if(env === "predio_residencial" || env === "predio_comercial") {
         camera.position.set(22,11,-26);
-    } else if(env === "predio_comercial") {
-        camera.position.set(0,9.5,-30);
-    } else if(env === "empresa") {
-        camera.position.set(0,9,-29);
     } else {
         camera.position.set(24,15,25);
     }

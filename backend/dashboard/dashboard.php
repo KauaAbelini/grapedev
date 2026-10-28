@@ -2,11 +2,12 @@
 
 session_start();
 
-include("conexao.php");
-include("local_contexto.php");
+require_once __DIR__ . '/../database/conexao.php';
+require_once __DIR__ . '/../locais/local_contexto.php';
+
 
 if (!isset($_SESSION["usuario_id"])) {
-    header("Location: login.php");
+    header("Location: ../../backend/auth/login.php");
     exit();
 }
 
@@ -180,7 +181,7 @@ href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.m
 
 <link
 rel="stylesheet"
-href="dashboard.css">
+href="../../public/css/dashboard.css">
 
 <style>
 
@@ -353,81 +354,6 @@ href="dashboard.css">
     }
 }
 
-
-
-.current-local-card {
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:20px;
-    padding:20px 22px;
-    border:1px solid rgba(120,90,220,.16);
-    border-radius:18px;
-    background:linear-gradient(145deg,rgba(120,90,220,.07),rgba(255,255,255,.025));
-}
-
-.local-selector-content { min-width:0; }
-.local-label {
-    display:block;
-    font-size:11px;
-    letter-spacing:1.5px;
-    opacity:.55;
-    font-weight:900;
-}
-.local-current-name {
-    display:block;
-    font-size:21px;
-    margin-top:4px;
-    white-space:nowrap;
-    overflow:hidden;
-    text-overflow:ellipsis;
-}
-.local-current-type {
-    display:block;
-    margin-top:2px;
-    opacity:.58;
-    font-size:12px;
-    text-transform:capitalize;
-}
-.local-selector-actions {
-    display:flex;
-    align-items:center;
-    gap:8px;
-    flex-wrap:wrap;
-    justify-content:flex-end;
-}
-.local-change-button,
-.local-add-button {
-    display:inline-flex;
-    align-items:center;
-    gap:7px;
-    min-height:40px;
-    padding:0 13px;
-    border-radius:11px;
-    text-decoration:none;
-    font-size:12px;
-    font-weight:900;
-    transition:.2s ease;
-}
-.local-change-button {
-    color:inherit;
-    background:rgba(255,255,255,.07);
-    border:1px solid rgba(255,255,255,.08);
-}
-.local-add-button {
-    color:#fff;
-    background:#7654ff;
-}
-.local-change-button:hover,
-.local-add-button:hover {
-    transform:translateY(-1px);
-}
-
-@media(max-width:700px) {
-    .current-local-card { align-items:flex-start; flex-direction:column; }
-    .local-selector-actions { width:100%; justify-content:flex-start; }
-}
-
 </style>
 
 </head>
@@ -442,27 +368,27 @@ href="dashboard.css">
 
     <nav class="menu">
 
-        <a href="dashboard.php" class="active">
+        <a href="../../backend/dashboard/dashboard.php" class="active">
             <i class="bi bi-grid"></i>
             Dashboard
         </a>
 
-        <a href="consumo.php">
+        <a href="../../backend/dashboard/consumo.php">
             <i class="bi bi-droplet"></i>
             Consumo
         </a>
 
-        <a href="gastos.php">
+        <a href="../../backend/dashboard/gastos.php">
             <i class="bi bi-currency-dollar"></i>
             Gastos
         </a>
 
-        <a href="dispositivos.php">
+        <a href="../../backend/dashboard/dispositivos.php">
             <i class="bi bi-cpu"></i>
             Dispositivos
         </a>
 
-        <a href="alertas.php">
+        <a href="../../backend/dashboard/alertas.php">
 
             <i class="bi bi-exclamation-triangle"></i>
 
@@ -478,12 +404,12 @@ href="dashboard.css">
 
         </a>
 
-        <a href="historico.php">
+        <a href="../../backend/dashboard/historico.php">
             <i class="bi bi-clock-history"></i>
             Histórico
         </a>
 
-        <a href="configuracoes.php">
+        <a href="../../backend/dashboard/configuracoes.php">
             <i class="bi bi-gear"></i>
             Configurações
         </a>
@@ -540,7 +466,7 @@ href="dashboard.css">
         </a>
 
         <a
-            href="3d.php"
+            href="../../public/3d/3d.php"
             class="aquaflow-3d-button"
             title="Abrir modelos 3D"
             aria-label="Abrir modelos 3D"
@@ -1036,22 +962,12 @@ href="dashboard.css">
 </section>
 
 <section class="current-local-card" style="margin-top:24px;">
-    <div class="local-selector-content">
-        <span class="local-label">LOCAL ATUAL</span>
-        <strong class="local-current-name"><?php echo htmlspecialchars($localNome); ?></strong>
-        <small class="local-current-type"><?php echo htmlspecialchars($localTipo); ?></small>
+    <div>
+        <span style="font-size:11px;letter-spacing:1.5px;opacity:.55;font-weight:800;">LOCAL MONITORADO</span>
+        <strong style="display:block;font-size:21px;margin-top:4px;"><?php echo htmlspecialchars($localNome); ?></strong>
+        <small style="opacity:.6;"><?php echo htmlspecialchars($localTipo); ?></small>
     </div>
-
-    <div class="local-selector-actions">
-        <a href="locais.php" class="local-change-button">
-            <i class="bi bi-chevron-down"></i>
-            Trocar local
-        </a>
-        <a href="adicionar_local.php" class="local-add-button">
-            <i class="bi bi-plus-lg"></i>
-            Adicionar local
-        </a>
-    </div>
+    <a href="locais.php" style="text-decoration:none;color:inherit;font-weight:800;font-size:12px;">Gerenciar locais <i class="bi bi-arrow-right"></i></a>
 </section>
 
 <section class="bottom-grid">

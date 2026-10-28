@@ -2808,7 +2808,7 @@
           <span>Nex</span>
         </a>
 
-        <a href="backend/auth/login.php" class="login"> Login </a>
+        <a href="../../backend/auth/login.php" class="login"> Login </a>
 
         <button class="theme-button" id="themeButton">
           <img src="../../storage/images/icone_uva_sem_fundo.png" alt="Tema" />
@@ -3605,6 +3605,419 @@
             fechar();
           }
         });
+      })();
+    </script>
+
+    <!-- ================= ÁGUA ANIMADA (AquaFlow) ================= -->
+    <style>
+      .aquaflow-section .aquaflow-inner {
+        z-index: 2;
+      }
+
+      .af-water-canvas {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 1;
+        display: block;
+        pointer-events: none;
+      }
+    </style>
+
+    <script>
+      (function () {
+        const secao = document.querySelector(".aquaflow-section");
+        if (!secao) return;
+
+        const canvas = document.createElement("canvas");
+        canvas.className = "af-water-canvas";
+        canvas.setAttribute("aria-hidden", "true");
+        secao.insertBefore(canvas, secao.firstChild);
+
+        const ctx = canvas.getContext("2d");
+        if (!ctx) return;
+
+        const reduzir = window.matchMedia(
+          "(prefers-reduced-motion: reduce)",
+        ).matches;
+
+        /* ====== AJUSTES ====== */
+        const NIVEL_MIN = 10; // % de água quando a seção começa a aparecer
+        const NIVEL_MAX = 80; // % de água quando a seção está toda na tela
+        const PASSO = 6; // resolução da onda em px (menor = mais suave)
+
+        /* ====== CORES (escuro / claro) ====== */
+        const PALETAS = {
+          escuro: {
+            topo: [
+              [100, 195, 255, 0.16],
+              [70, 170, 255, 0.22],
+              [45, 145, 255, 0.28],
+            ],
+            fundo: [
+              [12, 70, 175, 0.22],
+              [10, 60, 160, 0.3],
+              [6, 34, 120, 0.46],
+            ],
+            linha: "170,228,255",
+            raio: "170,225,255",
+            raioForca: 1,
+            bolha: "190,232,255",
+            brilho: "225,246,255",
+            prof: {
+              cor: "2,10,34",
+              paradas: [
+                [0, 0],
+                [0.3, 0.18],
+                [0.65, 0.55],
+                [1, 0.88],
+              ],
+            },
+          },
+          claro: {
+            topo: [
+              [110, 185, 255, 0.14],
+              [85, 165, 255, 0.18],
+              [60, 145, 255, 0.22],
+            ],
+            fundo: [
+              [50, 130, 225, 0.16],
+              [40, 120, 220, 0.22],
+              [30, 100, 200, 0.3],
+            ],
+            linha: "70,150,235",
+            raio: "255,255,255",
+            raioForca: 2.2,
+            bolha: "255,255,255",
+            brilho: "255,255,255",
+            prof: {
+              cor: "16,60,140",
+              paradas: [
+                [0, 0],
+                [0.3, 0.08],
+                [0.65, 0.22],
+                [1, 0.4],
+              ],
+            },
+          },
+        };
+
+        const rgba = (c) =>
+          "rgba(" + c[0] + "," + c[1] + "," + c[2] + "," + c[3] + ")";
+
+        /* ====== CAMADAS DE ONDA (fundo -> frente) ====== */
+        const camadas = [
+          { amp: 7, k: 0.0055, vel: 0.45, fase: 0, off: -10, ripple: false },
+          { amp: 9, k: 0.0075, vel: -0.6, fase: 2, off: -2, ripple: true },
+          { amp: 6, k: 0.011, vel: 0.9, fase: 4, off: 6, ripple: true },
+        ];
+
+        let W = 0;
+        let H = 0;
+
+        function medir() {
+          const dpr = Math.min(window.devicePixelRatio || 1, 2);
+          W = secao.clientWidth;
+          H = secao.clientHeight;
+          canvas.width = Math.round(W * dpr);
+          canvas.height = Math.round(H * dpr);
+          ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        }
+
+        medir();
+
+        if ("ResizeObserver" in window) {
+          new ResizeObserver(medir).observe(secao);
+        } else {
+          window.addEventListener("resize", medir);
+        }
+
+        /* ====== ESTADO ====== */
+        let alvo = NIVEL_MIN;
+        let atual = NIVEL_MIN;
+        let energia = 0; // sobe quando você rola rápido, deixa a água mais agitada
+        let visivel = false;
+        let superficieY = H;
+        let ultimoRipple = 0;
+        let ripples = [];
+
+        const bolhas = Array.from({ length: 16 }, function () {
+          return {
+            fx: Math.random(),
+            y: H * (0.4 + Math.random() * 0.6),
+            r: 1.5 + Math.random() * 3.5,
+            v: 16 + Math.random() * 30,
+            ph: Math.random() * 6.28,
+            ow: 4 + Math.random() * 10,
+          };
+        });
+
+        /* ====== FORMA DA ONDA ====== */
+        function altura(x, c, t) {
+          const a = c.amp * (1 + energia * 1.4);
+
+          let y =
+            a * Math.sin(x * c.k + t * c.vel + c.fase) +
+            a * 0.5 * Math.sin(x * c.k * 2.1 - t * c.vel * 1.3 + c.fase * 1.7) +
+            a * 0.22 * Math.sin(x * c.k * 4.3 + t * c.vel * 2.2);
+
+          if (c.ripple) {
+            for (let i = 0; i < ripples.length; i++) {
+              const r = ripples[i];
+              const idade = t - r.t0;
+              const d = Math.abs(x - r.x);
+
+              y +=
+                16 *
+                Math.sin(d * 0.05 - idade * 7) *
+                Math.exp(-d / 240) *
+                Math.exp(-idade * 1.2) *
+                Math.min(1, idade * 8);
+            }
+          }
+
+          return y + c.off;
+        }
+
+        function camada(i, p, t, surf) {
+          const c = camadas[i];
+          const pts = [];
+
+          for (let x = 0; x <= W + PASSO; x += PASSO) {
+            pts.push([x, surf + altura(x, c, t)]);
+          }
+
+          const g = ctx.createLinearGradient(0, surf - 20, 0, H);
+          g.addColorStop(0, rgba(p.topo[i]));
+          g.addColorStop(1, rgba(p.fundo[i]));
+
+          ctx.beginPath();
+          ctx.moveTo(pts[0][0], pts[0][1]);
+
+          for (let n = 1; n < pts.length; n++) {
+            ctx.lineTo(pts[n][0], pts[n][1]);
+          }
+
+          ctx.lineTo(W + PASSO, H);
+          ctx.lineTo(0, H);
+          ctx.closePath();
+          ctx.fillStyle = g;
+          ctx.fill();
+
+          return pts;
+        }
+
+        function linha(pts, p, largura, alpha) {
+          ctx.beginPath();
+          ctx.moveTo(pts[0][0], pts[0][1]);
+
+          for (let n = 1; n < pts.length; n++) {
+            ctx.lineTo(pts[n][0], pts[n][1]);
+          }
+
+          ctx.strokeStyle = "rgba(" + p.linha + "," + alpha + ")";
+          ctx.lineWidth = largura;
+          ctx.stroke();
+        }
+
+        /* ====== ESCURECIMENTO COM A PROFUNDIDADE ====== */
+        function profundidade(pts, p, surf) {
+          const g = ctx.createLinearGradient(0, surf, 0, H);
+
+          for (let i = 0; i < p.prof.paradas.length; i++) {
+            const s = p.prof.paradas[i];
+            g.addColorStop(s[0], "rgba(" + p.prof.cor + "," + s[1] + ")");
+          }
+
+          ctx.beginPath();
+          ctx.moveTo(pts[0][0], pts[0][1]);
+
+          for (let n = 1; n < pts.length; n++) {
+            ctx.lineTo(pts[n][0], pts[n][1]);
+          }
+
+          ctx.lineTo(W + PASSO, H);
+          ctx.lineTo(0, H);
+          ctx.closePath();
+          ctx.fillStyle = g;
+          ctx.fill();
+        }
+
+        /* ====== RAIOS DE LUZ DENTRO DA ÁGUA ====== */
+        function raios(p, t, surf) {
+          const prof = Math.min(H - surf, H * 0.6);
+          if (prof < 40) return;
+
+          for (let j = 0; j < 6; j++) {
+            const base =
+              ((j + 0.5) / 6) * W + Math.sin(t * 0.25 + j * 1.7) * 50;
+            const topo = 18 + (j % 3) * 8;
+            const baixo = topo + 110;
+            const inclina = Math.sin(t * 0.2 + j) * 30 + 40;
+            const a =
+              (0.1 + 0.05 * Math.sin(t * 0.7 + j * 2)) * p.raioForca;
+
+            const g = ctx.createLinearGradient(0, surf, 0, surf + prof);
+            g.addColorStop(0, "rgba(" + p.raio + "," + a + ")");
+            g.addColorStop(1, "rgba(" + p.raio + ",0)");
+
+            ctx.beginPath();
+            ctx.moveTo(base - topo / 2, surf);
+            ctx.lineTo(base + topo / 2, surf);
+            ctx.lineTo(base + inclina + baixo / 2, surf + prof);
+            ctx.lineTo(base + inclina - baixo / 2, surf + prof);
+            ctx.closePath();
+            ctx.fillStyle = g;
+            ctx.fill();
+          }
+        }
+
+        /* ====== BOLHAS ====== */
+        function desenharBolhas(p, t, dt, surf) {
+          for (let i = 0; i < bolhas.length; i++) {
+            const b = bolhas[i];
+
+            b.y -= b.v * dt;
+
+            if (b.y < surf + 8) {
+              b.y = H + 10;
+              b.fx = Math.random();
+            }
+
+            const x = b.fx * W + Math.sin(t * 1.2 + b.ph) * b.ow;
+
+            ctx.beginPath();
+            ctx.arc(x, b.y, b.r, 0, Math.PI * 2);
+            ctx.fillStyle = "rgba(" + p.bolha + ",0.1)";
+            ctx.fill();
+            ctx.strokeStyle = "rgba(" + p.bolha + ",0.5)";
+            ctx.lineWidth = 1;
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.arc(x - b.r * 0.3, b.y - b.r * 0.3, b.r * 0.35, 0, Math.PI * 2);
+            ctx.fillStyle = "rgba(" + p.bolha + ",0.55)";
+            ctx.fill();
+          }
+        }
+
+        /* ====== BRILHOS NA SUPERFÍCIE ====== */
+        function brilhos(p, t, surf) {
+          const c = camadas[2];
+
+          for (let k = 0; k < 16; k++) {
+            const x = (k * 83.7 + t * (10 + (k % 4) * 6)) % W;
+            const y = surf + altura(x, c, t);
+            const forca = Math.pow(Math.max(0, Math.sin(t * 2.2 + k * 1.9)), 3);
+
+            if (forca < 0.02) continue;
+
+            ctx.beginPath();
+            ctx.ellipse(x, y, 6, 1.2, 0, 0, Math.PI * 2);
+            ctx.fillStyle = "rgba(" + p.brilho + "," + forca * 0.8 + ")";
+            ctx.fill();
+          }
+        }
+
+        /* ====== DESENHO PRINCIPAL ====== */
+        function desenhar(dt, tempo) {
+          const p = document.body.classList.contains("light")
+            ? PALETAS.claro
+            : PALETAS.escuro;
+
+          atual += (alvo - atual) * Math.min(1, dt * 5);
+          energia *= Math.exp(-dt * 1.5);
+
+          const t = reduzir ? 0 : tempo;
+          const surf = H * (1 - atual / 100);
+          superficieY = surf;
+
+          ripples = ripples.filter(function (r) {
+            return t - r.t0 < 4;
+          });
+
+          ctx.clearRect(0, 0, W, H);
+
+          const trasPts = camada(0, p, t, surf);
+
+          if (!reduzir) raios(p, t, surf);
+          if (!reduzir) desenharBolhas(p, t, dt, surf);
+
+          const meioPts = camada(1, p, t, surf);
+          const frentePts = camada(2, p, t, surf);
+
+          profundidade(frentePts, p, surf);
+
+          linha(trasPts, p, 1, 0.18);
+          linha(meioPts, p, 1.2, 0.3);
+          linha(frentePts, p, 5, 0.07);
+          linha(frentePts, p, 1.6, 0.55);
+
+          if (!reduzir) brilhos(p, t, surf);
+        }
+
+        /* ====== NÍVEL CONFORME A ROLAGEM ====== */
+        function calcularAlvo() {
+          const r = secao.getBoundingClientRect();
+          const progresso = Math.min(
+            1,
+            Math.max(0, (window.innerHeight * 0.9 - r.top) / r.height),
+          );
+
+          alvo = NIVEL_MIN + progresso * (NIVEL_MAX - NIVEL_MIN);
+        }
+
+        let ultimoScroll = window.scrollY;
+
+        window.addEventListener(
+          "scroll",
+          function () {
+            calcularAlvo();
+
+            const d = Math.abs(window.scrollY - ultimoScroll);
+            ultimoScroll = window.scrollY;
+
+            if (!reduzir) energia = Math.min(1, energia + Math.min(d / 80, 0.4));
+          },
+          { passive: true },
+        );
+
+        window.addEventListener("resize", calcularAlvo);
+
+        /* ====== ONDULAÇÃO AO PASSAR O MOUSE PERTO DA SUPERFÍCIE ====== */
+        secao.addEventListener("mousemove", function (e) {
+          if (reduzir || !visivel) return;
+
+          const r = secao.getBoundingClientRect();
+          const mx = e.clientX - r.left;
+          const my = e.clientY - r.top;
+          const agora = performance.now();
+
+          if (Math.abs(my - superficieY) < 110 && agora - ultimoRipple > 140) {
+            ultimoRipple = agora;
+            ripples.push({ x: mx, t0: agora / 1000 });
+          }
+        });
+
+        new IntersectionObserver(function (e) {
+          visivel = e[0].isIntersecting;
+        }).observe(secao);
+
+        calcularAlvo();
+
+        let ultimo = performance.now();
+
+        function quadro(agora) {
+          const dt = Math.min((agora - ultimo) / 1000, 0.05);
+          ultimo = agora;
+
+          if (visivel) desenhar(dt, agora / 1000);
+
+          requestAnimationFrame(quadro);
+        }
+
+        requestAnimationFrame(quadro);
       })();
     </script>
   </body>

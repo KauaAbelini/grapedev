@@ -9,7 +9,7 @@ function iniciarSessao(): void
 
 function destinoSeguro(
     ?string $destino,
-    string $padrao = 'dashboard.php'
+    string $padrao = '../../dashboard.php'
 ): string {
 
     $destino = trim((string)$destino);

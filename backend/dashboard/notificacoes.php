@@ -6,7 +6,7 @@ include("conexao.php");
 
 // Verifica se o usuário está logado
 if (!isset($_SESSION["usuario_id"])) {
-    header("Location: login.php");
+    header("Location: ../auth/login.php");
     exit();
 }
 
@@ -229,7 +229,7 @@ body {
 
 <div class="container">
 
-    <a href="dashboard.php" class="voltar">
+    <a href="../dashboard/dashboard.php" class="voltar">
         ← Voltar
     </a>
 

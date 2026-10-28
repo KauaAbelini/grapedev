@@ -3,11 +3,11 @@
 session_start();
 
 if (!isset($_SESSION["usuario_id"])) {
-    header("Location: login.php");
+    header("Location: ../auth/login.php");
     exit();
 }
 
-include("conexao.php");
+include("../database/conexao.php");
 
 $usuario_id = $_SESSION["usuario_id"];
 
@@ -86,7 +86,7 @@ foreach ($dispositivos as $dispositivo) {
     <link rel="stylesheet"
         href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
-    <link rel="stylesheet" href="dashboard.css">
+    <link rel="stylesheet" href="../../public/css/dashboard.css">
 
 </head>
 
@@ -101,42 +101,42 @@ foreach ($dispositivos as $dispositivo) {
 
         <nav class="menu">
 
-            <a href="dashboard.php">
+            <a href="../dashboard/dashboard.php">
                 <i class="bi bi-grid"></i>
                 Dashboard
             </a>
 
-            <a href="consumo.php">
+            <a href="../dashboard/consumo.php">
                 <i class="bi bi-droplet"></i>
                 Consumo
             </a>
 
-            <a href="gastos.php">
+            <a href="../dashboard/gastos.php">
                 <i class="bi bi-currency-dollar"></i>
                 Gastos
             </a>
 
-            <a href="dispositivos.php" class="active">
+            <a href="../dashboard/dispositivos.php" class="active">
                 <i class="bi bi-cpu"></i>
                 Dispositivos
             </a>
 
-            <a href="alertas.php">
+            <a href="../dashboard/alertas.php">
                 <i class="bi bi-exclamation-triangle"></i>
                 Alertas
             </a>
 
-            <a href="historico.php">
+            <a href="../dashboard/historico.php">
                 <i class="bi bi-clock-history"></i>
                 Histórico
             </a>
 
-            <a href="configuracoes.php">
+            <a href="../dashboard/configuracoes.php">
                 <i class="bi bi-gear"></i>
                 Configurações
             </a>
 
-            <a href="logout.php" class="logout">
+            <a href="../auth/logout.php" class="logout">
                 <i class="bi bi-box-arrow-right"></i>
                 Sair
             </a>

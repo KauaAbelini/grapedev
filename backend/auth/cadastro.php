@@ -1,14 +1,14 @@
 <?php
 
-require_once 'auth.php';
-require_once 'conexao.php';
+require_once __DIR__ . '/auth.php';
+require_once __DIR__ . '/../database/conexao.php';
 
 iniciarSessao();
 
 $redirect = destinoSeguro(
     $_GET['redirect']
     ?? $_POST['redirect']
-    ?? 'dashboard.php'
+    ?? '../../dashboard/dashboard.php'
 );
 
 $erro = '';
@@ -277,38 +277,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 html {
+    min-height: 100%;
     scroll-behavior: smooth;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+    display: none;
 }
 
 body {
     margin: 0;
     min-height: 100vh;
-
     font-family: 'Nunito', sans-serif;
-
     color: var(--text);
 
-    background:
-        radial-gradient(
-            circle at 50% -10%,
-            rgba(130,71,229,.18),
-            transparent 32%
-        ),
-        radial-gradient(
-            circle at 0% 100%,
-            rgba(74,36,128,.13),
-            transparent 28%
-        ),
+    background-color: #050510;
+    background-image:
         linear-gradient(
-            135deg,
-            var(--bg-dark),
-            var(--bg-black)
-        );
-
+            90deg,
+            rgba(5, 4, 16, .10),
+            rgba(5, 4, 16, .20) 50%,
+            rgba(5, 4, 16, .10)
+        ),
+        url('/grapedev/storage/images/fundo_cadastro_grape.png');
+    background-position: center center;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
     overflow-x: hidden;
 }
 
 .background-glow {
+    display: none;
     position: fixed;
 
     width: 400px;
@@ -517,18 +522,15 @@ h1 span {
 
     border-radius: 22px;
 
-    border: 1px solid var(--border);
+    border: 1px solid rgba(168,117,255,.22);
 
-    background:
-        linear-gradient(
-            145deg,
-            rgba(30,25,40,.95),
-            rgba(14,12,19,.95)
-        );
+    background: rgba(12,9,23,.82);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
 
     box-shadow:
-        0 25px 65px rgba(0,0,0,.42),
-        0 0 60px rgba(130,71,229,.04);
+        0 25px 65px rgba(0,0,0,.40),
+        0 0 35px rgba(130,71,229,.10);
 
     overflow: hidden;
 }
@@ -1175,6 +1177,264 @@ select option {
         height: 43px;
     }
 }
+
+/* ==========================================
+   AJUSTES VISUAIS: FORMULÁRIO MAIS COMPACTO
+========================================== */
+
+html {
+    height: 100%;
+    overflow-x: hidden;
+}
+
+body {
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+.topbar {
+    width: min(1100px, calc(100% - 40px));
+    padding: 8px 0;
+}
+
+.page {
+    width: min(900px, calc(100% - 32px));
+    margin: 0 auto 10px;
+}
+
+.intro {
+    margin: 0 auto 12px;
+}
+
+.intro-small {
+    margin-bottom: 5px;
+    font-size: 8px;
+}
+
+h1 {
+    font-size: clamp(36px, 4vw, 48px);
+    line-height: .95;
+}
+
+.intro p {
+    margin-top: 5px;
+    font-size: 11px;
+}
+
+.form-card {
+    padding: 16px 22px;
+    border-radius: 16px;
+    background: rgba(12, 9, 23, .70);
+    backdrop-filter: blur(9px);
+    -webkit-backdrop-filter: blur(9px);
+    box-shadow:
+        0 15px 40px rgba(0, 0, 0, .25),
+        0 0 25px rgba(130, 71, 229, .08);
+}
+
+.section-heading {
+    margin-bottom: 8px;
+}
+
+.section-heading h2 {
+    font-size: 23px;
+}
+
+.section-label {
+    font-size: 8px;
+}
+
+.type-title {
+    margin-bottom: 7px;
+    font-size: 10px;
+}
+
+.types {
+    gap: 10px;
+    margin-bottom: 13px;
+}
+
+.type {
+    min-height: 58px;
+    padding: 10px 12px;
+    gap: 10px;
+    border-radius: 12px;
+}
+
+.type-icon {
+    width: 35px;
+    height: 35px;
+    border-radius: 10px;
+    font-size: 15px;
+}
+
+.type-name {
+    font-size: 11px;
+    margin-bottom: 2px;
+}
+
+.type-description {
+    font-size: 9px;
+}
+
+.divider {
+    margin-bottom: 13px;
+}
+
+.grid {
+    gap: 8px 12px;
+}
+
+.field label {
+    margin-bottom: 4px;
+    font-size: 8px;
+}
+
+input,
+select {
+    height: 38px;
+    padding-left: 34px;
+    border-radius: 8px;
+    font-size: 10px;
+}
+
+.input-wrap i {
+    left: 12px;
+    font-size: 12px;
+}
+
+.comercial {
+    margin-top: 14px;
+    padding: 13px;
+    border-radius: 12px;
+}
+
+.comercial-header {
+    margin-bottom: 10px;
+}
+
+.comercial-icon {
+    width: 30px;
+    height: 30px;
+}
+
+.section-heading[style] {
+    margin-top: 15px !important;
+}
+
+.submit {
+    height: 39px;
+    margin-top: 13px;
+    border-radius: 9px;
+    font-size: 10px;
+}
+
+.login-link {
+    margin-top: 8px;
+    font-size: 9px;
+}
+
+.footer-note {
+    margin-top: 7px;
+    font-size: 7px;
+}
+
+/* Em telas baixas, compacta um pouco mais */
+@media (min-width: 701px) and (max-height: 950px) {
+    .topbar {
+        padding: 6px 0;
+    }
+
+    .intro {
+        margin-bottom: 9px;
+    }
+
+    .form-card {
+        padding: 13px 20px;
+    }
+
+    .types {
+        margin-bottom: 10px;
+    }
+
+    .type {
+        min-height: 54px;
+    }
+
+    .divider {
+        margin-bottom: 10px;
+    }
+
+    .grid {
+        gap: 7px 12px;
+    }
+
+    .section-heading {
+        margin-bottom: 6px;
+    }
+
+    .section-heading[style] {
+        margin-top: 12px !important;
+    }
+
+    .submit {
+        margin-top: 10px;
+        height: 36px;
+    }
+
+    .login-link {
+        margin-top: 6px;
+    }
+
+    .footer-note {
+        margin-top: 5px;
+    }
+}
+
+/* Celulares: permite rolar se os campos não couberem */
+@media (max-width: 700px) {
+    html,
+    body {
+        height: auto;
+        min-height: 100%;
+        overflow-y: auto;
+    }
+
+    body {
+        background-attachment: scroll;
+    }
+
+    .topbar {
+        width: calc(100% - 28px);
+        padding: 12px 0;
+    }
+
+    .page {
+        width: calc(100% - 20px);
+        margin: 8px auto 20px;
+    }
+
+    .form-card {
+        padding: 18px 14px;
+    }
+
+    .grid {
+        grid-template-columns: 1fr;
+    }
+
+    .full {
+        grid-column: auto;
+    }
+
+    .types {
+        grid-template-columns: 1fr;
+    }
+
+    h1 {
+        font-size: 42px;
+    }
+}
+
 </style>
 
 </head>
@@ -1190,12 +1450,12 @@ select option {
 <header class="topbar">
 
     <a
-        href="home.html"
+        href="../../home.html"
         class="logo"
     >
 
         <img
-            src="fotos/icone uva sem fundo.png"
+            src="../../fotos/icone uva sem fundo.png"
             alt="GRAPE"
         >
 
@@ -1207,7 +1467,7 @@ select option {
 
 
     <a
-        href="home.html"
+        href="../../home.html"
         class="back-button"
     >
 

@@ -1,14 +1,15 @@
+
 <?php
 
-require_once 'auth.php';
-require_once 'conexao.php';
+require_once __DIR__ . '/auth.php';
+require_once __DIR__ . '/../database/conexao.php';
 
 iniciarSessao();
 
 $redirect = destinoSeguro(
     $_GET['redirect']
     ?? $_POST['redirect']
-    ?? 'dashboard.php'
+    ?? '../../backend/dashboard/dashboard.php'
 );
 
 if (isset($_SESSION['usuario_id'])) {
@@ -17,1525 +18,1344 @@ if (isset($_SESSION['usuario_id'])) {
 }
 
 $erro = '';
-
 $email = '';
 $tipo = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-    $email = trim(
-        (string)($_POST['email'] ?? '')
-    );
-
-    $senha = (string)(
-        $_POST['senha'] ?? ''
-    );
-
-    $tipo = (string)(
-        $_POST['tipo_usuario'] ?? ''
-    );
+    $email = trim((string)($_POST['email'] ?? ''));
+    $senha = (string)($_POST['senha'] ?? '');
+    $tipo = (string)($_POST['tipo_usuario'] ?? '');
 
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-
         $erro = 'Digite um e-mail válido.';
 
     } elseif ($senha === '') {
-
         $erro = 'Digite sua senha.';
 
-    } elseif (
-        !in_array(
-            $tipo,
-            ['residencial', 'comercial'],
-            true
-        )
-    ) {
-
+    } elseif (!in_array($tipo, ['residencial', 'comercial'], true)) {
         $erro = 'Selecione o tipo de uso.';
 
     } else {
 
         $stmt = $conexao->prepare(
             "SELECT
-                id,
-                nome,
-                email,
-                senha,
-                cidade,
-                telefone,
-                tipo_usuario,
-                tipo_imovel,
-                endereco,
-                numero,
-                bairro,
-                cep,
-                empresa,
-                tipo_estabelecimento
+                id, nome, email, senha, cidade, telefone,
+                tipo_usuario, tipo_imovel, endereco, numero,
+                bairro, cep, empresa, tipo_estabelecimento
              FROM usuarios
-             WHERE email = ?
-             AND tipo_usuario = ?
+             WHERE email = ? AND tipo_usuario = ?
              LIMIT 1"
         );
 
-        $stmt->bind_param(
-            'ss',
-            $email,
-            $tipo
-        );
-
-        $stmt->execute();
-
-        $usuario =
-            $stmt
-            ->get_result()
-            ->fetch_assoc();
-
-        $stmt->close();
-
-        $senhaOk = false;
-
-        if ($usuario) {
-
-            $senhaBanco =
-                (string)$usuario['senha'];
-
-            $senhaOk =
-                password_verify(
-                    $senha,
-                    $senhaBanco
-                )
-                ||
-                hash_equals(
-                    $senhaBanco,
-                    $senha
-                );
-
-            if (
-                $senhaOk &&
-                !password_get_info(
-                    $senhaBanco
-                )['algo']
-            ) {
-
-                $novoHash =
-                    password_hash(
-                        $senha,
-                        PASSWORD_DEFAULT
-                    );
-
-                $up = $conexao->prepare(
-                    "UPDATE usuarios
-                     SET senha = ?
-                     WHERE id = ?"
-                );
-
-                $up->bind_param(
-                    'si',
-                    $novoHash,
-                    $usuario['id']
-                );
-
-                $up->execute();
-
-                $up->close();
-            }
-        }
-
-        if (
-            !$usuario ||
-            !$senhaOk
-        ) {
-
-            $erro =
-                'E-mail, senha ou tipo de uso incorreto.';
+        if (!$stmt) {
+            error_log('Erro ao preparar login: ' . $conexao->error);
+            $erro = 'Não foi possível realizar o login. Tente novamente.';
 
         } else {
 
-            session_regenerate_id(true);
+            $stmt->bind_param('ss', $email, $tipo);
+            $stmt->execute();
 
-            $_SESSION['usuario_id'] =
-                (int)$usuario['id'];
+            $usuario = $stmt->get_result()->fetch_assoc();
+            $stmt->close();
 
-            $_SESSION['usuario_nome'] =
-                $usuario['nome'];
+            $senhaOk = false;
 
-            $_SESSION['usuario_email'] =
-                $usuario['email'];
+            if ($usuario) {
 
-            $_SESSION['usuario_cidade'] =
-                $usuario['cidade'];
+                $senhaBanco = (string)$usuario['senha'];
 
-            $_SESSION['usuario_telefone'] =
-                $usuario['telefone'];
+                $senhaOk = password_verify($senha, $senhaBanco);
 
-            $_SESSION['usuario_tipo'] =
-                $usuario['tipo_usuario'];
+                // Migração de senhas antigas em texto puro.
+                if (!$senhaOk && hash_equals($senhaBanco, $senha)) {
 
-            $_SESSION['usuario_tipo_imovel'] =
-                $usuario['tipo_imovel'] ?? '';
+                    $senhaOk = true;
+                    $novoHash = password_hash($senha, PASSWORD_DEFAULT);
 
-            $_SESSION['usuario_endereco'] =
-                $usuario['endereco'] ?? '';
+                    $up = $conexao->prepare(
+                        "UPDATE usuarios SET senha = ? WHERE id = ?"
+                    );
 
-            $_SESSION['usuario_numero'] =
-                $usuario['numero'] ?? '';
+                    if ($up) {
+                        $idUsuario = (int)$usuario['id'];
+                        $up->bind_param('si', $novoHash, $idUsuario);
+                        $up->execute();
+                        $up->close();
+                    }
+                }
+            }
 
-            $_SESSION['usuario_bairro'] =
-                $usuario['bairro'] ?? '';
+            if (!$usuario || !$senhaOk) {
 
-            $_SESSION['usuario_cep'] =
-                $usuario['cep'] ?? '';
+                $erro = 'E-mail, senha ou tipo de uso incorreto.';
 
-            $_SESSION['usuario_empresa'] =
-                $usuario['empresa'] ?? '';
+            } else {
 
-            $_SESSION['usuario_tipo_estabelecimento'] =
-                $usuario['tipo_estabelecimento'] ?? '';
+                session_regenerate_id(true);
 
-            header(
-                'Location: ' . $redirect
-            );
+                $_SESSION['usuario_id'] = (int)$usuario['id'];
+                $_SESSION['usuario_nome'] = $usuario['nome'];
+                $_SESSION['usuario_email'] = $usuario['email'];
+                $_SESSION['usuario_cidade'] = $usuario['cidade'];
+                $_SESSION['usuario_telefone'] = $usuario['telefone'];
+                $_SESSION['usuario_tipo'] = $usuario['tipo_usuario'];
 
-            exit;
+                $_SESSION['usuario_tipo_imovel'] =
+                    $usuario['tipo_imovel'] ?? '';
+
+                $_SESSION['usuario_endereco'] =
+                    $usuario['endereco'] ?? '';
+
+                $_SESSION['usuario_numero'] =
+                    $usuario['numero'] ?? '';
+
+                $_SESSION['usuario_bairro'] =
+                    $usuario['bairro'] ?? '';
+
+                $_SESSION['usuario_cep'] =
+                    $usuario['cep'] ?? '';
+
+                $_SESSION['usuario_empresa'] =
+                    $usuario['empresa'] ?? '';
+
+                $_SESSION['usuario_tipo_estabelecimento'] =
+                    $usuario['tipo_estabelecimento'] ?? '';
+
+                header('Location: ' . $redirect);
+                exit;
+            }
         }
     }
 }
+
+function e($valor): string
+{
+    return htmlspecialchars((string)$valor, ENT_QUOTES, 'UTF-8');
+}
+
+$homeUrl = '../public/pages/home.html';
+$cadastroUrl = '../backend/auth/cadastro.php';
 
 ?>
 
 <!DOCTYPE html>
-
 <html lang="pt-BR">
 
 <head>
 
-<meta charset="UTF-8">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Entrar — GRAPE Digital Studio</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet"
+    >
+
+    <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+    >
+
+    <style>
+
+        :root {
+            --purple: #8247e5;
+            --purple-light: #b58aff;
+            --text: #f5f0ff;
+            --muted: #b0a4c2;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        body {
+            width: 100%;
+            height: 100vh;
+            height: 100dvh;
+            margin: 0;
+            padding: 0;
+
+            overflow: hidden;
+
+            font-family: 'Nunito', sans-serif;
+            color: var(--text);
+
+            background-color: #080411;
+
+            background-image:
+                linear-gradient(
+                    110deg,
+                    rgba(5, 3, 15, .42),
+                    rgba(5, 3, 15, .66)
+                ),
+                url('/grapedev/storage/images/fundo_login_grape.png');
+
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        /* Camada de profundidade */
+
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+
+            background:
+                radial-gradient(
+                    ellipse at 50% 42%,
+                    rgba(30, 10, 60, .12),
+                    rgba(5, 3, 12, .43) 100%
+                );
+        }
+
+        /* Luzes ambientes */
+
+        .glow {
+            position: fixed;
+            width: 320px;
+            height: 320px;
+            border-radius: 50%;
+            filter: blur(110px);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .glow-one {
+            top: -190px;
+            left: 15%;
+            background: rgba(130, 71, 229, .19);
+        }
+
+        .glow-two {
+            right: -180px;
+            bottom: -200px;
+            background: rgba(116, 45, 225, .18);
+        }
 
-<meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
->
+        /* Topo sem logotipo */
 
-<title>GRAPE — Entrar</title>
+        .topbar {
+            position: relative;
+            z-index: 3;
 
-<link
-    rel="preconnect"
-    href="https://fonts.googleapis.com"
->
+            width: calc(100% - 64px);
+            max-width: 1440px;
 
-<link
-    rel="preconnect"
-    href="https://fonts.gstatic.com"
-    crossorigin
->
+            margin: 0 auto;
+            padding-top: 20px;
 
-<link
-    href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;500;600;700;800;900&display=swap"
-    rel="stylesheet"
->
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+        }
 
-<link
-    rel="stylesheet"
-    href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
->
+        /* Botão voltar */
 
-<style>
+        .back-button {
+            position: relative;
 
-:root {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
 
-    --bg-dark: #1d1924;
-    --bg-black: #0b090f;
+            padding: 11px 19px;
 
-    --purple: #8247e5;
-    --purple-dark: #4a2480;
-    --purple-light: #a875ff;
+            color: #f5efff;
+            text-decoration: none;
 
-    --white: #ffffff;
-    --text: #eeeaf5;
-    --muted: #938b9f;
+            font-size: 11px;
+            font-weight: 900;
+            letter-spacing: .3px;
 
-    --border:
-        rgba(255,255,255,.08);
+            border: 1px solid rgba(255,255,255,.15);
+            border-radius: 50px;
 
-    --input:
-        rgba(10,8,14,.72);
-}
+            background: rgba(14, 9, 25, .65);
 
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
 
-* {
-    box-sizing: border-box;
-}
+            box-shadow: 0 5px 25px rgba(0,0,0,.18);
 
+            transition:
+                color .25s ease,
+                border-color .25s ease,
+                background .25s ease,
+                transform .25s ease;
+        }
 
-html {
-    min-height: 100%;
-}
+        .back-button i {
+            font-size: 14px;
+            transition: transform .25s ease;
+        }
 
+        .back-button:hover {
+            color: white;
+            border-color: rgba(181,138,255,.65);
+            background: rgba(130,71,229,.24);
+            transform: translateY(-2px);
+        }
 
-body {
+        .back-button:hover i {
+            transform: translateX(-3px);
+        }
 
-    margin: 0;
+        /* Área central */
 
-    min-height: 100vh;
+        .page {
+            position: relative;
+            z-index: 2;
 
-    font-family:
-        'Nunito',
-        sans-serif;
+            width: min(510px, calc(100% - 32px));
 
-    color: var(--text);
+            margin: 9px auto 0;
+        }
 
-    background:
+        /* Introdução */
 
-        radial-gradient(
-            circle at 50% -10%,
-            rgba(130,71,229,.18),
-            transparent 32%
-        ),
+        .intro {
+            text-align: center;
+            margin-bottom: 17px;
+        }
 
-        radial-gradient(
-            circle at 0% 100%,
-            rgba(74,36,128,.13),
-            transparent 28%
-        ),
+        .intro-small {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 9px;
 
-        linear-gradient(
-            135deg,
-            var(--bg-dark),
-            var(--bg-black)
-        );
+            margin-bottom: 7px;
 
-    overflow-x: hidden;
-}
+            color: var(--purple-light);
 
+            font-size: 9px;
+            font-weight: 900;
+            letter-spacing: 2.7px;
+        }
 
-/* =====================================================
-   FUNDO
-===================================================== */
+        .intro-small::before,
+        .intro-small::after {
+            content: "";
+            width: 23px;
+            height: 1px;
 
-.background-glow {
+            background: linear-gradient(
+                90deg,
+                transparent,
+                var(--purple-light)
+            );
+        }
 
-    position: fixed;
+        .intro-small::after {
+            transform: rotate(180deg);
+        }
 
-    width: 400px;
-    height: 400px;
+        h1 {
+            margin: 0;
 
-    border-radius: 50%;
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: clamp(45px, 5vw, 63px);
+            font-weight: 400;
+            line-height: .91;
+            letter-spacing: 1px;
 
-    background:
-        rgba(130,71,229,.07);
+            color: #fff;
 
-    filter:
-        blur(110px);
+            text-shadow: 0 4px 30px rgba(0,0,0,.4);
+        }
 
-    pointer-events: none;
+        h1 span {
+            display: block;
 
-    z-index: 0;
-}
+            margin-top: 4px;
 
+            color: var(--purple-light);
 
-.glow-one {
+            text-shadow:
+                0 0 22px rgba(130,71,229,.35);
+        }
 
-    top: -220px;
-    left: 20%;
-}
+        .intro p {
+            max-width: 380px;
+            margin: 10px auto 0;
 
+            color: #c5bad5;
 
-.glow-two {
+            font-size: 11px;
+            line-height: 1.5;
+        }
 
-    bottom: -250px;
-    right: -100px;
-}
+        /* Cartão de login */
 
+        .login-card {
+            position: relative;
 
-/* =====================================================
-   TOPO
-===================================================== */
+            padding: 23px 27px 20px;
 
-.topbar {
+            border: 1px solid rgba(188,151,255,.22);
+            border-radius: 22px;
 
-    position: relative;
+            background:
+                linear-gradient(
+                    145deg,
+                    rgba(25, 17, 40, .91),
+                    rgba(8, 6, 16, .93)
+                );
 
-    width:
-        min(1050px, calc(100% - 36px));
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
 
-    margin: 0 auto;
+            box-shadow:
+                0 25px 70px rgba(0,0,0,.40),
+                0 0 45px rgba(130,71,229,.09),
+                inset 0 1px 0 rgba(255,255,255,.06);
 
-    padding: 21px 0;
+            overflow: hidden;
+        }
 
-    display: flex;
+        .login-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 12%;
 
-    align-items: center;
+            width: 76%;
+            height: 1px;
 
-    justify-content: space-between;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                #8247e5,
+                #d1b5ff,
+                #8247e5,
+                transparent
+            );
+        }
 
-    z-index: 10;
-}
+        .login-card::after {
+            content: "";
+            position: absolute;
 
+            top: -90px;
+            right: -90px;
 
-.logo {
+            width: 180px;
+            height: 180px;
 
-    display: flex;
+            border-radius: 50%;
 
-    align-items: center;
+            background: rgba(130,71,229,.08);
+            filter: blur(45px);
 
-    gap: 8px;
+            pointer-events: none;
+        }
 
-    color: white;
+        /* Mensagem de erro */
 
-    text-decoration: none;
-}
+        .error-box {
+            position: relative;
+            z-index: 1;
 
+            display: flex;
+            align-items: center;
+            gap: 9px;
 
-.logo img {
+            margin-bottom: 14px;
+            padding: 11px 13px;
 
-    width: 29px;
-    height: 29px;
+            border: 1px solid rgba(248,113,113,.28);
+            border-radius: 11px;
 
-    object-fit: contain;
+            background: rgba(127,29,29,.25);
 
-    filter:
-        drop-shadow(
-            0 0 10px
-            rgba(130,71,229,.4)
-        );
-}
+            color: #fecaca;
+            font-size: 11px;
+            font-weight: 800;
+        }
 
+        /* Títulos das seções */
 
-.logo-text {
+        .section-label {
+            margin-bottom: 3px;
 
-    font-size: 18px;
+            color: var(--purple-light);
 
-    font-weight: 900;
+            font-size: 8px;
+            font-weight: 900;
+            letter-spacing: 1.8px;
+        }
 
-    letter-spacing: -.5px;
-}
+        .section-title {
+            margin: 0 0 12px;
 
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 25px;
+            font-weight: 400;
+            letter-spacing: .7px;
 
-.logo-text span {
+            color: white;
+        }
 
-    color:
-        var(--purple-light);
-}
+        /* Tipos de conta */
 
+        .types {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
 
-.back-button {
+            margin-bottom: 18px;
+        }
 
-    display: inline-flex;
+        .types label {
+            display: block;
+            margin: 0;
+        }
 
-    align-items: center;
+        .types input[type="radio"] {
+            position: absolute;
 
-    gap: 7px;
+            width: 1px;
+            height: 1px;
 
-    padding: 8px 14px;
+            opacity: 0;
+            pointer-events: none;
+        }
 
-    border:
-        1px solid
-        rgba(255,255,255,.08);
+        .type {
+            display: flex;
+            align-items: center;
+            gap: 10px;
 
-    border-radius: 25px;
+            min-height: 66px;
+            padding: 10px;
 
-    background:
-        rgba(255,255,255,.035);
+            border: 1px solid rgba(255,255,255,.09);
+            border-radius: 13px;
 
-    color: #ddd7e5;
+            background: rgba(8,6,16,.62);
 
-    font-size: 12px;
+            cursor: pointer;
 
-    font-weight: 800;
+            transition:
+                border-color .25s ease,
+                background .25s ease,
+                transform .25s ease,
+                box-shadow .25s ease;
+        }
 
-    text-decoration: none;
+        .type:hover {
+            transform: translateY(-2px);
+            border-color: rgba(181,138,255,.45);
+            background: rgba(130,71,229,.10);
+        }
 
-    transition: .25s ease;
-}
+        .types input:checked + .type {
+            border-color: #a875ff;
 
+            background:
+                linear-gradient(
+                    135deg,
+                    rgba(130,71,229,.23),
+                    rgba(74,36,128,.13)
+                );
 
-.back-button:hover {
+            box-shadow:
+                0 0 0 1px rgba(130,71,229,.12),
+                0 0 20px rgba(130,71,229,.08);
+        }
 
-    color: white;
+        .types input:focus-visible + .type {
+            outline: 2px solid var(--purple-light);
+            outline-offset: 3px;
+        }
 
-    border-color:
-        rgba(130,71,229,.4);
+        .type-icon {
+            flex-shrink: 0;
 
-    background:
-        rgba(130,71,229,.09);
+            display: flex;
+            align-items: center;
+            justify-content: center;
 
-    transform:
-        translateX(-2px);
-}
+            width: 37px;
+            height: 37px;
 
+            border-radius: 11px;
 
-/* =====================================================
-   CONTAINER
-===================================================== */
+            background: rgba(130,71,229,.17);
+            color: #bd9aff;
 
-.page {
+            font-size: 17px;
 
-    position: relative;
+            transition: .25s ease;
+        }
 
-    width:
-        min(520px, calc(100% - 28px));
+        .types input:checked + .type .type-icon {
+            color: white;
 
-    margin:
-        8px auto 45px;
+            background: linear-gradient(
+                135deg,
+                #8247e5,
+                #a875ff
+            );
 
-    z-index: 2;
-}
+            box-shadow: 0 0 18px rgba(130,71,229,.32);
+        }
 
+        .type-name {
+            display: block;
+            margin-bottom: 3px;
 
-/* =====================================================
-   INTRO
-===================================================== */
+            color: #fff;
+            font-size: 11px;
+            font-weight: 900;
+        }
 
-.intro {
+        .type-description {
+            display: block;
 
-    margin:
-        0 auto 25px;
+            color: #a99db9;
+            font-size: 9px;
+            line-height: 1.35;
+        }
 
-    text-align: center;
-}
+        /* Campos */
 
+        .field {
+            margin-bottom: 13px;
+        }
 
-.intro-small {
+        .field label {
+            display: block;
+            margin-bottom: 6px;
 
-    display: inline-flex;
+            color: #e6dcef;
 
-    align-items: center;
+            font-size: 9px;
+            font-weight: 900;
+            letter-spacing: .8px;
+            text-transform: uppercase;
+        }
 
-    gap: 7px;
+        .input-wrap {
+            position: relative;
+        }
 
-    margin-bottom: 9px;
+        .input-wrap > i {
+            position: absolute;
+            top: 50%;
+            left: 14px;
 
-    color:
-        var(--purple-light);
+            transform: translateY(-50%);
 
-    font-size: 9px;
+            color: #9887b0;
+            font-size: 14px;
 
-    font-weight: 900;
+            pointer-events: none;
+            transition: color .2s ease;
+        }
 
-    letter-spacing: 1.8px;
+        .input-wrap input {
+            display: block;
 
-    text-transform: uppercase;
-}
+            width: 100%;
+            height: 44px;
 
+            padding: 0 14px 0 40px;
 
-.intro-small::before,
-.intro-small::after {
+            border: 1px solid rgba(255,255,255,.11);
+            border-radius: 10px;
 
-    content: "";
+            outline: none;
 
-    width: 20px;
+            background: rgba(5,4,11,.70);
+            color: white;
 
-    height: 1px;
+            font-family: 'Nunito', sans-serif;
+            font-size: 11px;
+            font-weight: 700;
 
-    background:
-        var(--purple);
-}
+            transition:
+                border-color .2s ease,
+                box-shadow .2s ease,
+                background .2s ease;
+        }
 
+        .input-wrap input::placeholder {
+            color: #81758f;
+            font-weight: 500;
+        }
 
-h1 {
+        .input-wrap input:hover {
+            border-color: rgba(181,138,255,.40);
+        }
 
-    margin: 0;
+        .input-wrap input:focus {
+            border-color: #a875ff;
+            background: rgba(10,6,20,.92);
 
-    font-family:
-        'Bebas Neue',
-        sans-serif;
+            box-shadow:
+                0 0 0 3px rgba(130,71,229,.13),
+                0 0 20px rgba(130,71,229,.06);
+        }
 
-    font-size:
-        clamp(48px, 7vw, 64px);
+        .input-wrap:focus-within > i {
+            color: #c4a4ff;
+        }
 
-    line-height: .86;
+        /* Botão principal moderno */
 
-    letter-spacing: .8px;
+        .submit {
+            position: relative;
+            isolation: isolate;
 
-    color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
 
-    text-transform: uppercase;
-}
+            width: 100%;
+            min-height: 49px;
 
+            margin-top: 7px;
+            padding: 12px 18px;
 
-h1 span {
+            overflow: hidden;
 
-    color:
-        var(--purple);
-}
+            border: 1px solid rgba(255,255,255,.23);
+            border-radius: 12px;
 
+            background: linear-gradient(
+                105deg,
+                #6429bf 0%,
+                #8247e5 45%,
+                #a66bff 100%
+            );
 
-.intro p {
+            color: #fff;
 
-    max-width: 430px;
+            font-family: 'Nunito', sans-serif;
+            font-size: 11px;
+            font-weight: 900;
+            letter-spacing: 1px;
 
-    margin:
-        11px auto 0;
+            cursor: pointer;
 
-    color:
-        var(--muted);
+            box-shadow:
+                0 8px 25px rgba(103,48,192,.35),
+                0 0 0 1px rgba(180,140,255,.08),
+                inset 0 1px 0 rgba(255,255,255,.20);
 
-    font-size: 12px;
+            transition:
+                transform .25s ease,
+                box-shadow .25s ease,
+                filter .25s ease;
+        }
 
-    line-height: 1.55;
-}
+        /* Reflexo animado do botão */
 
+        .submit::before {
+            content: "";
 
-/* =====================================================
-   CARD
-===================================================== */
+            position: absolute;
+            z-index: -1;
 
-.login-card {
+            top: -50%;
+            left: -80%;
 
-    position: relative;
+            width: 55%;
+            height: 200%;
 
-    padding: 27px;
+            transform: rotate(25deg);
 
-    border-radius: 21px;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(255,255,255,.24),
+                transparent
+            );
 
-    border:
-        1px solid
-        var(--border);
+            transition: left .6s ease;
+        }
 
-    background:
+        .submit:hover {
+            transform: translateY(-3px);
 
-        linear-gradient(
-            145deg,
-            rgba(30,25,40,.95),
-            rgba(14,12,19,.95)
-        );
+            filter: brightness(1.10);
 
-    box-shadow:
+            box-shadow:
+                0 13px 34px rgba(103,48,192,.47),
+                0 0 25px rgba(130,71,229,.20),
+                inset 0 1px 0 rgba(255,255,255,.25);
+        }
 
-        0 25px 65px
-        rgba(0,0,0,.42),
+        .submit:hover::before {
+            left: 130%;
+        }
 
-        0 0 60px
-        rgba(130,71,229,.04);
+        .submit:active {
+            transform: translateY(-1px) scale(.99);
+        }
 
-    overflow: hidden;
-}
+        .submit:focus-visible {
+            outline: 2px solid #d3baff;
+            outline-offset: 4px;
+        }
 
+        .submit .button-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
 
-.login-card::before {
+            width: 26px;
+            height: 26px;
 
-    content: "";
+            border: 1px solid rgba(255,255,255,.25);
+            border-radius: 8px;
 
-    position: absolute;
+            background: rgba(255,255,255,.13);
 
-    top: 0;
-    left: 10%;
+            transition:
+                transform .25s ease,
+                background .25s ease;
+        }
 
-    width: 80%;
-    height: 1px;
+        .submit .button-icon i {
+            font-size: 14px;
+        }
 
-    background:
+        .submit:hover .button-icon {
+            transform: translateX(3px);
+            background: rgba(255,255,255,.22);
+        }
 
-        linear-gradient(
-            90deg,
-            transparent,
-            var(--purple),
-            transparent
-        );
-}
+        /* Cadastro */
 
+        .register {
+            margin-top: 14px;
 
-/* =====================================================
-   ERRO
-===================================================== */
+            text-align: center;
 
-.error-box {
+            color: #b0a4c2;
 
-    display: flex;
+            font-size: 10px;
+            font-weight: 600;
+        }
 
-    align-items: center;
+        .register a {
+            color: #c1a0ff;
+            text-decoration: none;
+            font-weight: 900;
 
-    gap: 8px;
+            transition: color .2s ease;
+        }
 
-    margin-bottom: 18px;
+        .register a:hover {
+            color: white;
+            text-decoration: underline;
+        }
 
-    padding: 11px 13px;
+        /* Rodapé */
 
-    border-radius: 10px;
+        .footer-note {
+            margin-top: 14px;
 
-    border:
-        1px solid
-        rgba(248,113,113,.18);
+            text-align: center;
 
-    background:
-        rgba(127,29,29,.13);
+            color: rgba(220,205,245,.72);
 
-    color:
-        #fca5a5;
+            font-size: 8px;
+            font-weight: 800;
+            letter-spacing: 1.4px;
 
-    font-size: 10px;
+            text-shadow: 0 2px 10px #000;
+        }
 
-    font-weight: 700;
-}
+        /* Telas menores */
 
+        @media (max-height: 800px) {
+            .topbar {
+                padding-top: 10px;
+            }
 
-.error-box i {
+            .page {
+                margin-top: 2px;
+            }
 
-    font-size: 14px;
-}
+            .intro {
+                margin-bottom: 11px;
+            }
 
+            h1 {
+                font-size: 46px;
+            }
 
-/* =====================================================
-   SEÇÕES
-===================================================== */
+            .intro p {
+                margin-top: 7px;
+            }
 
-.section-label {
+            .login-card {
+                padding: 17px 23px 15px;
+            }
 
-    margin-bottom: 5px;
+            .section-title {
+                margin-bottom: 9px;
+                font-size: 23px;
+            }
 
-    color:
-        var(--purple-light);
+            .types {
+                margin-bottom: 13px;
+                gap: 8px;
+            }
 
-    font-size: 8px;
+            .type {
+                min-height: 57px;
+                padding: 8px;
+            }
 
-    font-weight: 900;
+            .type-icon {
+                width: 33px;
+                height: 33px;
+            }
 
-    letter-spacing: 1.5px;
+            .field {
+                margin-bottom: 10px;
+            }
 
-    text-transform: uppercase;
-}
+            .input-wrap input {
+                height: 40px;
+            }
 
+            .submit {
+                min-height: 43px;
+                margin-top: 4px;
+            }
 
-.section-title {
+            .register {
+                margin-top: 10px;
+            }
 
-    margin: 0 0 15px;
+            .footer-note {
+                margin-top: 9px;
+            }
+        }
 
-    font-family:
-        'Bebas Neue',
-        sans-serif;
+        @media (max-height: 650px) and (min-width: 551px) {
+            .topbar {
+                padding-top: 6px;
+            }
 
-    font-size: 27px;
+            .page {
+                width: min(460px, calc(100% - 32px));
+                margin-top: 0;
+            }
 
-    letter-spacing: .4px;
+            .intro {
+                margin-bottom: 7px;
+            }
 
-    color: white;
-}
+            .intro-small {
+                margin-bottom: 4px;
+                font-size: 8px;
+            }
 
+            h1 {
+                font-size: 37px;
+            }
 
-/* =====================================================
-   TIPO DE USO
-===================================================== */
+            .intro p {
+                margin-top: 5px;
+                font-size: 10px;
+            }
 
-.types {
+            .login-card {
+                padding: 12px 20px;
+            }
 
-    display: grid;
+            .section-title {
+                font-size: 20px;
+                margin-bottom: 7px;
+            }
 
-    grid-template-columns:
-        repeat(2, 1fr);
+            .section-label {
+                font-size: 7px;
+            }
 
-    gap: 10px;
+            .types {
+                margin-bottom: 9px;
+            }
 
-    margin-bottom: 25px;
-}
+            .type {
+                min-height: 48px;
+                gap: 7px;
+                padding: 6px;
+            }
 
+            .type-icon {
+                width: 29px;
+                height: 29px;
+                font-size: 14px;
+            }
 
-.types label {
+            .type-name {
+                font-size: 10px;
+            }
 
-    margin: 0;
-}
+            .type-description {
+                font-size: 8px;
+            }
 
+            .field {
+                margin-bottom: 7px;
+            }
 
-.types input {
+            .field label {
+                margin-bottom: 4px;
+                font-size: 8px;
+            }
 
-    position: absolute;
+            .input-wrap input {
+                height: 35px;
+            }
 
-    opacity: 0;
+            .submit {
+                min-height: 38px;
+                padding: 6px 12px;
+            }
 
-    pointer-events: none;
-}
+            .submit .button-icon {
+                width: 22px;
+                height: 22px;
+            }
 
+            .register {
+                margin-top: 7px;
+                font-size: 9px;
+            }
 
-.type {
+            .footer-note {
+                margin-top: 6px;
+            }
+        }
 
-    min-height: 74px;
+        @media (max-width: 550px) {
+            .topbar {
+                width: calc(100% - 30px);
+                padding-top: 13px;
+            }
 
-    display: flex;
+            .page {
+                width: calc(100% - 26px);
+                margin-top: 10px;
+            }
 
-    align-items: center;
+            .login-card {
+                padding: 21px 17px;
+            }
 
-    gap: 11px;
+            h1 {
+                font-size: clamp(39px, 11vw, 53px);
+            }
 
-    padding: 13px;
+            .types {
+                gap: 8px;
+            }
 
-    border-radius: 14px;
+            .type {
+                min-height: 60px;
+            }
 
-    border:
-        1px solid
-        rgba(255,255,255,.07);
+            .intro p {
+                font-size: 10px;
+            }
 
-    background:
+            .back-button {
+                padding: 9px 14px;
+            }
+        }
 
-        linear-gradient(
-            145deg,
-            rgba(30,26,39,.92),
-            rgba(14,12,20,.92)
-        );
+        @media (max-width: 550px) and (max-height: 760px) {
+            .topbar {
+                padding-top: 7px;
+            }
 
-    color: #cbd5e4;
+            .page {
+                margin-top: 3px;
+            }
 
-    cursor: pointer;
+            .intro {
+                margin-bottom: 10px;
+            }
 
-    transition: .25s ease;
-}
+            h1 {
+                font-size: 39px;
+            }
 
+            .intro p {
+                margin-top: 6px;
+            }
 
-.type:hover {
+            .login-card {
+                padding: 15px 16px;
+            }
 
-    transform:
-        translateY(-2px);
+            .section-title {
+                margin-bottom: 8px;
+            }
 
-    border-color:
-        rgba(130,71,229,.35);
-}
+            .types {
+                margin-bottom: 12px;
+            }
 
+            .type {
+                min-height: 53px;
+            }
 
-.types input:checked + .type {
+            .field {
+                margin-bottom: 9px;
+            }
 
-    border-color:
-        var(--purple);
+            .input-wrap input {
+                height: 39px;
+            }
 
-    background:
+            .submit {
+                min-height: 43px;
+            }
 
-        linear-gradient(
-            145deg,
-            rgba(130,71,229,.15),
-            rgba(74,36,128,.09)
-        );
+            .footer-note {
+                margin-top: 7px;
+            }
+        }
 
-    box-shadow:
-        0 0 0 1px
-        rgba(130,71,229,.08);
-}
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                transition-duration: .01ms !important;
+                animation-duration: .01ms !important;
+            }
+        }
 
-
-.type-icon {
-
-    flex-shrink: 0;
-
-    width: 40px;
-    height: 40px;
-
-    display: flex;
-
-    align-items: center;
-    justify-content: center;
-
-    border-radius: 11px;
-
-    background:
-        rgba(130,71,229,.10);
-
-    color:
-        var(--purple-light);
-
-    font-size: 17px;
-}
-
-
-.types input:checked + .type .type-icon {
-
-    background:
-        var(--purple);
-
-    color:
-        white;
-}
-
-
-.type-name {
-
-    display: block;
-
-    margin-bottom: 2px;
-
-    color: white;
-
-    font-size: 12px;
-
-    font-weight: 900;
-}
-
-
-.type-description {
-
-    display: block;
-
-    color:
-        #847d8e;
-
-    font-size: 9px;
-
-    line-height: 1.35;
-
-    font-weight: 600;
-}
-
-
-/* =====================================================
-   CAMPOS
-===================================================== */
-
-.field {
-
-    margin-bottom: 15px;
-}
-
-
-.field label {
-
-    display: block;
-
-    margin-bottom: 6px;
-
-    color:
-        #cfc8da;
-
-    font-size: 9px;
-
-    font-weight: 900;
-
-    letter-spacing: .6px;
-
-    text-transform: uppercase;
-}
-
-
-.input-wrap {
-
-    position: relative;
-}
-
-
-.input-wrap i {
-
-    position: absolute;
-
-    left: 14px;
-    top: 50%;
-
-    transform:
-        translateY(-50%);
-
-    color:
-        #756c81;
-
-    font-size: 13px;
-
-    pointer-events: none;
-
-    transition: .2s ease;
-}
-
-
-input {
-
-    width: 100%;
-
-    height: 45px;
-
-    padding:
-        0 14px 0 39px;
-
-    border:
-        1px solid
-        rgba(255,255,255,.07);
-
-    border-radius: 10px;
-
-    outline: none;
-
-    background:
-        var(--input);
-
-    color: white;
-
-    font-family:
-        'Nunito',
-        sans-serif;
-
-    font-size: 11px;
-
-    font-weight: 600;
-
-    transition: .2s ease;
-}
-
-
-input::placeholder {
-
-    color:
-        #5e5669;
-}
-
-
-input:hover {
-
-    border-color:
-        rgba(130,71,229,.28);
-}
-
-
-input:focus {
-
-    border-color:
-        var(--purple);
-
-    box-shadow:
-        0 0 0 2px
-        rgba(130,71,229,.07);
-}
-
-
-.input-wrap:focus-within i {
-
-    color:
-        var(--purple-light);
-}
-
-
-/* =====================================================
-   BOTÃO
-===================================================== */
-
-.submit {
-
-    position: relative;
-
-    width: 100%;
-
-    height: 49px;
-
-    margin-top: 8px;
-
-    border: 0;
-
-    border-radius: 11px;
-
-    background:
-
-        linear-gradient(
-            110deg,
-            #6d35c4,
-            #8247e5,
-            #9a68f0
-        );
-
-    color: white;
-
-    font-family:
-        'Nunito',
-        sans-serif;
-
-    font-size: 11px;
-
-    font-weight: 900;
-
-    letter-spacing: .5px;
-
-    cursor: pointer;
-
-    box-shadow:
-
-        0 12px 28px
-        rgba(74,36,128,.3);
-
-    transition: .25s ease;
-}
-
-
-.submit:hover {
-
-    transform:
-        translateY(-2px);
-
-    box-shadow:
-
-        0 16px 32px
-        rgba(74,36,128,.42);
-}
-
-
-.submit i {
-
-    margin-left: 5px;
-
-    transition: .2s ease;
-}
-
-
-.submit:hover i {
-
-    transform:
-        translateX(3px);
-}
-
-
-/* =====================================================
-   CADASTRO
-===================================================== */
-
-.register {
-
-    margin-top: 17px;
-
-    text-align: center;
-
-    color:
-        #716a7b;
-
-    font-size: 10px;
-
-    font-weight: 600;
-}
-
-
-.register a {
-
-    color:
-        var(--purple-light);
-
-    text-decoration: none;
-
-    font-weight: 900;
-}
-
-
-.register a:hover {
-
-    color: white;
-}
-
-
-/* =====================================================
-   RODAPÉ
-===================================================== */
-
-.footer-note {
-
-    margin-top: 20px;
-
-    text-align: center;
-
-    color:
-        #5f5869;
-
-    font-size: 8px;
-
-    font-weight: 700;
-
-    letter-spacing: .5px;
-}
-
-
-/* =====================================================
-   RESPONSIVO
-===================================================== */
-
-@media (max-width: 550px) {
-
-    .topbar {
-
-        width:
-            calc(100% - 28px);
-
-        padding:
-            17px 0;
-    }
-
-
-    .page {
-
-        width:
-            calc(100% - 20px);
-    }
-
-
-    .login-card {
-
-        padding:
-            21px 17px;
-
-        border-radius:
-            18px;
-    }
-
-
-    .types {
-
-        grid-template-columns:
-            1fr;
-
-        gap: 8px;
-    }
-
-
-    .type {
-
-        min-height:
-            70px;
-    }
-
-
-    h1 {
-
-        font-size:
-            50px;
-    }
-}
-
-
-@media (max-width: 420px) {
-
-    .logo-text {
-
-        font-size:
-            16px;
-    }
-
-
-    .logo img {
-
-        width:
-            27px;
-
-        height:
-            27px;
-    }
-
-
-    .back-button {
-
-        padding:
-            7px 10px;
-    }
-
-
-    .back-button span {
-
-        display:
-            none;
-    }
-
-
-    h1 {
-
-        font-size:
-            46px;
-    }
-
-
-    .intro p {
-
-        font-size:
-            11px;
-    }
-
-
-    .login-card {
-
-        padding:
-            19px 14px;
-    }
-
-}
-
-</style>
+    </style>
 
 </head>
 
-
 <body>
 
+    <div class="glow glow-one"></div>
+    <div class="glow glow-two"></div>
 
-<div class="background-glow glow-one"></div>
-<div class="background-glow glow-two"></div>
+    <!-- Topo somente com o botão de voltar -->
 
+    <header class="topbar">
 
-<header class="topbar">
+        <a href="<?= e($homeUrl) ?>" class="back-button">
+            <span>VOLTAR AO SITE</span>
+        </a>
 
-    <a
-        href="home.html"
-        class="logo"
-    >
+    </header>
 
-        <img
-            src="fotos/icone uva sem fundo.png"
-            alt="GRAPE"
-        >
+    <main class="page">
 
-        <div class="logo-text">
-            GRAPE<span>Dev</span>
-        </div>
+        <section class="intro">
 
-    </a>
-
-
-    <a
-        href="home.html"
-        class="back-button"
-    >
-
-        <i class="bi bi-arrow-left"></i>
-
-        <span>Voltar</span>
-
-    </a>
-
-</header>
-
-
-<main class="page">
-
-
-    <section class="intro">
-
-        <div class="intro-small">
-            GRAPE ACCOUNT
-        </div>
-
-        <h1>
-            BEM-VINDO <span>DE VOLTA.</span>
-        </h1>
-
-        <p>
-            Acesse sua conta para continuar
-            sua experiência no ecossistema GRAPE.
-        </p>
-
-    </section>
-
-
-    <section class="login-card">
-
-
-        <?php if ($erro !== ''): ?>
-
-            <div class="error-box">
-
-                <i class="bi bi-exclamation-circle"></i>
-
-                <span>
-                    <?= htmlspecialchars(
-                        $erro,
-                        ENT_QUOTES,
-                        'UTF-8'
-                    ) ?>
-                </span>
-
+            <div class="intro-small">
+                GRAPE ACCOUNT
             </div>
 
-        <?php endif; ?>
+            <h1>
+                BEM-VINDO
+                <span>DE VOLTA.</span>
+            </h1>
 
+            <p>
+                Entre na sua conta e continue explorando
+                o ecossistema digital da GRAPE.
+            </p>
 
-        <form method="POST">
+        </section>
 
+        <section class="login-card">
 
-            <input
-                type="hidden"
-                name="redirect"
-                value="<?= htmlspecialchars(
-                    $redirect,
-                    ENT_QUOTES,
-                    'UTF-8'
-                ) ?>"
-            >
+            <?php if ($erro !== ''): ?>
 
+                <div class="error-box" role="alert">
+                    <i class="bi bi-exclamation-circle-fill"></i>
+                    <span><?= e($erro) ?></span>
+                </div>
 
-            <div class="section-label">
-                SEU AMBIENTE
-            </div>
+            <?php endif; ?>
 
-            <h2 class="section-title">
-                COMO VOCÊ VAI UTILIZAR?
-            </h2>
+            <form method="POST" action="">
 
+                <input
+                    type="hidden"
+                    name="redirect"
+                    value="<?= e($redirect) ?>"
+                >
 
-            <div class="types">
+                <div class="section-label">
+                    SEU AMBIENTE
+                </div>
 
+                <h2 class="section-title">
+                    COMO VOCÊ VAI UTILIZAR?
+                </h2>
 
-                <label>
+                <div class="types">
 
-                    <input
-                        type="radio"
-                        name="tipo_usuario"
-                        value="residencial"
+                    <label>
 
-                        <?= $tipo === 'residencial'
-                            ? 'checked'
-                            : '' ?>
+                        <input
+                            type="radio"
+                            name="tipo_usuario"
+                            value="residencial"
+                            <?= $tipo === 'residencial' ? 'checked' : '' ?>
+                            required
+                        >
 
-                        required
-                    >
+                        <span class="type">
 
-                    <span class="type">
-
-                        <span class="type-icon">
-
-                            <i class="bi bi-house-door-fill"></i>
-
-                        </span>
-
-                        <span>
-
-                            <span class="type-name">
-                                Residencial
+                            <span class="type-icon">
+                                <i class="bi bi-house-door-fill"></i>
                             </span>
 
-                            <span class="type-description">
-                                Casa ou apartamento
+                            <span>
+                                <span class="type-name">Residencial</span>
+                                <span class="type-description">
+                                    Casa ou apartamento
+                                </span>
                             </span>
 
                         </span>
 
-                    </span>
+                    </label>
 
-                </label>
+                    <label>
 
+                        <input
+                            type="radio"
+                            name="tipo_usuario"
+                            value="comercial"
+                            <?= $tipo === 'comercial' ? 'checked' : '' ?>
+                            required
+                        >
 
-                <label>
+                        <span class="type">
 
-                    <input
-                        type="radio"
-                        name="tipo_usuario"
-                        value="comercial"
-
-                        <?= $tipo === 'comercial'
-                            ? 'checked'
-                            : '' ?>
-
-                        required
-                    >
-
-                    <span class="type">
-
-                        <span class="type-icon">
-
-                            <i class="bi bi-building-fill"></i>
-
-                        </span>
-
-                        <span>
-
-                            <span class="type-name">
-                                Comercial
+                            <span class="type-icon">
+                                <i class="bi bi-building-fill"></i>
                             </span>
 
-                            <span class="type-description">
-                                Empresa ou indústria
+                            <span>
+                                <span class="type-name">Comercial</span>
+                                <span class="type-description">
+                                    Empresa ou indústria
+                                </span>
                             </span>
 
                         </span>
 
-                    </span>
-
-                </label>
-
-
-            </div>
-
-
-            <div class="section-label">
-                ACESSO
-            </div>
-
-            <h2 class="section-title">
-                SEUS DADOS
-            </h2>
-
-
-            <div class="field">
-
-                <label for="email">
-                    E-mail
-                </label>
-
-                <div class="input-wrap">
-
-                    <i class="bi bi-envelope"></i>
-
-                    <input
-                        id="email"
-                        name="email"
-                        type="email"
-                        autocomplete="email"
-                        placeholder="seu@email.com"
-                        value="<?= htmlspecialchars(
-                            $email,
-                            ENT_QUOTES,
-                            'UTF-8'
-                        ) ?>"
-                        required
-                    >
+                    </label>
 
                 </div>
 
-            </div>
+                <div class="section-label">
+                    ACESSO SEGURO
+                </div>
 
+                <h2 class="section-title">
+                    SEUS DADOS
+                </h2>
 
-            <div class="field">
+                <div class="field">
 
-                <label for="senha">
-                    Senha
-                </label>
+                    <label for="email">E-mail</label>
 
-                <div class="input-wrap">
+                    <div class="input-wrap">
 
-                    <i class="bi bi-lock"></i>
+                        <i class="bi bi-envelope"></i>
 
-                    <input
-                        id="senha"
-                        name="senha"
-                        type="password"
-                        autocomplete="current-password"
-                        placeholder="Digite sua senha"
-                        required
-                    >
+                        <input
+                            id="email"
+                            name="email"
+                            type="email"
+                            autocomplete="email"
+                            placeholder="seu@email.com"
+                            value="<?= e($email) ?>"
+                            required
+                        >
+
+                    </div>
 
                 </div>
 
+                <div class="field">
+
+                    <label for="senha">Senha</label>
+
+                    <div class="input-wrap">
+
+                        <i class="bi bi-lock"></i>
+
+                        <input
+                            id="senha"
+                            name="senha"
+                            type="password"
+                            autocomplete="current-password"
+                            placeholder="Digite sua senha"
+                            required
+                        >
+
+                    </div>
+
+                </div>
+
+                <button type="submit" class="submit">
+
+                    <span>ENTRAR NA MINHA CONTA</span>
+
+                </button>
+
+            </form>
+
+            <div class="register">
+
+                Ainda não possui uma conta?
+
+                <a href="<?= e($cadastroUrl) ?>?redirect=<?= urlencode($redirect) ?>">
+                    Criar cadastro
+                </a>
+
             </div>
 
+        </section>
 
-            <button
-                type="submit"
-                class="submit"
-            >
-
-                ENTRAR NA MINHA CONTA
-
-                <i class="bi bi-arrow-right"></i>
-
-            </button>
-
-
-        </form>
-
-
-        <div class="register">
-
-            Ainda não possui uma conta?
-
-            <a
-                href="cadastro.php?redirect=<?= urlencode($redirect) ?>"
-            >
-                Criar cadastro
-            </a>
-
+        <div class="footer-note">
+            GRAPE DIGITAL STUDIO &nbsp;·&nbsp; CREATE THE FUTURE
         </div>
 
-
-    </section>
-
-
-    <div class="footer-note">
-
-        GRAPE DIGITAL STUDIO · CREATE THE FUTURE.
-
-    </div>
-
-
-</main>
+    </main>
 
 </body>
-
 </html>

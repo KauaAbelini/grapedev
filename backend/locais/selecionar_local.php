@@ -4,17 +4,17 @@ session_start();
 include("conexao.php");
 
 if (!isset($_SESSION["usuario_id"])) {
-    header("Location: login.php");
+    header("Location: ../auth/login.php");
     exit;
 }
 
 $usuarioId = (int)$_SESSION["usuario_id"];
 $localId = (int)($_GET["id"] ?? 0);
-$destino = $_GET["destino"] ?? "dashboard.php";
+$destino = $_GET["destino"] ?? "../dashboard/dashboard.php";
 
-$destinosPermitidos = ["dashboard.php", "3d.php", "locais.php"];
+$destinosPermitidos = ["../dashboard/dashboard.php", "../3d.php", "../locais.php"];
 if (!in_array($destino, $destinosPermitidos, true)) {
-    $destino = "dashboard.php";
+    $destino = "../dashboard/dashboard.php";
 }
 
 $stmt = $conexao->prepare("SELECT id,nome,tipo_imovel FROM locais WHERE id = ? AND usuario_id = ? AND ativo = 1 LIMIT 1");

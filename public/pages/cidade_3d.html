@@ -237,7 +237,8 @@ canvas{
 
 
 .logo{
-
+    text-decoration:none;
+    flex-shrink:0;
     margin-top:18px;
 
     width:48px;
@@ -267,6 +268,19 @@ canvas{
 
 }
 
+
+.logo img{
+    width:100%;
+    height:100%;
+    object-fit:contain;
+    padding:5px;
+}
+
+.logo > span{
+    color:#fff;
+    font-size:23px;
+    font-weight:900;
+}
 
 .logo-text{
 
@@ -299,7 +313,7 @@ canvas{
 }
 
 
-.menu button{
+.menu-link{
 
     width:100%;
 
@@ -322,8 +336,8 @@ canvas{
 }
 
 
-.menu button:hover,
-.menu button.active{
+.menu-link:hover,
+.menu-link.active{
 
     color:white;
 
@@ -342,9 +356,18 @@ canvas{
 
 
 .menu-icon{
-
+    display:block;
     font-size:20px;
+    line-height:1.2;
+}
 
+.menu-link{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    text-decoration:none;
+    text-align:center;
 }
 
 
@@ -420,100 +443,63 @@ canvas{
 
 
 /* =========================================================
-   RAIO-X
+   RAIO-X — BOTÃO DE AÇÃO MODERNO
 ========================================================= */
-
 .xray{
-
     position:fixed;
-
-    top:20px;
-
-    right:390px;
-
+    top:24px;
+    right:370px;
     z-index:60;
-
-    padding:12px 18px;
-
-    border:
-        1px solid
-        rgba(0,200,255,.4);
-
-    border-radius:25px;
-
-    background:
-        rgba(2,7,17,.85);
-
-    color:#8fa4b8;
-
+    display:inline-flex;
+    align-items:center;
+    gap:9px;
+    padding:12px 17px;
+    border:1px solid rgba(0,195,255,.38);
+    border-radius:14px;
+    background:linear-gradient(135deg,rgba(7,22,44,.96),rgba(5,10,24,.94));
+    color:#b7d9ef;
+    font-size:11px;
+    font-weight:800;
+    letter-spacing:1.3px;
     cursor:pointer;
-
-    backdrop-filter:
-        blur(15px);
-
+    box-shadow:0 8px 28px rgba(0,0,0,.22),inset 0 1px rgba(255,255,255,.06);
+    backdrop-filter:blur(16px);
+    transition:transform .2s,border-color .2s,box-shadow .2s,color .2s;
 }
-
-
-.xray.active{
-
-    color:white;
-
-    background:
-        linear-gradient(
-            135deg,
-            #0077ff,
-            #00c8ff
-        );
-
-    box-shadow:
-        0 0 30px
-        rgba(0,190,255,.45);
-
+.xray::before{
+    content:"";width:7px;height:7px;border-radius:50%;background:#39cfff;
+    box-shadow:0 0 12px #39cfff;
 }
-
+.xray:hover{transform:translateY(-2px);border-color:#35d5ff;box-shadow:0 0 25px rgba(0,190,255,.17);color:#fff}
+.xray.active{color:#fff;border-color:#21d4ff;background:linear-gradient(120deg,#0754a5,#087fc4);box-shadow:0 0 26px rgba(0,190,255,.28)}
+.xray.active::before{background:#fff;box-shadow:0 0 12px #fff}
 
 /* =========================================================
    DIA / NOITE
 ========================================================= */
 
 .mode{
-
-    position:fixed;
-
-    top:20px;
-
-    right:20px;
-
-    z-index:60;
-
-    padding:5px;
-
-    border-radius:30px;
-
-    background:
-        rgba(2,5,14,.85);
-
-    border:
-        1px solid
-        rgba(255,255,255,.12);
-
+    display:flex;
+    gap:5px;
+    margin:15px 0 5px;
+    padding:4px;
+    border-radius:13px;
+    background:rgba(255,255,255,.035);
+    border:1px solid rgba(255,255,255,.09);
 }
 
 
 .mode button{
-
+    flex:1;
     border:0;
-
-    padding:10px 15px;
-
-    border-radius:20px;
-
+    padding:9px 12px;
+    border-radius:9px;
     background:transparent;
-
-    color:#788196;
-
+    color:#9aa8bd;
+    font-size:11px;
+    font-weight:700;
     cursor:pointer;
-
+    transition:.2s;
 }
 
 
@@ -647,7 +633,7 @@ canvas{
 
 
 .aqua-icon{
-
+    flex-shrink:0;
     width:52px;
 
     height:52px;
@@ -671,6 +657,10 @@ canvas{
 
 }
 
+
+.aqua-icon img{width:100%;height:100%;padding:7px;object-fit:contain}
+.aqua-icon span{font-size:27px}
+.aqua-brand-copy{min-width:0}
 
 .aqua-title{
 
@@ -696,7 +686,7 @@ canvas{
 
 .panel-title{
 
-    margin:22px 0 12px;
+    margin:18px 0 12px;
 
     color:#d76aff;
 
@@ -732,6 +722,16 @@ canvas{
 
 }
 
+
+.catalog-cta{
+    display:flex;align-items:center;justify-content:space-between;gap:12px;
+    margin-top:14px;padding:14px 15px;border-radius:13px;text-decoration:none;
+    color:#fff;font-size:12px;font-weight:800;letter-spacing:.3px;
+    background:linear-gradient(110deg,#7135df,#176fd1);
+    border:1px solid rgba(255,255,255,.17);box-shadow:0 8px 25px rgba(80,65,220,.2);
+    transition:.2s;
+}
+.catalog-cta:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(0,174,255,.2)}
 
 .product:hover{
 
@@ -1111,9 +1111,12 @@ canvas{
     }
 
     .xray{
-        right:10px;
-        top:80px;
+        right:12px;
+        top:82px;
     }
+    .mode{margin-top:12px}
+    .menu{padding:8px 6px}
+    .menu-link{height:59px}
 
 }
 
@@ -1239,6 +1242,7 @@ canvas{
 </div>
 
 <canvas id="city"></canvas>
+<div id="ambientes" aria-hidden="true"></div>
 
 
 <!-- =========================================================
@@ -1247,52 +1251,32 @@ canvas{
 
 <aside class="sidebar">
 
-    <div class="logo">
-        G
-    </div>
+    <a class="logo" href="home.html" aria-label="GrapeDev - Início" title="GrapeDev">
+        <img src="../../fotos/logo-grapedev.png" alt="Logo GrapeDev" onerror="this.hidden=true;this.nextElementSibling.hidden=false">
+        <span hidden>G</span>
+    </a>
 
-    <div class="logo-text">
-        GRAPE<span>DEV</span>
-    </div>
+    <div class="logo-text">GRAPE<span>DEV</span></div>
 
-
-    <nav class="menu">
-
-        <button class="active">
-            <div class="menu-icon">⌂</div>
-            <span class="menu-label">Início</span>
-        </button>
-
-
-        <button>
-            <div class="menu-icon">⌕</div>
-            <span class="menu-label">Explorar</span>
-        </button>
-
-
-        <button>
-            <div class="menu-icon">▦</div>
-            <span class="menu-label">Catálogo</span>
-        </button>
-
-
-        <button>
-            <div class="menu-icon">◇</div>
-            <span class="menu-label">Ambientes</span>
-        </button>
-
-
-        <button>
-            <div class="menu-icon">💧</div>
-            <span class="menu-label">AquaFlow</span>
-        </button>
-
-
-        <button>
-            <div class="menu-icon">✦</div>
-            <span class="menu-label">Nex</span>
-        </button>
-
+    <nav class="menu" aria-label="Navegação principal">
+        <a class="menu-link" href="home.html" title="Início">
+            <span class="menu-icon">⌂</span><span class="menu-label">Início</span>
+        </a>
+        <a class="menu-link" href="projetos.html" title="Explorar projetos">
+            <span class="menu-icon">⌕</span><span class="menu-label">Explorar</span>
+        </a>
+        <a class="menu-link" href="catalogo.html" title="Catálogo de soluções">
+            <span class="menu-icon">▦</span><span class="menu-label">Catálogo</span>
+        </a>
+        <a class="menu-link active" href="cidade_3d.html#ambientes" title="Ambientes 3D">
+            <span class="menu-icon">◇</span><span class="menu-label">Ambientes</span>
+        </a>
+        <a class="menu-link" href="aquaflow.html" title="Projeto AquaFlow">
+            <span class="menu-icon">💧</span><span class="menu-label">AquaFlow</span>
+        </a>
+        <a class="menu-link" href="nex.html" title="Assistente Nex">
+            <span class="menu-icon">✦</span><span class="menu-label">Nex</span>
+        </a>
     </nav>
 
 </aside>
@@ -1319,24 +1303,11 @@ canvas{
     class="xray"
     id="xrayButton"
 >
-    🔬 RAIO-X
+    <span>RAIO-X</span>
 </button>
 
 
-<div class="mode">
 
-    <button
-        id="dayButton"
-        class="active"
-    >
-        ☀ Dia
-    </button>
-
-    <button id="nightButton">
-        🌙 Noite
-    </button>
-
-</div>
 
 
 <!-- =========================================================
@@ -1397,10 +1368,11 @@ canvas{
     <div class="aqua-header">
 
         <div class="aqua-icon">
-            💧
+            <img src="../../fotos/logo-aquaflow.png" alt="Logo AquaFlow" onerror="this.hidden=true;this.nextElementSibling.hidden=false">
+            <span hidden>💧</span>
         </div>
 
-        <div>
+        <div class="aqua-brand-copy">
 
             <div class="aqua-title">
                 AQUAFLOW
@@ -1414,6 +1386,10 @@ canvas{
 
     </div>
 
+    <div class="mode" aria-label="Alternar iluminação da cidade">
+        <button id="dayButton" class="active" type="button">☀ Dia</button>
+        <button id="nightButton" type="button">☾ Noite</button>
+    </div>
 
     <div class="panel-title">
         SOLUÇÕES AQUAFLOW
@@ -1426,7 +1402,7 @@ canvas{
     >
 
         <strong>
-            🔵 Smart Sensor
+             Smart Sensor
         </strong>
 
         <small>
@@ -1449,7 +1425,7 @@ canvas{
     >
 
         <strong>
-            📊 Digital Meter
+             Digital Meter
         </strong>
 
         <small>
@@ -1471,7 +1447,7 @@ canvas{
     >
 
         <strong>
-            🖥 AquaFlow Dashboard
+             AquaFlow Dashboard
         </strong>
 
         <small>
@@ -1492,7 +1468,7 @@ canvas{
     >
 
         <strong>
-            🚿 Eco Shower
+             Eco Shower
         </strong>
 
         <small>
@@ -1507,6 +1483,28 @@ canvas{
         </div>
 
     </div>
+
+    <div class="product" onclick="openProduct('valve')">
+        <strong> Smart Valve</strong>
+        <small>Permite interromper o fluxo de água em situações de risco, conforme a integração do sistema.</small>
+        <div class="product-tags"><span>CONTROLE</span><span>AUTOMAÇÃO</span><span>SEGURANÇA</span></div>
+    </div>
+
+    <div class="product" onclick="openProduct('leak')">
+        <strong> Leak Guard</strong>
+        <small>Apresenta alertas de possíveis vazamentos e ajuda a localizar ocorrências.</small>
+        <div class="product-tags"><span>VAZAMENTOS</span><span>ALERTAS</span></div>
+    </div>
+
+    <div class="product" onclick="openProduct('irrigation')">
+        <strong> AquaFlow Irrigation</strong>
+        <small>Acompanhamento da irrigação e do uso de água em jardins e áreas agrícolas.</small>
+        <div class="product-tags"><span>FAZENDAS</span><span>JARDINS</span></div>
+    </div>
+
+    <a class="catalog-cta" href="catalogo.html">
+        <span>Ver catálogo completo</span><span aria-hidden="true">↗</span>
+    </a>
 
 </aside>
 
@@ -5099,6 +5097,19 @@ function(product){
 
             `
 
+        },
+
+        valve:{
+            title:"Smart Valve",
+            html:`<h3>Controle inteligente</h3><p>Conceito de válvula conectada para permitir o controle do fluxo de água quando integrada ao sistema AquaFlow.</p><h3>Aplicações</h3><p>Residências, comércios e instalações que precisam de monitoramento hidráulico.</p>`
+        },
+        leak:{
+            title:"Leak Guard",
+            html:`<h3>Detecção de anomalias</h3><p>Reúne alertas relacionados a padrões de consumo ou fluxo que possam indicar um vazamento.</p><h3>Benefícios</h3><p>Ajuda o usuário a investigar ocorrências e agir mais cedo para reduzir desperdícios.</p>`
+        },
+        irrigation:{
+            title:"AquaFlow Irrigation",
+            html:`<h3>Uso consciente na irrigação</h3><p>Conceito de acompanhamento do consumo de água em jardins, propriedades rurais e áreas verdes.</p><h3>Objetivo</h3><p>Facilitar a análise do uso de água e apoiar decisões de irrigação mais eficientes.</p>`
         }
 
     };
