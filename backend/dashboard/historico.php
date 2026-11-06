@@ -9,7 +9,10 @@ if (!isset($_SESSION["usuario_id"])) {
 
 include("../database/conexao.php");
 
-$usuario_id = $_SESSION["usuario_id"];
+require_once __DIR__ . "/demo_dados.php";
+
+$usuario_id = (int) $_SESSION["usuario_id"];
+$modoDemo = ($usuario_id === 8);
 
 $nome = $_SESSION["usuario_nome"] ?? "Usuário";
 $cidade = $_SESSION["usuario_cidade"] ?? "";

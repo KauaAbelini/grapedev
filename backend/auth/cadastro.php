@@ -1,3 +1,4 @@
+
 <?php
 
 require_once __DIR__ . '/auth.php';
@@ -10,6 +11,11 @@ $redirect = destinoSeguro(
     ?? $_POST['redirect']
     ?? '../../dashboard/dashboard.php'
 );
+
+if (isset($_SESSION['usuario_id'])) {
+    header('Location: ' . $redirect);
+    exit;
+}
 
 $erro = '';
 
@@ -29,7 +35,6 @@ $bairro = '';
 $empresa = '';
 $tipo_estabelecimento = '';
 
-
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $nome = trim($_POST['nome'] ?? '');
@@ -48,7 +53,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $empresa = trim($_POST['empresa'] ?? '');
     $tipo_estabelecimento = trim($_POST['tipo_estabelecimento'] ?? '');
 
-
     if (
         $nome === '' ||
         $email === '' ||
@@ -59,25 +63,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $erro = 'Preencha todos os campos obrigatórios.';
 
-    } elseif (
-        !filter_var($email, FILTER_VALIDATE_EMAIL)
-    ) {
+    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
 
         $erro = 'Digite um e-mail válido.';
 
-    } elseif (
-        strlen($senha) < 6
-    ) {
+    } elseif (strlen($senha) < 6) {
 
         $erro = 'A senha deve ter pelo menos 6 caracteres.';
 
-    } elseif (
-        !in_array(
-            $tipo_usuario,
-            ['residencial', 'comercial'],
-            true
-        )
-    ) {
+    } elseif (!in_array($tipo_usuario, ['residencial', 'comercial'], true)) {
 
         $erro = 'Selecione o tipo de uso.';
 
@@ -92,10 +86,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     } elseif (
         $tipo_usuario === 'comercial' &&
-        (
-            $empresa === '' ||
-            $tipo_estabelecimento === ''
-        )
+        ($empresa === '' || $tipo_estabelecimento === '')
     ) {
 
         $erro = 'Preencha os dados comerciais.';
@@ -103,21 +94,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
 
         $stmt = $conexao->prepare(
-            "SELECT id
-             FROM usuarios
-             WHERE email = ?
-             LIMIT 1"
+            "SELECT id FROM usuarios WHERE email = ? LIMIT 1"
         );
 
         $stmt->bind_param('s', $email);
         $stmt->execute();
 
-        $existe = $stmt
-            ->get_result()
-            ->fetch_assoc();
+        $existe = $stmt->get_result()->fetch_assoc();
 
         $stmt->close();
-
 
         if ($existe) {
 
@@ -125,15 +110,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         } else {
 
-            $senhaHash = password_hash(
-                $senha,
-                PASSWORD_DEFAULT
-            );
-
+            $senhaHash = password_hash($senha, PASSWORD_DEFAULT);
 
             $stmt = $conexao->prepare(
-                "INSERT INTO usuarios
-                (
+                "INSERT INTO usuarios (
                     nome,
                     email,
                     senha,
@@ -146,8 +126,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     cep,
                     empresa,
                     tipo_estabelecimento
-                )
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
             );
 
             $stmt->bind_param(
@@ -166,61 +145,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $tipo_estabelecimento
             );
 
-
             if ($stmt->execute()) {
+
+                $novoUsuarioId = $conexao->insert_id;
+
+                $stmt->close();
 
                 session_regenerate_id(true);
 
-                $_SESSION['usuario_id'] =
-                    $conexao->insert_id;
+                $_SESSION['usuario_id'] = $novoUsuarioId;
+                $_SESSION['usuario_nome'] = $nome;
+                $_SESSION['usuario_email'] = $email;
+                $_SESSION['usuario_cidade'] = $cidade;
+                $_SESSION['usuario_telefone'] = $telefone;
+                $_SESSION['usuario_tipo'] = $tipo_usuario;
+                $_SESSION['usuario_endereco'] = $endereco;
+                $_SESSION['usuario_numero'] = $numero;
+                $_SESSION['usuario_bairro'] = $bairro;
+                $_SESSION['usuario_cep'] = $cep;
+                $_SESSION['usuario_empresa'] = $empresa;
+                $_SESSION['usuario_tipo_estabelecimento'] = $tipo_estabelecimento;
 
-                $_SESSION['usuario_nome'] =
-                    $nome;
-
-                $_SESSION['usuario_email'] =
-                    $email;
-
-                $_SESSION['usuario_cidade'] =
-                    $cidade;
-
-                $_SESSION['usuario_telefone'] =
-                    $telefone;
-
-                $_SESSION['usuario_tipo'] =
-                    $tipo_usuario;
-
-                $_SESSION['usuario_endereco'] =
-                    $endereco;
-
-                $_SESSION['usuario_numero'] =
-                    $numero;
-
-                $_SESSION['usuario_bairro'] =
-                    $bairro;
-
-                $_SESSION['usuario_cep'] =
-                    $cep;
-
-                $_SESSION['usuario_empresa'] =
-                    $empresa;
-
-                $_SESSION['usuario_tipo_estabelecimento'] =
-                    $tipo_estabelecimento;
-
-
-                header(
-                    'Location: ' . $redirect
-                );
-
+                header('Location: ' . $redirect);
                 exit;
 
             } else {
 
-                $erro =
-                    'Não foi possível realizar o cadastro.';
-            }
+                $erro = 'Não foi possível realizar o cadastro.';
 
-            $stmt->close();
+                $stmt->close();
+            }
         }
     }
 }
@@ -228,1608 +182,1063 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 ?>
 
 <!DOCTYPE html>
-
 <html lang="pt-BR">
 
 <head>
 
-<meta charset="UTF-8">
-
-<meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
->
-
-<title>GRAPE — Criar conta</title>
-
-<link rel="preconnect" href="https://fonts.googleapis.com">
-
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-<link
-    href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;500;600;700;800;900&display=swap"
-    rel="stylesheet"
->
-
-<link
-    rel="stylesheet"
-    href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
->
-
-<style>
-
-:root {
-    --bg-dark: #1d1924;
-    --bg-black: #0b090f;
-    --purple: #8247e5;
-    --purple-dark: #4a2480;
-    --purple-light: #a875ff;
-    --white: #ffffff;
-    --text: #eeeaf5;
-    --muted: #938b9f;
-    --card: rgba(28, 24, 36, .88);
-    --border: rgba(255,255,255,.08);
-    --input: rgba(10,8,14,.72);
-}
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>GRAPE — Criar conta</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet"
+    >
+
+    <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+    >
+
+    <style>
+
+        :root {
+            --bg-dark: #1d1924;
+            --bg-black: #0b090f;
+            --purple: #8247e5;
+            --purple-dark: #4a2480;
+            --purple-light: #a875ff;
+            --white: #ffffff;
+            --text: #eeeaf5;
+            --muted: #938b9f;
+            --card: rgba(28, 24, 36, .88);
+            --border: rgba(255,255,255,.08);
+            --input: rgba(10,8,14,.72);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            min-height: 100%;
+            scroll-behavior: smooth;
+            overflow-x: hidden;
+            scrollbar-width: none;
+        }
+
+        html::-webkit-scrollbar,
+        body::-webkit-scrollbar {
+            display: none;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: 'Nunito', sans-serif;
+            color: var(--text);
+
+            background-color: #050510;
+
+            background-image:
+                linear-gradient(
+                    90deg,
+                    rgba(5, 4, 16, .10),
+                    rgba(5, 4, 16, .20) 50%,
+                    rgba(5, 4, 16, .10)
+                ),
+                url('/grapedev/storage/images/fundo_cadastro_grape.png');
+
+            background-position: center center;
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+
+            overflow-x: hidden;
+        }
+
+        /* ==========================================
+           CABEÇALHO
+        ========================================== */
+
+        .topbar {
+            position: relative;
+            width: min(1100px, calc(100% - 40px));
+            margin: 0 auto;
+            padding: 13px 0;
+
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+
+            z-index: 10;
+        }
+
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+
+            height: 39px;
+            padding: 0 17px;
 
-* {
-    box-sizing: border-box;
-}
+            border: 1px solid rgba(168, 117, 255, .22);
+            border-radius: 10px;
 
-html {
-    min-height: 100%;
-    scroll-behavior: smooth;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-}
+            background: rgba(15, 11, 25, .65);
 
-html::-webkit-scrollbar,
-body::-webkit-scrollbar {
-    width: 0;
-    height: 0;
-    display: none;
-}
+            color: #dcd2eb;
 
-body {
-    margin: 0;
-    min-height: 100vh;
-    font-family: 'Nunito', sans-serif;
-    color: var(--text);
+            font-family: 'Nunito', sans-serif;
+            font-size: 11px;
+            font-weight: 800;
 
-    background-color: #050510;
-    background-image:
-        linear-gradient(
-            90deg,
-            rgba(5, 4, 16, .10),
-            rgba(5, 4, 16, .20) 50%,
-            rgba(5, 4, 16, .10)
-        ),
-        url('/grapedev/storage/images/fundo_cadastro_grape.png');
-    background-position: center center;
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-attachment: fixed;
-    overflow-x: hidden;
-}
+            text-decoration: none;
 
-.background-glow {
-    display: none;
-    position: fixed;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
 
-    width: 400px;
-    height: 400px;
+            transition: all .3s ease;
+        }
 
-    border-radius: 50%;
+        .back-button i {
+            font-size: 14px;
+            transition: transform .3s ease;
+        }
 
-    background: rgba(130,71,229,.07);
+        .back-button:hover {
+            color: white;
+            border-color: rgba(168, 117, 255, .65);
 
-    filter: blur(110px);
+            background: rgba(130, 71, 229, .16);
 
-    pointer-events: none;
+            box-shadow: 0 0 22px rgba(130, 71, 229, .13);
 
-    z-index: 0;
-}
+            transform: translateY(-2px);
+        }
 
-.glow-one {
-    top: -220px;
-    left: 20%;
-}
+        .back-button:hover i {
+            transform: translateX(-4px);
+        }
 
-.glow-two {
-    bottom: -250px;
-    right: -100px;
-}
+        /* ==========================================
+           ESTRUTURA PRINCIPAL
+        ========================================== */
 
-.topbar {
-    position: relative;
+        .page {
+            position: relative;
+            width: min(900px, calc(100% - 32px));
+            margin: 0 auto 10px;
+            z-index: 2;
+        }
 
-    width: min(1050px, calc(100% - 36px));
+        .intro {
+            max-width: 650px;
+            margin: 0 auto 12px;
+            text-align: center;
+        }
 
-    margin: 0 auto;
+        .intro-small {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
 
-    padding: 21px 0;
+            margin-bottom: 5px;
 
-    display: flex;
+            color: var(--purple-light);
 
-    align-items: center;
+            font-size: 8px;
+            font-weight: 900;
+            letter-spacing: 1.8px;
+            text-transform: uppercase;
+        }
 
-    justify-content: space-between;
+        .intro-small::before,
+        .intro-small::after {
+            content: "";
+            width: 20px;
+            height: 1px;
+            background: var(--purple);
+        }
 
-    z-index: 10;
-}
+        h1 {
+            margin: 0;
 
-.logo {
-    display: flex;
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: clamp(36px, 4vw, 48px);
+            line-height: .95;
+            letter-spacing: .8px;
 
-    align-items: center;
+            color: white;
+            text-transform: uppercase;
+        }
 
-    gap: 8px;
+        h1 span {
+            color: var(--purple);
+        }
 
-    color: white;
+        .intro p {
+            max-width: 500px;
+            margin: 5px auto 0;
 
-    text-decoration: none;
-}
+            color: var(--muted);
+            font-size: 11px;
+            line-height: 1.55;
+        }
 
-.logo img {
-    width: 29px;
-    height: 29px;
+        /* ==========================================
+           CARTÃO DO FORMULÁRIO
+        ========================================== */
 
-    object-fit: contain;
+        .form-card {
+            position: relative;
+            width: 100%;
 
-    filter:
-        drop-shadow(
-            0 0 10px
-            rgba(130,71,229,.4)
-        );
-}
+            padding: 16px 22px;
 
-.logo-text {
-    font-size: 18px;
+            border-radius: 16px;
 
-    font-weight: 900;
+            border: 1px solid rgba(168,117,255,.22);
 
-    letter-spacing: -.5px;
-}
+            background: rgba(12, 9, 23, .70);
 
-.logo-text span {
-    color: var(--purple-light);
-}
+            backdrop-filter: blur(9px);
+            -webkit-backdrop-filter: blur(9px);
 
-.back-button {
-    display: inline-flex;
+            box-shadow:
+                0 15px 40px rgba(0, 0, 0, .25),
+                0 0 25px rgba(130, 71, 229, .08);
 
-    align-items: center;
+            overflow: hidden;
+        }
 
-    gap: 7px;
+        .form-card::before {
+            content: "";
 
-    padding: 8px 14px;
+            position: absolute;
+            top: 0;
+            left: 10%;
 
-    border: 1px solid rgba(255,255,255,.08);
+            width: 80%;
+            height: 1px;
 
-    border-radius: 25px;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                var(--purple),
+                transparent
+            );
+        }
 
-    background: rgba(255,255,255,.035);
+        /* ==========================================
+           TÍTULOS DAS SEÇÕES
+        ========================================== */
 
-    color: #ddd7e5;
+        .section-heading {
+            margin-bottom: 8px;
+        }
 
-    font-size: 12px;
+        .section-label {
+            margin-bottom: 4px;
 
-    font-weight: 800;
+            color: var(--purple-light);
 
-    text-decoration: none;
+            font-size: 8px;
+            font-weight: 900;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+        }
 
-    transition: .25s ease;
-}
+        .section-heading h2 {
+            margin: 0;
 
-.back-button:hover {
-    color: white;
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 23px;
+            letter-spacing: .4px;
 
-    border-color: rgba(130,71,229,.4);
+            color: white;
+        }
 
-    background: rgba(130,71,229,.09);
+        /* ==========================================
+           TIPO DE USUÁRIO
+        ========================================== */
 
-    transform: translateX(-2px);
-}
+        .type-title {
+            margin-bottom: 7px;
 
-.page {
-    position: relative;
+            color: #dcd6e5;
 
-    width: min(980px, calc(100% - 32px));
+            font-size: 10px;
+            font-weight: 800;
+        }
 
-    margin: 12px auto 45px;
+        .types {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
 
-    z-index: 2;
-}
+            gap: 10px;
+            margin-bottom: 13px;
+        }
 
+        .types label {
+            margin: 0;
+        }
 
-.intro {
-    max-width: 650px;
+        .types input {
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+        }
 
-    margin: 0 auto 28px;
+        .type {
+            position: relative;
 
-    text-align: center;
-}
+            min-height: 58px;
 
-.intro-small {
-    display: inline-flex;
+            display: flex;
+            align-items: center;
+            gap: 10px;
 
-    align-items: center;
+            padding: 10px 12px;
 
-    gap: 7px;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,.07);
 
-    margin-bottom: 9px;
+            background: linear-gradient(
+                145deg,
+                rgba(30,26,39,.92),
+                rgba(14,12,20,.92)
+            );
 
-    color: var(--purple-light);
+            cursor: pointer;
+            transition: .25s ease;
+        }
 
-    font-size: 9px;
+        .type:hover {
+            transform: translateY(-2px);
+            border-color: rgba(130,71,229,.35);
+        }
 
-    font-weight: 900;
+        .types input:checked + .type {
+            border-color: var(--purple);
 
-    letter-spacing: 1.8px;
+            background: linear-gradient(
+                145deg,
+                rgba(130,71,229,.15),
+                rgba(74,36,128,.09)
+            );
 
-    text-transform: uppercase;
-}
+            box-shadow: 0 0 0 1px rgba(130,71,229,.08);
+        }
 
-.intro-small::before,
-.intro-small::after {
-    content: "";
+        .type-icon {
+            flex-shrink: 0;
 
-    width: 20px;
+            width: 35px;
+            height: 35px;
 
-    height: 1px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
 
-    background: var(--purple);
-}
+            border-radius: 10px;
 
-h1 {
-    margin: 0;
+            background: rgba(130,71,229,.10);
+            border: 1px solid rgba(130,71,229,.17);
 
-    font-family: 'Bebas Neue', sans-serif;
+            color: var(--purple-light);
+            font-size: 15px;
+        }
 
-    font-size: clamp(46px, 6vw, 66px);
+        .types input:checked + .type .type-icon {
+            background: var(--purple);
+            color: white;
+            border-color: var(--purple);
+        }
 
-    line-height: .86;
+        .type-name {
+            display: block;
+            margin-bottom: 2px;
 
-    letter-spacing: .8px;
+            color: white;
+            font-size: 11px;
+            font-weight: 900;
+        }
 
-    color: white;
+        .type-description {
+            display: block;
 
-    text-transform: uppercase;
-}
+            color: #847d8e;
+            font-size: 9px;
+            line-height: 1.35;
+            font-weight: 600;
+        }
 
-h1 span {
-    color: var(--purple);
-}
+        /* ==========================================
+           DIVISÓRIA
+        ========================================== */
 
-.intro p {
-    max-width: 500px;
+        .divider {
+            height: 1px;
+            margin: 0 0 13px;
 
-    margin: 11px auto 0;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(255,255,255,.07),
+                transparent
+            );
+        }
 
-    color: var(--muted);
+        /* ==========================================
+           CAMPOS
+        ========================================== */
 
-    font-size: 13px;
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0,1fr));
+            gap: 8px 12px;
+        }
 
-    line-height: 1.55;
-}
+        .full {
+            grid-column: 1 / -1;
+        }
 
-.form-card {
-    position: relative;
+        .field label {
+            display: block;
+            margin-bottom: 4px;
 
-    width: 100%;
+            color: #cfc8da;
 
-    padding: 28px;
+            font-size: 8px;
+            font-weight: 900;
+            letter-spacing: .6px;
+            text-transform: uppercase;
+        }
 
-    border-radius: 22px;
+        .input-wrap {
+            position: relative;
+        }
 
-    border: 1px solid rgba(168,117,255,.22);
+        .input-wrap i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
 
-    background: rgba(12,9,23,.82);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
+            transform: translateY(-50%);
 
-    box-shadow:
-        0 25px 65px rgba(0,0,0,.40),
-        0 0 35px rgba(130,71,229,.10);
+            color: #756c81;
+            font-size: 12px;
 
-    overflow: hidden;
-}
+            pointer-events: none;
+            transition: .2s ease;
+        }
 
-.form-card::before {
-    content: "";
+        input,
+        select {
+            width: 100%;
+            height: 38px;
 
-    position: absolute;
+            padding: 0 12px 0 34px;
 
-    top: 0;
-    left: 10%;
+            border: 1px solid rgba(255,255,255,.07);
+            border-radius: 8px;
 
-    width: 80%;
-    height: 1px;
+            outline: none;
 
-    background:
-        linear-gradient(
-            90deg,
-            transparent,
-            var(--purple),
-            transparent
-        );
-}
+            background: var(--input);
+            color: white;
 
-.section-heading {
-    margin-bottom: 16px;
-}
+            font-family: 'Nunito', sans-serif;
+            font-size: 10px;
+            font-weight: 600;
 
-.section-label {
-    margin-bottom: 4px;
+            transition: .2s ease;
+        }
 
-    color: var(--purple-light);
+        input::placeholder {
+            color: #5e5669;
+        }
 
-    font-size: 8px;
+        input:hover,
+        select:hover {
+            border-color: rgba(130,71,229,.28);
+        }
 
-    font-weight: 900;
+        input:focus,
+        select:focus {
+            border-color: var(--purple);
 
-    letter-spacing: 1.5px;
+            box-shadow: 0 0 0 2px rgba(130,71,229,.07);
+        }
 
-    text-transform: uppercase;
-}
+        .input-wrap:focus-within i {
+            color: var(--purple-light);
+        }
 
-.section-heading h2 {
-    margin: 0;
+        select {
+            appearance: none;
+            cursor: pointer;
 
-    font-family: 'Bebas Neue', sans-serif;
+            padding-right: 35px;
 
-    font-size: 27px;
+            background-image:
+                linear-gradient(
+                    45deg,
+                    transparent 50%,
+                    #837b90 50%
+                ),
+                linear-gradient(
+                    135deg,
+                    #837b90 50%,
+                    transparent 50%
+                );
 
-    letter-spacing: .4px;
+            background-position:
+                calc(100% - 17px) 16px,
+                calc(100% - 12px) 16px;
 
-    color: white;
-}
+            background-size: 5px 5px;
+            background-repeat: no-repeat;
+        }
 
-.type-title {
-    margin-bottom: 9px;
+        select option {
+            background: #15111d;
+            color: white;
+        }
 
-    color: #dcd6e5;
+        /* ==========================================
+           DADOS COMERCIAIS
+        ========================================== */
 
-    font-size: 11px;
+        .comercial {
+            display: none;
 
-    font-weight: 800;
-}
+            margin-top: 14px;
+            padding: 13px;
 
-.types {
-    display: grid;
+            border-radius: 12px;
 
-    grid-template-columns: repeat(2, 1fr);
+            border: 1px solid rgba(130,71,229,.18);
 
-    gap: 12px;
+            background: linear-gradient(
+                145deg,
+                rgba(130,71,229,.06),
+                rgba(12,10,17,.5)
+            );
 
-    margin-bottom: 28px;
-}
+            animation: aparecer .3s ease;
+        }
 
-.types label {
-    margin: 0;
-}
+        @keyframes aparecer {
+            from {
+                opacity: 0;
+                transform: translateY(-5px);
+            }
 
-.types input {
-    position: absolute;
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
 
-    opacity: 0;
+        .comercial-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
 
-    pointer-events: none;
-}
+            margin-bottom: 10px;
+        }
 
-.type {
-    position: relative;
+        .comercial-icon {
+            width: 30px;
+            height: 30px;
 
-    min-height: 88px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
 
-    display: flex;
+            border-radius: 10px;
 
-    align-items: center;
+            background: rgba(130,71,229,.11);
 
-    gap: 13px;
+            color: var(--purple-light);
+            font-size: 15px;
+        }
 
-    padding: 15px;
+        .comercial-header strong {
+            display: block;
+            color: white;
+            font-size: 12px;
+            font-weight: 900;
+        }
 
-    border-radius: 15px;
+        .comercial-header span {
+            display: block;
+            margin-top: 2px;
 
-    border: 1px solid rgba(255,255,255,.07);
+            color: #776f80;
+            font-size: 9px;
+            font-weight: 600;
+        }
 
-    background:
-        linear-gradient(
-            145deg,
-            rgba(30,26,39,.92),
-            rgba(14,12,20,.92)
-        );
+        /* ==========================================
+           BOTÃO CADASTRAR
+        ========================================== */
 
-    cursor: pointer;
+        .submit {
+            position: relative;
 
-    transition: .25s ease;
-}
+            width: 100%;
+            height: 39px;
 
-.type:hover {
-    transform: translateY(-2px);
+            margin-top: 13px;
 
-    border-color: rgba(130,71,229,.35);
-}
+            border: 0;
+            border-radius: 9px;
 
-.types input:checked + .type {
-    border-color: var(--purple);
+            background: linear-gradient(
+                110deg,
+                #6d35c4,
+                #8247e5,
+                #9a68f0
+            );
 
-    background:
-        linear-gradient(
-            145deg,
-            rgba(130,71,229,.15),
-            rgba(74,36,128,.09)
-        );
+            color: white;
 
-    box-shadow:
-        0 0 0 1px rgba(130,71,229,.08);
-}
+            font-family: 'Nunito', sans-serif;
+            font-size: 10px;
+            font-weight: 900;
+            letter-spacing: .5px;
 
-.type-icon {
-    flex-shrink: 0;
+            cursor: pointer;
 
-    width: 43px;
-    height: 43px;
+            box-shadow: 0 12px 28px rgba(74,36,128,.3);
 
-    display: flex;
+            transition: .25s ease;
+        }
 
-    align-items: center;
-    justify-content: center;
+        .submit:hover {
+            transform: translateY(-2px);
 
-    border-radius: 12px;
+            box-shadow: 0 16px 32px rgba(74,36,128,.42);
+        }
 
-    background: rgba(130,71,229,.10);
+        /* ==========================================
+           MENSAGEM DE ERRO
+        ========================================== */
 
-    border: 1px solid rgba(130,71,229,.17);
+        .error-box {
+            display: flex;
+            align-items: center;
+            gap: 8px;
 
-    color: var(--purple-light);
+            margin-bottom: 14px;
+            padding: 11px 13px;
 
-    font-size: 18px;
-}
+            border-radius: 10px;
 
-.types input:checked + .type .type-icon {
-    background: var(--purple);
+            border: 1px solid rgba(248,113,113,.18);
+            background: rgba(127,29,29,.13);
 
-    color: white;
+            color: #fca5a5;
 
-    border-color: var(--purple);
-}
+            font-size: 10px;
+            font-weight: 700;
+        }
 
-.type-name {
-    display: block;
+        /* ==========================================
+           LOGIN
+        ========================================== */
 
-    margin-bottom: 3px;
+        .login-link {
+            margin-top: 8px;
 
-    color: white;
+            text-align: center;
 
-    font-size: 13px;
+            color: #716a7b;
+            font-size: 9px;
+            font-weight: 600;
+        }
 
-    font-weight: 900;
-}
+        .login-link a {
+            color: var(--purple-light);
+            text-decoration: none;
+            font-weight: 900;
+            transition: .2s ease;
+        }
 
-.type-description {
-    display: block;
+        .login-link a:hover {
+            color: white;
+        }
 
-    color: #847d8e;
+        /* ==========================================
+           RODAPÉ
+        ========================================== */
 
-    font-size: 10px;
+        .footer-note {
+            margin-top: 7px;
 
-    line-height: 1.35;
+            text-align: center;
 
-    font-weight: 600;
-}
+            color: #5f5869;
 
+            font-size: 7px;
+            font-weight: 700;
+            letter-spacing: .5px;
+        }
 
-.divider {
-    height: 1px;
+        /* ==========================================
+           TELAS BAIXAS
+        ========================================== */
 
-    margin: 0 0 27px;
+        @media (min-width: 701px) and (max-height: 950px) {
 
-    background:
-        linear-gradient(
-            90deg,
-            transparent,
-            rgba(255,255,255,.07),
-            transparent
-        );
-}
+            .topbar {
+                padding: 8px 0;
+            }
 
+            .intro {
+                margin-bottom: 9px;
+            }
 
-.grid {
-    display: grid;
+            .form-card {
+                padding: 13px 20px;
+            }
 
-    grid-template-columns:
-        repeat(2, minmax(0,1fr));
+            .types {
+                margin-bottom: 10px;
+            }
 
-    gap: 15px 14px;
-}
+            .type {
+                min-height: 54px;
+            }
 
-.full {
-    grid-column: 1 / -1;
-}
+            .divider {
+                margin-bottom: 10px;
+            }
 
+            .grid {
+                gap: 7px 12px;
+            }
 
-.field label {
-    display: block;
+            .section-heading {
+                margin-bottom: 6px;
+            }
 
-    margin-bottom: 6px;
+            .section-heading[style] {
+                margin-top: 12px !important;
+            }
 
-    color: #cfc8da;
+            .submit {
+                margin-top: 10px;
+                height: 36px;
+            }
 
-    font-size: 9px;
+            .login-link {
+                margin-top: 6px;
+            }
 
-    font-weight: 900;
+            .footer-note {
+                margin-top: 5px;
+            }
+        }
 
-    letter-spacing: .6px;
+        /* ==========================================
+           RESPONSIVIDADE
+        ========================================== */
 
-    text-transform: uppercase;
-}
+        @media (max-width: 700px) {
 
-.input-wrap {
-    position: relative;
-}
+            html,
+            body {
+                height: auto;
+                min-height: 100%;
+                overflow-y: auto;
+            }
 
-.input-wrap i {
-    position: absolute;
+            body {
+                background-attachment: scroll;
+            }
 
-    left: 14px;
-    top: 50%;
+            .topbar {
+                width: calc(100% - 28px);
+                padding: 12px 0;
+            }
 
-    transform: translateY(-50%);
+            .back-button {
+                height: 37px;
+                padding: 0 14px;
+            }
 
-    color: #756c81;
+            .page {
+                width: calc(100% - 20px);
+                margin: 8px auto 20px;
+            }
 
-    font-size: 13px;
+            .form-card {
+                padding: 18px 14px;
+                border-radius: 18px;
+            }
 
-    pointer-events: none;
+            .grid {
+                grid-template-columns: 1fr;
+            }
 
-    transition: .2s ease;
-}
+            .full {
+                grid-column: auto;
+            }
 
-input,
-select {
-    width: 100%;
+            .types {
+                grid-template-columns: 1fr;
+                gap: 9px;
+            }
 
-    height: 45px;
+            .type {
+                min-height: 58px;
+            }
 
-    padding: 0 14px 0 39px;
+            h1 {
+                font-size: 42px;
+            }
 
-    border: 1px solid rgba(255,255,255,.07);
+            .intro {
+                margin-bottom: 22px;
+            }
 
-    border-radius: 10px;
+            .intro p {
+                font-size: 11px;
+            }
+        }
 
-    outline: none;
+        @media (max-width: 420px) {
 
-    background: var(--input);
+            .form-card {
+                padding: 19px 14px;
+            }
 
-    color: white;
+            h1 {
+                font-size: 40px;
+            }
 
-    font-family: 'Nunito', sans-serif;
+            input,
+            select {
+                height: 40px;
+            }
 
-    font-size: 11px;
+        }
 
-    font-weight: 600;
-
-    transition: .2s ease;
-}
-
-input::placeholder {
-    color: #5e5669;
-}
-
-input:hover,
-select:hover {
-    border-color: rgba(130,71,229,.28);
-}
-
-input:focus,
-select:focus {
-    border-color: var(--purple);
-
-    box-shadow:
-        0 0 0 2px
-        rgba(130,71,229,.07);
-}
-
-.input-wrap:focus-within i {
-    color: var(--purple-light);
-}
-
-select {
-    appearance: none;
-
-    cursor: pointer;
-
-    padding-right: 35px;
-
-    background-image:
-        linear-gradient(
-            45deg,
-            transparent 50%,
-            #837b90 50%
-        ),
-        linear-gradient(
-            135deg,
-            #837b90 50%,
-            transparent 50%
-        );
-
-    background-position:
-        calc(100% - 17px) 19px,
-        calc(100% - 12px) 19px;
-
-    background-size: 5px 5px;
-
-    background-repeat: no-repeat;
-}
-
-select option {
-    background: #15111d;
-
-    color: white;
-}
-
-
-/* COMERCIAL */
-
-.comercial {
-    display: none;
-
-    margin-top: 23px;
-
-    padding: 18px;
-
-    border-radius: 15px;
-
-    border: 1px solid rgba(130,71,229,.18);
-
-    background:
-        linear-gradient(
-            145deg,
-            rgba(130,71,229,.06),
-            rgba(12,10,17,.5)
-        );
-
-    animation: aparecer .3s ease;
-}
-
-@keyframes aparecer {
-    from {
-        opacity: 0;
-
-        transform: translateY(-5px);
-    }
-
-    to {
-        opacity: 1;
-
-        transform: translateY(0);
-    }
-}
-
-.comercial-header {
-    display: flex;
-
-    align-items: center;
-
-    gap: 10px;
-
-    margin-bottom: 17px;
-}
-
-.comercial-icon {
-    width: 35px;
-    height: 35px;
-
-    display: flex;
-
-    align-items: center;
-    justify-content: center;
-
-    border-radius: 10px;
-
-    background: rgba(130,71,229,.11);
-
-    color: var(--purple-light);
-
-    font-size: 15px;
-}
-
-.comercial-header strong {
-    display: block;
-
-    color: white;
-
-    font-size: 12px;
-
-    font-weight: 900;
-}
-
-.comercial-header span {
-    display: block;
-
-    margin-top: 2px;
-
-    color: #776f80;
-
-    font-size: 9px;
-
-    font-weight: 600;
-}
-
-
-/* BOTÃO */
-
-.submit {
-    position: relative;
-
-    width: 100%;
-
-    height: 49px;
-
-    margin-top: 25px;
-
-    border: 0;
-
-    border-radius: 11px;
-
-    background:
-        linear-gradient(
-            110deg,
-            #6d35c4,
-            #8247e5,
-            #9a68f0
-        );
-
-    color: white;
-
-    font-family: 'Nunito', sans-serif;
-
-    font-size: 11px;
-
-    font-weight: 900;
-
-    letter-spacing: .5px;
-
-    cursor: pointer;
-
-    box-shadow:
-        0 12px 28px
-        rgba(74,36,128,.3);
-
-    transition: .25s ease;
-}
-
-.submit:hover {
-    transform: translateY(-2px);
-
-    box-shadow:
-        0 16px 32px
-        rgba(74,36,128,.42);
-}
-
-.submit i {
-    margin-left: 5px;
-
-    transition: .2s ease;
-}
-
-.submit:hover i {
-    transform: translateX(3px);
-}
-
-
-/* ERRO */
-
-.error-box {
-    display: flex;
-
-    align-items: center;
-
-    gap: 8px;
-
-    margin-bottom: 18px;
-
-    padding: 11px 13px;
-
-    border-radius: 10px;
-
-    border: 1px solid rgba(248,113,113,.18);
-
-    background: rgba(127,29,29,.13);
-
-    color: #fca5a5;
-
-    font-size: 10px;
-
-    font-weight: 700;
-}
-
-
-/* LOGIN */
-
-.login-link {
-    margin-top: 17px;
-
-    text-align: center;
-
-    color: #716a7b;
-
-    font-size: 10px;
-
-    font-weight: 600;
-}
-
-.login-link a {
-    color: var(--purple-light);
-
-    text-decoration: none;
-
-    font-weight: 900;
-}
-
-.login-link a:hover {
-    color: white;
-}
-
-
-/* RODAPÉ */
-
-.footer-note {
-    margin-top: 20px;
-
-    text-align: center;
-
-    color: #5f5869;
-
-    font-size: 8px;
-
-    font-weight: 700;
-
-    letter-spacing: .5px;
-}
-
-
-/* RESPONSIVO */
-
-@media (max-width: 700px) {
-
-    .topbar {
-        width: calc(100% - 28px);
-
-        padding: 17px 0;
-    }
-
-    .page {
-        width: calc(100% - 20px);
-
-        margin-top: 8px;
-    }
-
-    .form-card {
-        padding: 21px 17px;
-
-        border-radius: 18px;
-    }
-
-    .grid {
-        grid-template-columns: 1fr;
-    }
-
-    .full {
-        grid-column: auto;
-    }
-
-    .types {
-        grid-template-columns: 1fr;
-
-        gap: 9px;
-    }
-
-    .type {
-        min-height: 78px;
-    }
-
-    .intro {
-        margin-bottom: 22px;
-    }
-
-    h1 {
-        font-size: 50px;
-    }
-}
-
-
-@media (max-width: 420px) {
-
-    .logo-text {
-        font-size: 16px;
-    }
-
-    .logo img {
-        width: 27px;
-        height: 27px;
-    }
-
-    .back-button {
-        padding: 7px 10px;
-    }
-
-    .back-button span {
-        display: none;
-    }
-
-    h1 {
-        font-size: 46px;
-    }
-
-    .intro p {
-        font-size: 11px;
-    }
-
-    .form-card {
-        padding: 19px 14px;
-    }
-
-    input,
-    select {
-        height: 43px;
-    }
-}
-
-/* ==========================================
-   AJUSTES VISUAIS: FORMULÁRIO MAIS COMPACTO
-========================================== */
-
-html {
-    height: 100%;
-    overflow-x: hidden;
-}
-
-body {
-    min-height: 100vh;
-    overflow-x: hidden;
-}
-
-.topbar {
-    width: min(1100px, calc(100% - 40px));
-    padding: 8px 0;
-}
-
-.page {
-    width: min(900px, calc(100% - 32px));
-    margin: 0 auto 10px;
-}
-
-.intro {
-    margin: 0 auto 12px;
-}
-
-.intro-small {
-    margin-bottom: 5px;
-    font-size: 8px;
-}
-
-h1 {
-    font-size: clamp(36px, 4vw, 48px);
-    line-height: .95;
-}
-
-.intro p {
-    margin-top: 5px;
-    font-size: 11px;
-}
-
-.form-card {
-    padding: 16px 22px;
-    border-radius: 16px;
-    background: rgba(12, 9, 23, .70);
-    backdrop-filter: blur(9px);
-    -webkit-backdrop-filter: blur(9px);
-    box-shadow:
-        0 15px 40px rgba(0, 0, 0, .25),
-        0 0 25px rgba(130, 71, 229, .08);
-}
-
-.section-heading {
-    margin-bottom: 8px;
-}
-
-.section-heading h2 {
-    font-size: 23px;
-}
-
-.section-label {
-    font-size: 8px;
-}
-
-.type-title {
-    margin-bottom: 7px;
-    font-size: 10px;
-}
-
-.types {
-    gap: 10px;
-    margin-bottom: 13px;
-}
-
-.type {
-    min-height: 58px;
-    padding: 10px 12px;
-    gap: 10px;
-    border-radius: 12px;
-}
-
-.type-icon {
-    width: 35px;
-    height: 35px;
-    border-radius: 10px;
-    font-size: 15px;
-}
-
-.type-name {
-    font-size: 11px;
-    margin-bottom: 2px;
-}
-
-.type-description {
-    font-size: 9px;
-}
-
-.divider {
-    margin-bottom: 13px;
-}
-
-.grid {
-    gap: 8px 12px;
-}
-
-.field label {
-    margin-bottom: 4px;
-    font-size: 8px;
-}
-
-input,
-select {
-    height: 38px;
-    padding-left: 34px;
-    border-radius: 8px;
-    font-size: 10px;
-}
-
-.input-wrap i {
-    left: 12px;
-    font-size: 12px;
-}
-
-.comercial {
-    margin-top: 14px;
-    padding: 13px;
-    border-radius: 12px;
-}
-
-.comercial-header {
-    margin-bottom: 10px;
-}
-
-.comercial-icon {
-    width: 30px;
-    height: 30px;
-}
-
-.section-heading[style] {
-    margin-top: 15px !important;
-}
-
-.submit {
-    height: 39px;
-    margin-top: 13px;
-    border-radius: 9px;
-    font-size: 10px;
-}
-
-.login-link {
-    margin-top: 8px;
-    font-size: 9px;
-}
-
-.footer-note {
-    margin-top: 7px;
-    font-size: 7px;
-}
-
-/* Em telas baixas, compacta um pouco mais */
-@media (min-width: 701px) and (max-height: 950px) {
-    .topbar {
-        padding: 6px 0;
-    }
-
-    .intro {
-        margin-bottom: 9px;
-    }
-
-    .form-card {
-        padding: 13px 20px;
-    }
-
-    .types {
-        margin-bottom: 10px;
-    }
-
-    .type {
-        min-height: 54px;
-    }
-
-    .divider {
-        margin-bottom: 10px;
-    }
-
-    .grid {
-        gap: 7px 12px;
-    }
-
-    .section-heading {
-        margin-bottom: 6px;
-    }
-
-    .section-heading[style] {
-        margin-top: 12px !important;
-    }
-
-    .submit {
-        margin-top: 10px;
-        height: 36px;
-    }
-
-    .login-link {
-        margin-top: 6px;
-    }
-
-    .footer-note {
-        margin-top: 5px;
-    }
-}
-
-/* Celulares: permite rolar se os campos não couberem */
-@media (max-width: 700px) {
-    html,
-    body {
-        height: auto;
-        min-height: 100%;
-        overflow-y: auto;
-    }
-
-    body {
-        background-attachment: scroll;
-    }
-
-    .topbar {
-        width: calc(100% - 28px);
-        padding: 12px 0;
-    }
-
-    .page {
-        width: calc(100% - 20px);
-        margin: 8px auto 20px;
-    }
-
-    .form-card {
-        padding: 18px 14px;
-    }
-
-    .grid {
-        grid-template-columns: 1fr;
-    }
-
-    .full {
-        grid-column: auto;
-    }
-
-    .types {
-        grid-template-columns: 1fr;
-    }
-
-    h1 {
-        font-size: 42px;
-    }
-}
-
-</style>
+    </style>
 
 </head>
 
-
 <body>
 
+    <!-- CABEÇALHO SOMENTE COM BOTÃO VOLTAR -->
 
-<div class="background-glow glow-one"></div>
-<div class="background-glow glow-two"></div>
+    <header class="topbar">
 
-
-<header class="topbar">
-
-    <a
-        href="../../home.html"
-        class="logo"
-    >
-
-        <img
-            src="../../fotos/icone uva sem fundo.png"
-            alt="GRAPE"
+        <a
+            href="../../public/pages/home.html"
+            class="back-button"
         >
+            <i class="bi bi-arrow-left"></i>
+            <span>Voltar</span>
+        </a>
 
-        <div class="logo-text">
-            GRAPE<span>Dev</span>
-        </div>
-
-    </a>
-
-
-    <a
-        href="../../home.html"
-        class="back-button"
-    >
-
-        <i class="bi bi-arrow-left"></i>
-
-        <span>Voltar</span>
-
-    </a>
-
-</header>
+    </header>
 
 
-<main class="page">
+    <main class="page">
+
+        <!-- APRESENTAÇÃO -->
+
+        <section class="intro">
+
+            <div class="intro-small">
+                GRAPE ACCOUNT
+            </div>
+
+            <h1>
+                CRIE SUA <span>CONTA.</span>
+            </h1>
+
+            <p>
+                Entre para o ecossistema GRAPE e configure
+                sua experiência de acordo com o seu ambiente.
+            </p>
+
+        </section>
 
 
-    <section class="intro">
+        <!-- FORMULÁRIO -->
 
-        <div class="intro-small">
-            GRAPE ACCOUNT
-        </div>
+        <section class="form-card">
 
-        <h1>
-            CRIE SUA <span>CONTA.</span>
-        </h1>
+            <?php if ($erro !== ''): ?>
 
-        <p>
-            Entre para o ecossistema GRAPE e configure
-            sua experiência de acordo com o seu ambiente.
-        </p>
+                <div class="error-box">
 
-    </section>
+                    <i class="bi bi-exclamation-circle"></i>
+
+                    <span>
+                        <?= htmlspecialchars(
+                            $erro,
+                            ENT_QUOTES,
+                            'UTF-8'
+                        ) ?>
+                    </span>
+
+                </div>
+
+            <?php endif; ?>
 
 
-    <section class="form-card">
+            <form method="POST" autocomplete="on">
 
-
-        <?php if ($erro !== ''): ?>
-
-            <div class="error-box">
-
-                <i class="bi bi-exclamation-circle"></i>
-
-                <span>
-                    <?= htmlspecialchars(
-                        $erro,
+                <input
+                    type="hidden"
+                    name="redirect"
+                    value="<?= htmlspecialchars(
+                        $redirect,
                         ENT_QUOTES,
                         'UTF-8'
-                    ) ?>
-                </span>
-
-            </div>
-
-        <?php endif; ?>
+                    ) ?>"
+                >
 
 
-        <form
-            method="POST"
-            autocomplete="on"
-        >
+                <!-- TIPO DE AMBIENTE -->
 
+                <div class="section-heading">
 
-            <input
-                type="hidden"
-                name="redirect"
-                value="<?= htmlspecialchars(
-                    $redirect,
-                    ENT_QUOTES,
-                    'UTF-8'
-                ) ?>"
-            >
+                    <div class="section-label">
+                        PRIMEIRO PASSO
+                    </div>
 
+                    <h2>
+                        SELECIONE SEU AMBIENTE
+                    </h2>
 
-            <div class="section-heading">
-
-                <div class="section-label">
-                    PRIMEIRO PASSO
                 </div>
 
-                <h2>
-                    SELECIONE SEU AMBIENTE
-                </h2>
 
-            </div>
-
-
-            <div class="type-title">
-                Como você pretende utilizar o GRAPE?
-            </div>
+                <div class="type-title">
+                    Como você pretende utilizar o GRAPE?
+                </div>
 
 
-            <div class="types">
+                <div class="types">
 
+                    <label>
 
-                <label>
+                        <input
+                            type="radio"
+                            name="tipo_usuario"
+                            value="residencial"
+                            <?= $tipo_usuario === 'residencial' ? 'checked' : '' ?>
+                            required
+                        >
 
-                    <input
-                        type="radio"
-                        name="tipo_usuario"
-                        value="residencial"
+                        <span class="type">
 
-                        <?= $tipo_usuario === 'residencial'
-                            ? 'checked'
-                            : '' ?>
-
-                        required
-                    >
-
-                    <span class="type">
-
-                        <span class="type-icon">
-                            <i class="bi bi-house-door-fill"></i>
-                        </span>
-
-                        <span class="type-content">
-
-                            <span class="type-name">
-                                Residencial
+                            <span class="type-icon">
+                                <i class="bi bi-house-door-fill"></i>
                             </span>
 
-                            <span class="type-description">
-                                Casa, apartamento ou
-                                residência.
+                            <span class="type-content">
+
+                                <span class="type-name">
+                                    Residencial
+                                </span>
+
+                                <span class="type-description">
+                                    Casa, apartamento ou residência.
+                                </span>
+
                             </span>
 
                         </span>
 
-                    </span>
-
-                </label>
+                    </label>
 
 
-                <label>
+                    <label>
 
-                    <input
-                        type="radio"
-                        name="tipo_usuario"
-                        value="comercial"
+                        <input
+                            type="radio"
+                            name="tipo_usuario"
+                            value="comercial"
+                            <?= $tipo_usuario === 'comercial' ? 'checked' : '' ?>
+                            required
+                        >
 
-                        <?= $tipo_usuario === 'comercial'
-                            ? 'checked'
-                            : '' ?>
+                        <span class="type">
 
-                        required
-                    >
-
-                    <span class="type">
-
-                        <span class="type-icon">
-                            <i class="bi bi-building-fill"></i>
-                        </span>
-
-                        <span class="type-content">
-
-                            <span class="type-name">
-                                Comercial / Indústria
+                            <span class="type-icon">
+                                <i class="bi bi-building-fill"></i>
                             </span>
 
-                            <span class="type-description">
-                                Empresa, escola, indústria
-                                ou estabelecimento.
+                            <span class="type-content">
+
+                                <span class="type-name">
+                                    Comercial / Indústria
+                                </span>
+
+                                <span class="type-description">
+                                    Empresa, escola, indústria ou estabelecimento.
+                                </span>
+
                             </span>
 
                         </span>
 
-                    </span>
-
-                </label>
-
-
-            </div>
-
-
-            <div class="divider"></div>
-
-
-            <div class="section-heading">
-
-                <div class="section-label">
-                    SEGUNDO PASSO
-                </div>
-
-                <h2>
-                    SEUS DADOS
-                </h2>
-
-            </div>
-
-
-            <div class="grid">
-
-
-                <div class="field">
-
-                    <label for="nome">
-                        Nome
                     </label>
 
-                    <div class="input-wrap">
-
-                        <i class="bi bi-person"></i>
-
-                        <input
-                            id="nome"
-                            name="nome"
-                            type="text"
-                            autocomplete="name"
-                            placeholder="Seu nome"
-                            required
-
-                            value="<?= htmlspecialchars(
-                                $nome,
-                                ENT_QUOTES,
-                                'UTF-8'
-                            ) ?>"
-                        >
-
-                    </div>
-
                 </div>
 
 
-                <div class="field">
+                <div class="divider"></div>
 
-                    <label for="email">
-                        E-mail
-                    </label>
 
-                    <div class="input-wrap">
+                <!-- DADOS PESSOAIS -->
 
-                        <i class="bi bi-envelope"></i>
+                <div class="section-heading">
 
-                        <input
-                            id="email"
-                            name="email"
-                            type="email"
-                            autocomplete="email"
-                            placeholder="seu@email.com"
-                            required
-
-                            value="<?= htmlspecialchars(
-                                $email,
-                                ENT_QUOTES,
-                                'UTF-8'
-                            ) ?>"
-                        >
-
+                    <div class="section-label">
+                        SEGUNDO PASSO
                     </div>
 
-                </div>
-
-
-                <div class="field">
-
-                    <label for="senha">
-                        Senha
-                    </label>
-
-                    <div class="input-wrap">
-
-                        <i class="bi bi-lock"></i>
-
-                        <input
-                            id="senha"
-                            name="senha"
-                            type="password"
-                            autocomplete="new-password"
-                            placeholder="Mínimo de 6 caracteres"
-                            minlength="6"
-                            required
-                        >
-
-                    </div>
-
-                </div>
-
-
-                <div class="field">
-
-                    <label for="telefone">
-                        Telefone
-                    </label>
-
-                    <div class="input-wrap">
-
-                        <i class="bi bi-telephone"></i>
-
-                        <input
-                            id="telefone"
-                            name="telefone"
-                            type="tel"
-                            autocomplete="tel"
-                            placeholder="(00) 00000-0000"
-                            required
-
-                            value="<?= htmlspecialchars(
-                                $telefone,
-                                ENT_QUOTES,
-                                'UTF-8'
-                            ) ?>"
-                        >
-
-                    </div>
-
-                </div>
-
-
-            </div>
-
-
-            <div
-                id="comercialBox"
-                class="comercial"
-            >
-
-                <div class="comercial-header">
-
-                    <div class="comercial-icon">
-
-                        <i class="bi bi-buildings-fill"></i>
-
-                    </div>
-
-                    <div>
-
-                        <strong>
-                            Dados do estabelecimento
-                        </strong>
-
-                        <span>
-                            Essas informações serão utilizadas
-                            para configurar seu ambiente.
-                        </span>
-
-                    </div>
+                    <h2>
+                        SEUS DADOS
+                    </h2>
 
                 </div>
 
 
                 <div class="grid">
 
-
                     <div class="field">
 
-                        <label for="empresa">
-                            Empresa
-                        </label>
+                        <label for="nome">Nome</label>
 
                         <div class="input-wrap">
 
-                            <i class="bi bi-building"></i>
+                            <i class="bi bi-person"></i>
 
                             <input
-                                id="empresa"
-                                name="empresa"
+                                id="nome"
+                                name="nome"
                                 type="text"
-                                placeholder="Nome da empresa"
-
-                                value="<?= htmlspecialchars(
-                                    $empresa,
-                                    ENT_QUOTES,
-                                    'UTF-8'
-                                ) ?>"
+                                autocomplete="name"
+                                placeholder="Seu nome"
+                                required
+                                value="<?= htmlspecialchars($nome, ENT_QUOTES, 'UTF-8') ?>"
                             >
 
                         </div>
@@ -1839,527 +1248,536 @@ select {
 
                     <div class="field">
 
-                        <label for="tipo_estabelecimento">
-                            Tipo de estabelecimento
-                        </label>
+                        <label for="email">E-mail</label>
 
                         <div class="input-wrap">
 
-                            <i class="bi bi-diagram-3"></i>
+                            <i class="bi bi-envelope"></i>
 
-                            <select
-                                id="tipo_estabelecimento"
-                                name="tipo_estabelecimento"
+                            <input
+                                id="email"
+                                name="email"
+                                type="email"
+                                autocomplete="email"
+                                placeholder="seu@email.com"
+                                required
+                                value="<?= htmlspecialchars($email, ENT_QUOTES, 'UTF-8') ?>"
                             >
-
-                                <option value="">
-                                    Selecione
-                                </option>
-
-                                <option
-                                    value="Industria"
-
-                                    <?= $tipo_estabelecimento === 'Industria'
-                                        ? 'selected'
-                                        : '' ?>
-                                >
-                                    Indústria
-                                </option>
-
-                                <option
-                                    value="Escola"
-
-                                    <?= $tipo_estabelecimento === 'Escola'
-                                        ? 'selected'
-                                        : '' ?>
-                                >
-                                    Escola
-                                </option>
-
-                                <option
-                                    value="Fazenda"
-
-                                    <?= $tipo_estabelecimento === 'Fazenda'
-                                        ? 'selected'
-                                        : '' ?>
-                                >
-                                    Fazenda
-                                </option>
-
-                                <option
-                                    value="Empresa"
-
-                                    <?= $tipo_estabelecimento === 'Empresa'
-                                        ? 'selected'
-                                        : '' ?>
-                                >
-                                    Empresa
-                                </option>
-
-                            </select>
 
                         </div>
 
                     </div>
 
 
+                    <div class="field">
+
+                        <label for="senha">Senha</label>
+
+                        <div class="input-wrap">
+
+                            <i class="bi bi-lock"></i>
+
+                            <input
+                                id="senha"
+                                name="senha"
+                                type="password"
+                                autocomplete="new-password"
+                                placeholder="Mínimo de 6 caracteres"
+                                minlength="6"
+                                required
+                            >
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="field">
+
+                        <label for="telefone">Telefone</label>
+
+                        <div class="input-wrap">
+
+                            <i class="bi bi-telephone"></i>
+
+                            <input
+                                id="telefone"
+                                name="telefone"
+                                type="tel"
+                                autocomplete="tel"
+                                placeholder="(00) 00000-0000"
+                                required
+                                value="<?= htmlspecialchars($telefone, ENT_QUOTES, 'UTF-8') ?>"
+                            >
+
+                        </div>
+
+                    </div>
+
                 </div>
+
+
+                <!-- DADOS COMERCIAIS -->
+
+                <div
+                    id="comercialBox"
+                    class="comercial"
+                >
+
+                    <div class="comercial-header">
+
+                        <div class="comercial-icon">
+                            <i class="bi bi-buildings-fill"></i>
+                        </div>
+
+                        <div>
+
+                            <strong>
+                                Dados do estabelecimento
+                            </strong>
+
+                            <span>
+                                Essas informações serão utilizadas
+                                para configurar seu ambiente.
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="grid">
+
+                        <div class="field">
+
+                            <label for="empresa">
+                                Empresa
+                            </label>
+
+                            <div class="input-wrap">
+
+                                <i class="bi bi-building"></i>
+
+                                <input
+                                    id="empresa"
+                                    name="empresa"
+                                    type="text"
+                                    placeholder="Nome da empresa"
+                                    value="<?= htmlspecialchars($empresa, ENT_QUOTES, 'UTF-8') ?>"
+                                >
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="field">
+
+                            <label for="tipo_estabelecimento">
+                                Tipo de estabelecimento
+                            </label>
+
+                            <div class="input-wrap">
+
+                                <i class="bi bi-diagram-3"></i>
+
+                                <select
+                                    id="tipo_estabelecimento"
+                                    name="tipo_estabelecimento"
+                                >
+
+                                    <option value="">
+                                        Selecione
+                                    </option>
+
+                                    <option
+                                        value="Industria"
+                                        <?= $tipo_estabelecimento === 'Industria' ? 'selected' : '' ?>
+                                    >
+                                        Indústria
+                                    </option>
+
+                                    <option
+                                        value="Escola"
+                                        <?= $tipo_estabelecimento === 'Escola' ? 'selected' : '' ?>
+                                    >
+                                        Escola
+                                    </option>
+
+                                    <option
+                                        value="Fazenda"
+                                        <?= $tipo_estabelecimento === 'Fazenda' ? 'selected' : '' ?>
+                                    >
+                                        Fazenda
+                                    </option>
+
+                                    <option
+                                        value="Empresa"
+                                        <?= $tipo_estabelecimento === 'Empresa' ? 'selected' : '' ?>
+                                    >
+                                        Empresa
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- ENDEREÇO -->
+
+                <div
+                    class="section-heading"
+                    style="margin-top: 15px;"
+                >
+
+                    <div class="section-label">
+                        ENDEREÇO
+                    </div>
+
+                    <h2>
+                        LOCALIZAÇÃO
+                    </h2>
+
+                </div>
+
+
+                <div class="grid">
+
+                    <div class="field">
+
+                        <label for="cep">CEP</label>
+
+                        <div class="input-wrap">
+
+                            <i class="bi bi-geo-alt"></i>
+
+                            <input
+                                id="cep"
+                                name="cep"
+                                type="text"
+                                inputmode="numeric"
+                                autocomplete="postal-code"
+                                maxlength="9"
+                                placeholder="00000-000"
+                                required
+                                value="<?= htmlspecialchars($cep, ENT_QUOTES, 'UTF-8') ?>"
+                            >
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="field">
+
+                        <label for="cidade">Cidade</label>
+
+                        <div class="input-wrap">
+
+                            <i class="bi bi-pin-map"></i>
+
+                            <input
+                                id="cidade"
+                                name="cidade"
+                                type="text"
+                                autocomplete="address-level2"
+                                placeholder="Sua cidade"
+                                required
+                                value="<?= htmlspecialchars($cidade, ENT_QUOTES, 'UTF-8') ?>"
+                            >
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="field full">
+
+                        <label for="endereco">Endereço</label>
+
+                        <div class="input-wrap">
+
+                            <i class="bi bi-signpost-2"></i>
+
+                            <input
+                                id="endereco"
+                                name="endereco"
+                                type="text"
+                                autocomplete="street-address"
+                                placeholder="Rua, avenida..."
+                                required
+                                value="<?= htmlspecialchars($endereco, ENT_QUOTES, 'UTF-8') ?>"
+                            >
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="field">
+
+                        <label for="numero">Número</label>
+
+                        <div class="input-wrap">
+
+                            <i class="bi bi-hash"></i>
+
+                            <input
+                                id="numero"
+                                name="numero"
+                                type="text"
+                                placeholder="123"
+                                required
+                                value="<?= htmlspecialchars($numero, ENT_QUOTES, 'UTF-8') ?>"
+                            >
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="field">
+
+                        <label for="bairro">Bairro</label>
+
+                        <div class="input-wrap">
+
+                            <i class="bi bi-map"></i>
+
+                            <input
+                                id="bairro"
+                                name="bairro"
+                                type="text"
+                                autocomplete="address-level3"
+                                placeholder="Seu bairro"
+                                required
+                                value="<?= htmlspecialchars($bairro, ENT_QUOTES, 'UTF-8') ?>"
+                            >
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- BOTÃO -->
+
+                <button
+                    type="submit"
+                    class="submit"
+                >
+                    CRIAR MINHA CONTA
+                    <i class="bi bi-arrow-right"></i>
+                </button>
+
+
+            </form>
+
+
+            <!-- LOGIN -->
+
+            <div class="login-link">
+
+                Já possui uma conta?
+
+                <a href="login.php?redirect=<?= urlencode($redirect) ?>">
+                    Entrar
+                </a>
 
             </div>
 
+        </section>
 
-            <div
-                class="section-heading"
-                style="margin-top: 38px;"
-            >
 
-                <div class="section-label">
-                    ENDEREÇO
-                </div>
+        <!-- RODAPÉ -->
 
-                <h2>
-                    LOCALIZAÇÃO
-                </h2>
-
-            </div>
-
-
-            <div class="grid">
-
-
-                <div class="field">
-
-                    <label for="cep">
-                        CEP
-                    </label>
-
-                    <div class="input-wrap">
-
-                        <i class="bi bi-geo-alt"></i>
-
-                        <input
-                            id="cep"
-                            name="cep"
-                            type="text"
-                            inputmode="numeric"
-                            autocomplete="postal-code"
-                            maxlength="9"
-                            placeholder="00000-000"
-                            required
-
-                            value="<?= htmlspecialchars(
-                                $cep,
-                                ENT_QUOTES,
-                                'UTF-8'
-                            ) ?>"
-                        >
-
-                    </div>
-
-                </div>
-
-
-                <div class="field">
-
-                    <label for="cidade">
-                        Cidade
-                    </label>
-
-                    <div class="input-wrap">
-
-                        <i class="bi bi-pin-map"></i>
-
-                        <input
-                            id="cidade"
-                            name="cidade"
-                            type="text"
-                            autocomplete="address-level2"
-                            placeholder="Sua cidade"
-                            required
-
-                            value="<?= htmlspecialchars(
-                                $cidade,
-                                ENT_QUOTES,
-                                'UTF-8'
-                            ) ?>"
-                        >
-
-                    </div>
-
-                </div>
-
-
-                <div class="field full">
-
-                    <label for="endereco">
-                        Endereço
-                    </label>
-
-                    <div class="input-wrap">
-
-                        <i class="bi bi-signpost-2"></i>
-
-                        <input
-                            id="endereco"
-                            name="endereco"
-                            type="text"
-                            autocomplete="street-address"
-                            placeholder="Rua, avenida..."
-                            required
-
-                            value="<?= htmlspecialchars(
-                                $endereco,
-                                ENT_QUOTES,
-                                'UTF-8'
-                            ) ?>"
-                        >
-
-                    </div>
-
-                </div>
-
-
-                <div class="field">
-
-                    <label for="numero">
-                        Número
-                    </label>
-
-                    <div class="input-wrap">
-
-                        <i class="bi bi-hash"></i>
-
-                        <input
-                            id="numero"
-                            name="numero"
-                            type="text"
-                            placeholder="123"
-                            required
-
-                            value="<?= htmlspecialchars(
-                                $numero,
-                                ENT_QUOTES,
-                                'UTF-8'
-                            ) ?>"
-                        >
-
-                    </div>
-
-                </div>
-
-
-                <div class="field">
-
-                    <label for="bairro">
-                        Bairro
-                    </label>
-
-                    <div class="input-wrap">
-
-                        <i class="bi bi-map"></i>
-
-                        <input
-                            id="bairro"
-                            name="bairro"
-                            type="text"
-                            autocomplete="address-level3"
-                            placeholder="Seu bairro"
-                            required
-
-                            value="<?= htmlspecialchars(
-                                $bairro,
-                                ENT_QUOTES,
-                                'UTF-8'
-                            ) ?>"
-                        >
-
-                    </div>
-
-                </div>
-
-
-            </div>
-
-
-            <button
-                type="submit"
-                class="submit"
-            >
-
-                CRIAR MINHA CONTA
-
-            </button>
-
-
-        </form>
-
-
-        <div class="login-link">
-
-            Já possui uma conta?
-
-            <a
-                href="login.php?redirect=<?= urlencode($redirect) ?>"
-            >
-                Entrar
-            </a>
-
+        <div class="footer-note">
+            GRAPE DIGITAL STUDIO · CREATE THE FUTURE.
         </div>
 
-
-    </section>
-
-
-    <div class="footer-note">
-
-        GRAPE DIGITAL STUDIO · CREATE THE FUTURE.
-
-    </div>
+    </main>
 
 
-</main>
+    <script>
 
+        /* ==========================================
+           TIPO DE USUÁRIO
+        ========================================== */
 
-<script>
+        const tipoRadios = document.querySelectorAll(
+            'input[name="tipo_usuario"]'
+        );
 
+        const comercialBox = document.getElementById(
+            'comercialBox'
+        );
 
-/* =====================================================
-   TIPO DE USUÁRIO
-===================================================== */
+        const empresa = document.getElementById(
+            'empresa'
+        );
 
-const tipoRadios =
-    document.querySelectorAll(
-        'input[name="tipo_usuario"]'
-    );
-
-
-const comercialBox =
-    document.getElementById(
-        'comercialBox'
-    );
-
-
-const empresa =
-    document.getElementById(
-        'empresa'
-    );
-
-
-const estabelecimento =
-    document.getElementById(
-        'tipo_estabelecimento'
-    );
-
-
-function atualizarTipo() {
-
-    const selecionado =
-        document.querySelector(
-            'input[name="tipo_usuario"]:checked'
+        const estabelecimento = document.getElementById(
+            'tipo_estabelecimento'
         );
 
 
-    const comercial =
-        selecionado &&
-        selecionado.value === 'comercial';
+        function atualizarTipo() {
+
+            const selecionado = document.querySelector(
+                'input[name="tipo_usuario"]:checked'
+            );
+
+            const comercial = selecionado &&
+                selecionado.value === 'comercial';
+
+            comercialBox.style.display = comercial
+                ? 'block'
+                : 'none';
+
+            empresa.required = comercial;
+            estabelecimento.required = comercial;
+
+        }
 
 
-    comercialBox.style.display =
-        comercial
-            ? 'block'
-            : 'none';
+        tipoRadios.forEach(function(radio) {
+
+            radio.addEventListener(
+                'change',
+                atualizarTipo
+            );
+
+        });
 
 
-    empresa.required =
-        comercial;
+        atualizarTipo();
 
 
-    estabelecimento.required =
-        comercial;
+        /* ==========================================
+           CEP
+        ========================================== */
 
-}
-
-
-tipoRadios.forEach(
-    function(radio) {
-
-        radio.addEventListener(
-            'change',
-            atualizarTipo
-        );
-
-    }
-);
+        const cepInput = document.getElementById('cep');
 
 
-atualizarTipo();
+        cepInput.addEventListener('input', function() {
 
-
-/* =====================================================
-   CEP
-===================================================== */
-
-const cepInput =
-    document.getElementById(
-        'cep'
-    );
-
-
-cepInput.addEventListener(
-    'input',
-    function() {
-
-        let valor =
-            cepInput.value
+            let valor = cepInput.value
                 .replace(/\D/g, '')
                 .slice(0, 8);
 
+            if (valor.length > 5) {
 
-        if (valor.length > 5) {
+                valor =
+                    valor.substring(0, 5) +
+                    '-' +
+                    valor.substring(5);
 
-            valor =
-                valor.substring(0, 5)
-                + '-'
-                + valor.substring(5);
+            }
 
-        }
+            cepInput.value = valor;
 
-
-        cepInput.value =
-            valor;
-
-    }
-);
+        });
 
 
-cepInput.addEventListener(
-    'blur',
-    async function() {
+        cepInput.addEventListener('blur', async function() {
 
-        const cep =
-            cepInput.value
-                .replace(/\D/g, '');
+            const cep = cepInput.value.replace(/\D/g, '');
 
+            if (cep.length !== 8) {
+                return;
+            }
 
-        if (cep.length !== 8) {
-            return;
-        }
+            try {
 
-
-        try {
-
-            const resposta =
-                await fetch(
+                const resposta = await fetch(
                     'https://viacep.com.br/ws/' +
                     cep +
                     '/json/'
                 );
 
+                if (!resposta.ok) {
+                    return;
+                }
 
-            if (!resposta.ok) {
-                return;
+                const dados = await resposta.json();
+
+                if (dados.erro) {
+                    return;
+                }
+
+                document.getElementById('endereco').value =
+                    dados.logradouro || '';
+
+                document.getElementById('bairro').value =
+                    dados.bairro || '';
+
+                document.getElementById('cidade').value =
+                    dados.localidade || '';
+
+            } catch (erro) {
+
+                console.error(
+                    'Erro ao consultar CEP:',
+                    erro
+                );
+
             }
 
-
-            const dados =
-                await resposta.json();
+        });
 
 
-            if (dados.erro) {
-                return;
-            }
+        /* ==========================================
+           MÁSCARA DE TELEFONE
+        ========================================== */
+
+        const telefone = document.getElementById('telefone');
 
 
-            document.getElementById(
-                'endereco'
-            ).value =
-                dados.logradouro || '';
+        telefone.addEventListener('input', function() {
 
-
-            document.getElementById(
-                'bairro'
-            ).value =
-                dados.bairro || '';
-
-
-            document.getElementById(
-                'cidade'
-            ).value =
-                dados.localidade || '';
-
-        } catch (erro) {
-
-            console.error(
-                'Erro ao consultar CEP:',
-                erro
-            );
-
-        }
-
-    }
-);
-
-
-/* =====================================================
-   MÁSCARA TELEFONE
-===================================================== */
-
-const telefone =
-    document.getElementById(
-        'telefone'
-    );
-
-
-telefone.addEventListener(
-    'input',
-    function() {
-
-        let valor =
-            telefone.value
+            let valor = telefone.value
                 .replace(/\D/g, '')
                 .slice(0, 11);
 
+            if (valor.length <= 10) {
 
-        if (valor.length <= 10) {
-
-            valor =
-                valor.replace(
+                valor = valor.replace(
                     /^(\d{2})(\d)/,
                     '($1) $2'
                 );
 
-            valor =
-                valor.replace(
+                valor = valor.replace(
                     /(\d{4})(\d)/,
                     '$1-$2'
                 );
 
-        } else {
+            } else {
 
-            valor =
-                valor.replace(
+                valor = valor.replace(
                     /^(\d{2})(\d)/,
                     '($1) $2'
                 );
 
-            valor =
-                valor.replace(
+                valor = valor.replace(
                     /(\d{5})(\d)/,
                     '$1-$2'
                 );
 
-        }
+            }
 
+            telefone.value = valor;
 
-        telefone.value =
-            valor;
+        });
 
-    }
-);
-
-</script>
-
+    </script>
 
 </body>
-
 </html>

@@ -105,457 +105,6 @@
         }
 
         /* =========================
-           HEADER
-        ========================= */
-
-        .header {
-            position: fixed;
-
-            top: 0;
-            left: 0;
-
-            width: 100%;
-            height: 78px;
-
-            padding: 0 6%;
-
-            display: flex;
-
-            align-items: center;
-
-            justify-content: space-between;
-
-            z-index: 1000;
-
-            background: rgba(9, 7, 13, 0.72);
-
-            border-bottom:
-                1px solid rgba(255, 255, 255, 0.08);
-
-            backdrop-filter: blur(18px);
-            -webkit-backdrop-filter: blur(18px);
-        }
-
-        body.light .header {
-            background: rgba(255, 255, 255, 0.8);
-
-            border-bottom:
-                1px solid var(--border);
-        }
-
-        .logo {
-            display: flex;
-
-            align-items: center;
-
-            gap: 10px;
-
-            min-width: 160px;
-        }
-
-        .logo-grape {
-            width: 34px;
-            height: 34px;
-
-            object-fit: contain;
-
-            display: block;
-        }
-
-        .logo-text {
-            font-size: 20px;
-
-            font-weight: 900;
-
-            letter-spacing: -0.5px;
-        }
-
-        .logo-text span {
-            color: var(--purple);
-        }
-
-        .menu {
-            display: flex;
-
-            align-items: center;
-
-            justify-content: center;
-
-            gap: 30px;
-        }
-
-        .menu a {
-            position: relative;
-
-            font-size: 12px;
-
-            font-weight: 800;
-
-            text-transform: uppercase;
-
-            letter-spacing: 1px;
-
-            color: var(--text-soft);
-
-            transition: color 0.25s ease;
-        }
-
-        .menu a:hover,
-        .menu a.active {
-            color: var(--text);
-        }
-
-        .menu a::after {
-            content: "";
-
-            position: absolute;
-
-            left: 0;
-
-            bottom: -8px;
-
-            width: 0;
-
-            height: 2px;
-
-            border-radius: 10px;
-
-            background: var(--pet);
-
-            transition: width 0.25s ease;
-        }
-
-        .menu a:hover::after,
-        .menu a.active::after {
-            width: 100%;
-        }
-
-        .header-actions {
-            display: flex;
-
-            align-items: center;
-
-            justify-content: flex-end;
-
-            gap: 10px;
-
-            min-width: 160px;
-        }
-
-        .header-actions > button,
-        .login-button {
-            height: 40px;
-
-            display: flex;
-
-            align-items: center;
-
-            justify-content: center;
-
-            border: 1px solid var(--border);
-
-            background: var(--surface);
-
-            color: var(--text);
-
-            cursor: pointer;
-
-            transition:
-                transform 0.25s ease,
-                background 0.25s ease,
-                border-color 0.25s ease;
-        }
-
-        /* =========================
-           SEARCH
-        ========================= */
-
-        .search {
-            width: 40px !important;
-
-            min-width: 40px;
-
-            padding: 0 !important;
-
-            border-radius: 50%;
-        }
-
-        .search:hover {
-            background: var(--pet);
-
-            border-color: var(--pet);
-
-            transform: translateY(-2px);
-        }
-
-        /* =========================
-           LOGIN
-        ========================= */
-
-        .login-button {
-            width: auto !important;
-
-            padding: 0 18px;
-
-            border-radius: 30px;
-
-            font-size: 11px;
-
-            font-weight: 900;
-
-            text-transform: uppercase;
-
-            letter-spacing: 1px;
-        }
-
-        .login-button:hover {
-            background: var(--pet);
-
-            border-color: var(--pet);
-
-            transform: translateY(-2px);
-        }
-
-        /* =========================
-           TEMA
-        ========================= */
-
-        .theme-toggle {
-            width: 40px !important;
-            height: 40px !important;
-
-            min-width: 40px;
-
-            padding: 8px !important;
-
-            display: flex !important;
-
-            align-items: center;
-            justify-content: center;
-
-            border:
-                1px solid var(--border) !important;
-
-            border-radius: 50% !important;
-
-            background:
-                var(--surface) !important;
-
-            cursor: pointer;
-
-            overflow: hidden;
-
-            transition:
-                transform 0.25s ease,
-                background 0.25s ease,
-                border-color 0.25s ease,
-                box-shadow 0.25s ease;
-        }
-
-        .theme-toggle img {
-            width: 22px !important;
-            height: 22px !important;
-
-            max-width: 22px !important;
-            max-height: 22px !important;
-
-            object-fit: contain;
-
-            display: block;
-
-            transition:
-                transform 0.35s ease;
-        }
-
-        .theme-toggle:hover {
-            background:
-                var(--purple) !important;
-
-            border-color:
-                var(--purple) !important;
-
-            transform:
-                translateY(-2px) rotate(8deg);
-
-            box-shadow:
-                0 0 18px rgba(130, 71, 229, 0.35);
-        }
-
-        .theme-toggle:hover img {
-            transform:
-                scale(1.08) rotate(-8deg);
-        }
-
-        /* =========================
-           MENU MOBILE
-        ========================= */
-
-        .menu-mobile {
-            display: none !important;
-
-            width: 40px !important;
-
-            min-width: 40px;
-
-            padding: 0 !important;
-
-            border-radius: 50%;
-        }
-
-        .menu-mobile:hover {
-            background: var(--purple);
-
-            border-color: var(--purple);
-        }
-
-        /* =========================
-           SEARCH OVERLAY
-        ========================= */
-
-        .search-overlay {
-            position: fixed;
-
-            inset: 0;
-
-            z-index: 2000;
-
-            padding-top: 110px;
-
-            background:
-                rgba(4, 3, 7, 0.84);
-
-            backdrop-filter: blur(20px);
-
-            opacity: 0;
-
-            visibility: hidden;
-
-            transition: 0.3s ease;
-        }
-
-        .search-overlay.active {
-            opacity: 1;
-
-            visibility: visible;
-        }
-
-        body.light .search-overlay {
-            background:
-                rgba(247, 245, 250, 0.9);
-        }
-
-        .search-box {
-            width: min(700px, 90%);
-
-            margin: auto;
-
-            display: flex;
-
-            align-items: center;
-
-            gap: 15px;
-
-            padding: 16px 20px;
-
-            background:
-                var(--bg-secondary);
-
-            border:
-                1px solid var(--border);
-
-            border-radius: 18px;
-
-            box-shadow:
-                0 25px 80px var(--shadow);
-        }
-
-        .search-box > i {
-            color: var(--pet);
-
-            font-size: 20px;
-        }
-
-        .search-box input {
-            flex: 1;
-
-            border: none;
-
-            outline: none;
-
-            background: transparent;
-
-            color: var(--text);
-
-            font-size: 16px;
-        }
-
-        .search-box input::placeholder {
-            color: var(--text-soft);
-        }
-
-        .search-box button {
-            width: 35px;
-            height: 35px;
-
-            border: none;
-
-            background: transparent;
-
-            color: var(--text-soft);
-
-            cursor: pointer;
-
-            font-size: 18px;
-        }
-
-        .search-results {
-            width: min(700px, 90%);
-
-            margin: 15px auto 0;
-
-            display: grid;
-
-            gap: 10px;
-        }
-
-        .search-result {
-            display: flex;
-
-            flex-direction: column;
-
-            gap: 4px;
-
-            padding: 16px 20px;
-
-            border:
-                1px solid var(--border);
-
-            border-radius: 14px;
-
-            background:
-                var(--bg-secondary);
-
-            transition: 0.2s ease;
-        }
-
-        .search-result:hover {
-            border-color: var(--pet);
-
-            transform: translateX(4px);
-        }
-
-        .search-result strong {
-            color: var(--text);
-        }
-
-        .search-result span,
-        .search-empty {
-            color: var(--text-soft);
-
-            font-size: 13px;
-        }
-
-        /* =========================
            HERO
         ========================= */
 
@@ -1597,14 +1146,6 @@
 
         @media (max-width: 1000px) {
 
-            .menu {
-                gap: 16px;
-            }
-
-            .menu a {
-                font-size: 10px;
-            }
-
             .hero-container,
             .info-container {
                 grid-template-columns: 1fr;
@@ -1652,76 +1193,6 @@
         }
 
         @media (max-width: 760px) {
-
-            .header {
-                height: 70px;
-
-                padding: 0 5%;
-            }
-
-            .menu {
-                position: fixed;
-
-                top: 70px;
-
-                left: 5%;
-                right: 5%;
-
-                padding: 25px;
-
-                flex-direction: column;
-
-                align-items: stretch;
-
-                gap: 20px;
-
-                border:
-                    1px solid var(--border);
-
-                border-radius: 18px;
-
-                background:
-                    var(--bg-secondary);
-
-                box-shadow:
-                    0 25px 60px var(--shadow);
-
-                opacity: 0;
-
-                visibility: hidden;
-
-                transform:
-                    translateY(-10px);
-
-                transition: 0.25s ease;
-            }
-
-            .menu.active {
-                opacity: 1;
-
-                visibility: visible;
-
-                transform:
-                    translateY(0);
-            }
-
-            .menu a {
-                font-size: 12px;
-
-                padding: 4px 0;
-            }
-
-            .menu-mobile {
-                display: flex !important;
-            }
-
-            .header-actions {
-                min-width: auto;
-            }
-
-            .login-button {
-                display: none !important;
-            }
 
             .hero {
                 padding:
@@ -1804,33 +1275,6 @@
 
         @media (max-width: 480px) {
 
-            .logo-text {
-                font-size: 17px;
-            }
-
-            .logo-grape {
-                width: 30px;
-                height: 30px;
-            }
-
-            .search {
-                display: flex !important;
-            }
-
-            .theme-toggle {
-                width: 40px !important;
-                height: 40px !important;
-
-                min-width: 40px;
-
-                padding: 8px !important;
-            }
-
-            .theme-toggle img {
-                width: 21px !important;
-                height: 21px !important;
-            }
-
             .hero h1 {
                 font-size: 68px;
             }
@@ -1860,149 +1304,546 @@
 
     </style>
 
+
+<style>
+      /* ================= CABEÇALHO PADRÃO (igual à página inicial) ================= */
+      .header {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 92px;
+        padding: 0 6%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        z-index: 100;
+      }
+
+      .logo {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        text-decoration: none;
+        color: #fff;
+      }
+
+      .logo-grape {
+        width: 38px;
+        height: 42px;
+        object-fit: contain;
+        filter: drop-shadow(0 0 8px rgba(145, 55, 255, 0.7));
+      }
+
+      .logo-text {
+        font-size: 20px;
+        font-weight: 900;
+        letter-spacing: -0.7px;
+      }
+
+      body.light .logo {
+        color: #24152f;
+      }
+      .menu {
+        display: flex;
+        align-items: center;
+        gap: 30px;
+      }
+
+      .menu a {
+        position: relative;
+
+        color: #c9c6d5;
+
+        font-family: "Nunito", sans-serif;
+        font-size: 12px;
+        font-weight: 800;
+
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        text-decoration: none;
+        white-space: nowrap;
+
+        transition: color 0.25s ease;
+      }
+
+      /* Linha roxa invisível (início) */
+      .menu a::after {
+        content: "";
+
+        position: absolute;
+
+        left: 0;
+        bottom: -8px;
+
+        width: 0;
+        height: 2px;
+
+        background: #963cff;
+
+        box-shadow: 0 0 10px rgba(150, 60, 255, 0.5);
+
+        transition: width 0.25s ease;
+      }
+
+      /* Efeito ao passar o mouse (hover) e no link ativo */
+      .menu a:hover,
+      .menu a.active {
+        color: #ffffff;
+      }
+
+      /* Animação da linha expandindo para 100% */
+      .menu a:hover::after,
+      .menu a.active::after {
+        width: 100%;
+      }
+
+      /* Suporte ao Modo Claro (Light Mode) */
+      body.light .menu a {
+        color: #574d61;
+      }
+
+      body.light .menu a:hover,
+      body.light .menu a.active {
+        color: #7022ca;
+      }
+
+      .header-actions {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+      }
+
+      .search {
+        width: 32px;
+        height: 40px;
+        border: 0;
+        background: none;
+        color: #d5d1df;
+        font-size: 19px;
+        cursor: pointer;
+      }
+
+      .search:hover {
+        color: #a744ff;
+      }
+
+      .login {
+        width: 82px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid #7620d5;
+        border-radius: 10px;
+        color: #ddd8e7;
+        text-decoration: none;
+        font-size: 12px;
+        font-weight: 800;
+        transition: 0.25s;
+      }
+
+      .login:hover {
+        border-color: #a744ff;
+        box-shadow: 0 0 20px rgba(150, 60, 255, 0.25);
+      }
+
+      body.light .login {
+        color: #5c496c;
+      }
+
+      .nex-button {
+        height: 40px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
+
+        padding: 0 14px;
+
+        border: 1px solid rgba(167, 68, 255, 0.55);
+        border-radius: 10px;
+
+        background: linear-gradient(
+          135deg,
+          rgba(126, 37, 230, 0.18),
+          rgba(72, 20, 130, 0.1)
+        );
+
+        color: #d8b5ff;
+
+        text-decoration: none;
+
+        font-size: 11px;
+        font-weight: 900;
+
+        box-shadow: 0 0 15px rgba(150, 60, 255, 0.08);
+
+        transition: 0.25s ease;
+      }
+
+      .nex-button i {
+        font-size: 14px;
+        color: #b45cff;
+        transition: 0.25s ease;
+      }
+
+      .nex-button:hover {
+        transform: translateY(-2px);
+
+        border-color: #a744ff;
+
+        color: #fff;
+
+        background: linear-gradient(
+          135deg,
+          rgba(126, 37, 230, 0.35),
+          rgba(72, 20, 130, 0.2)
+        );
+
+        box-shadow: 0 0 22px rgba(150, 60, 255, 0.25);
+      }
+
+      .nex-button:hover i {
+        color: #d38cff;
+        transform: rotate(8deg) scale(1.1);
+      }
+
+      body.light .nex-button {
+        color: #7022ca;
+        border-color: rgba(112, 34, 202, 0.3);
+        background: rgba(112, 34, 202, 0.06);
+      }
+
+      body.light .nex-button i {
+        color: #7022ca;
+      }
+
+      body.light .nex-button:hover {
+        color: #fff;
+        background: #7022ca;
+        border-color: #7022ca;
+      }
+
+      body.light .nex-button:hover i {
+        color: #fff;
+      }
+
+      .theme-button {
+        width: 40px;
+        height: 40px;
+        border: none;
+        border-radius: 10px;
+        background: linear-gradient(145deg, #6c18d8, #4b0ba8);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        box-shadow: 0 7px 20px rgba(78, 16, 170, 0.28);
+        transition: 0.25s;
+      }
+
+      .theme-button:hover {
+        transform: translateY(-2px);
+      }
+
+      .theme-button img {
+        width: 24px;
+        height: 24px;
+        object-fit: contain;
+        filter: brightness(0) invert(1);
+      }
+
+      .mobile-menu {
+        display: none;
+        width: 40px;
+        height: 40px;
+        border: 1px solid #7620d5;
+        border-radius: 10px;
+        background: transparent;
+        color: white;
+        font-size: 20px;
+        cursor: pointer;
+      }
+
+      @media (max-width: 1200px) {
+        .header { padding: 0 4%; }
+        .menu { gap: 20px; }
+      }
+
+      @media (max-width: 900px) {
+        .menu { display: none; }
+        .mobile-menu { display: flex; align-items: center; justify-content: center; }
+        .header-actions { gap: 8px; }
+        .mobile-menu.open { background: #7021e8; }
+        .header.mobile-open .menu {
+          position: absolute; top: 78px; left: 20px; right: 20px;
+          width: auto; height: auto; transform: none;
+          display: flex; flex-direction: column; align-items: flex-start; gap: 0;
+          padding: 15px;
+          border: 1px solid rgba(145, 55, 255, 0.25); border-radius: 14px;
+          background: rgba(10, 6, 20, 0.96); backdrop-filter: blur(20px);
+        }
+        .header.mobile-open .menu a { width: 100%; padding: 14px; }
+        .header.mobile-open .menu a.active::after { display: none; }
+      }
+
+      @media (max-width: 600px) {
+        .header { height: 75px; padding: 0 20px; }
+        .logo-text { font-size: 18px; }
+        .logo-grape { width: 34px; height: 36px; }
+        .search { display: flex !important; }
+        .login { width: 70px; height: 36px; }
+        .nex-button { width: 36px; height: 36px; padding: 0; }
+        .nex-button span { display: none; }
+        .nex-button i { font-size: 16px; }
+        .theme-button { width: 36px; height: 36px; }
+        .mobile-menu { width: 36px; height: 36px; }
+      }
+
+      /* ================= PESQUISA ================= */
+
+      .search-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 99999;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 120px 20px 40px;
+        background: rgba(3, 2, 10, 0.88);
+        backdrop-filter: blur(18px);
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+        transition: 0.25s ease;
+      }
+
+      .search-overlay.active {
+        opacity: 1;
+        visibility: visible;
+        pointer-events: auto;
+      }
+
+      .search-box {
+        width: min(720px, 100%);
+        height: 58px;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 0 16px;
+        border: 1px solid #7620d5;
+        border-radius: 14px;
+        background: #100b1b;
+        box-shadow: 0 0 35px rgba(130, 45, 255, 0.2);
+      }
+
+      .search-box > i {
+        color: #a744ff;
+        font-size: 20px;
+      }
+
+      .search-box input {
+        flex: 1;
+        border: 0;
+        outline: 0;
+        background: transparent;
+        color: #fff;
+        font:
+          700 15px Nunito,
+          sans-serif;
+      }
+
+      .search-box input::placeholder {
+        color: #888195;
+      }
+
+      .search-box button {
+        width: 38px;
+        height: 38px;
+        border: 0;
+        border-radius: 9px;
+        background: transparent;
+        color: #aaa3b5;
+        cursor: pointer;
+        font-size: 17px;
+      }
+
+      .search-box button:hover {
+        color: #fff;
+        background: rgba(255, 255, 255, 0.06);
+      }
+
+      .search-results {
+        width: min(720px, 100%);
+        margin-top: 14px;
+        display: flex;
+        flex-direction: column;
+        gap: 9px;
+        max-height: 65vh;
+        overflow: auto;
+      }
+
+      .search-result {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        padding: 16px 18px;
+        border: 1px solid rgba(150, 68, 255, 0.25);
+        border-radius: 12px;
+        background: rgba(16, 11, 27, 0.94);
+        color: #fff;
+        text-decoration: none;
+        transition: 0.2s;
+      }
+
+      .search-result:hover {
+        border-color: #913bff;
+        transform: translateY(-2px);
+      }
+
+      .search-result strong {
+        font-size: 14px;
+        color: #c47cff;
+      }
+
+      .search-result span {
+        font-size: 12px;
+        color: #aaa3b5;
+        line-height: 1.4;
+      }
+
+      .search-empty {
+        padding: 20px;
+        text-align: center;
+        color: #aaa3b5;
+        font-size: 13px;
+        border: 1px solid rgba(150, 68, 255, 0.2);
+        border-radius: 12px;
+        background: rgba(16, 11, 27, 0.8);
+      }
+
+      body.light .search-overlay {
+        background: rgba(245, 241, 250, 0.88);
+      }
+
+      body.light .search-box,
+      body.light .search-result {
+        background: #fff;
+        color: #24152f;
+      }
+
+      body.light .search-box input {
+        color: #24152f;
+      }
+
+      body.light .search-result span {
+        color: #675b70;
+      }
+
+      body.light .search-empty {
+        background: #fff;
+        color: #675b70;
+      }
+
+      @media (max-width: 600px) {
+        .search {
+          display: flex !important;
+        }
+
+        .search-overlay {
+          padding: 90px 15px 25px;
+        }
+
+        .search-box {
+          height: 54px;
+        }
+
+        .search-results {
+          max-height: 70vh;
+        }
+      }
+
+      .search-box input { width: auto; padding: 0; border-radius: 0; box-shadow: none !important; }
+
+</style>
 </head>
 
 <body>
 
 
-    <!-- =========================
-         HEADER
-    ========================= -->
+    <header class="header" id="header">
+      <a href="home.html" class="logo">
+        <img
+          src="../../storage/images/icone_uva_sem_fundo.png"
+          class="logo-grape"
+          alt="GrapeDev"
+        />
 
-    <header class="header">
+        <span class="logo-text"> GrapeDev </span>
+      </a>
 
-        <a href="home.html" class="logo">
+      <nav class="menu">
+        <a href="home.html"> Início </a>
 
-            <img
-                src="../../storage/images/icone_uva_sem_fundo.png"
-                class="logo-grape"
-                alt="GrapeDev"
-            >
+        <a class="active" href="projetos.html"> Projetos </a>
 
-            <span class="logo-text">
-                Grape<span>Dev</span>
-            </span>
+        <a href="sobre_nos.html"> Sobre nós </a>
 
+        <a href="cartao.html"> Cartão de Visita </a>
+
+        <a href="contato.html"> Contato </a>
+      </nav>
+
+      <div class="header-actions">
+        <button
+          class="search"
+          id="searchButton"
+          type="button"
+          aria-label="Abrir pesquisa"
+        >
+          <i class="bi bi-search"></i>
+        </button>
+
+        <!-- ================= NEX ================= -->
+
+        <a href="nex.html" class="nex-button" title="Ir para o Nex">
+          <i class="bi bi-stars"></i>
+          <span>Nex</span>
         </a>
 
+        <a href="../../backend/auth/login.php" class="login"> Login </a>
 
-        <nav class="menu" id="menu">
+        <button class="theme-button" id="themeButton">
+          <img src="../../storage/images/icone_uva_sem_fundo.png" alt="Tema" />
+        </button>
 
-            <a href="home.html">
-                Início
-            </a>
-
-            <a href="projetos.html" class="active">
-                Projetos
-            </a>
-
-            <a href="sobre_nos.html">
-                Sobre nós
-            </a>
-
-            <a href="cartao.html">
-                Cartão de Visita
-            </a>
-
-            <a href="contato.html">
-                Contato
-            </a>
-
-        </nav>
-
-
-        <div class="header-actions">
-
-            <button
-                class="search"
-                id="searchButton"
-                type="button"
-                aria-label="Pesquisar"
-            >
-
-                <i class="bi bi-search"></i>
-
-            </button>
-
-
-            <a
-                href="login.php"
-                class="login-button"
-            >
-                Login
-            </a>
-
-
-            <button
-                class="theme-toggle"
-                id="themeToggle"
-                type="button"
-                aria-label="Alterar tema"
-            >
-
-                <img
-                    src="../../storage/images/icone_uva_sem_fundo.png"
-                    alt="Alterar tema"
-                >
-
-            </button>
-
-
-            <button
-                class="menu-mobile"
-                id="menuMobile"
-                type="button"
-                aria-label="Abrir menu"
-            >
-
-                <i class="bi bi-list"></i>
-
-            </button>
-
-        </div>
-
+        <button class="mobile-menu" id="mobileMenu">
+          <i class="bi bi-list"></i>
+        </button>
+      </div>
     </header>
 
+    <div class="search-overlay" id="searchOverlay">
+      <div class="search-box">
+        <i class="bi bi-search"></i>
 
-    <!-- =========================
-         PESQUISA
-    ========================= -->
+        <input
+          type="search"
+          id="searchInput"
+          placeholder="Pesquisar no site..."
+          autocomplete="off"
+        />
 
-    <div
-        class="search-overlay"
-        id="searchOverlay"
-    >
+        <button type="button" id="closeSearch" aria-label="Fechar pesquisa">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
 
-        <div class="search-box">
-
-            <i class="bi bi-search"></i>
-
-            <input
-                type="search"
-                id="searchInput"
-                placeholder="Pesquisar no site..."
-                autocomplete="off"
-            >
-
-            <button
-                type="button"
-                id="closeSearch"
-                aria-label="Fechar pesquisa"
-            >
-
-                <i class="bi bi-x-lg"></i>
-
-            </button>
-
-        </div>
-
-
-        <div
-            class="search-results"
-            id="searchResults"
-        ></div>
-
+      <div class="search-results" id="searchResults"></div>
     </div>
+
 
 
     <!-- =========================
@@ -2600,413 +2441,232 @@
     </footer>
 
 
-    <script>
 
-        /* =========================
-           TEMA
-        ========================= */
+<script>
+  /* ================= CABEÇALHO: TEMA, MENU MOBILE E PESQUISA ================= */
+  (function () {
+      /* ================= TEMA ================= */
 
-        const themeToggle =
-            document.getElementById("themeToggle");
+      const themeButton = document.getElementById("themeButton");
 
-        const temaSalvo =
-            localStorage.getItem("grapedev-theme");
+      const body = document.body;
 
+      const savedTheme = localStorage.getItem("grapedev-theme");
 
-        if (temaSalvo === "light") {
+      if (savedTheme === "light") {
+        body.classList.add("light");
+      }
 
-            document.body.classList.add("light");
+      themeButton.addEventListener("click", () => {
+        body.classList.toggle("light");
 
+        const isLight = body.classList.contains("light");
+
+        localStorage.setItem("grapedev-theme", isLight ? "light" : "dark");
+      });
+
+      /* ================= MENU MOBILE ================= */
+
+      const mobileMenu = document.getElementById("mobileMenu");
+
+      const header = document.getElementById("header");
+
+      mobileMenu.addEventListener("click", () => {
+        header.classList.toggle("mobile-open");
+
+        const icon = mobileMenu.querySelector("i");
+
+        if (header.classList.contains("mobile-open")) {
+          icon.classList.remove("bi-list");
+          icon.classList.add("bi-x-lg");
+        } else {
+          icon.classList.remove("bi-x-lg");
+          icon.classList.add("bi-list");
         }
+      });
 
+  })();
 
-        themeToggle.addEventListener(
-            "click",
-            () => {
+      (function () {
+        const botao = document.getElementById("searchButton");
 
-                document.body.classList.toggle("light");
+        const overlay = document.getElementById("searchOverlay");
 
+        const campo = document.getElementById("searchInput");
 
-                localStorage.setItem(
-                    "grapedev-theme",
+        const fecharBotao = document.getElementById("closeSearch");
 
-                    document.body.classList.contains("light")
-                        ? "light"
-                        : "dark"
-                );
+        const resultados = document.getElementById("searchResults");
 
-            }
-        );
-
-
-        /* =========================
-           MENU MOBILE
-        ========================= */
-
-        const menuMobile =
-            document.getElementById("menuMobile");
-
-        const menu =
-            document.getElementById("menu");
-
-
-        menuMobile.addEventListener(
-            "click",
-            () => {
-
-                menu.classList.toggle("active");
-
-
-                const icon =
-                    menuMobile.querySelector("i");
-
-
-                if (
-                    menu.classList.contains("active")
-                ) {
-
-                    icon.className =
-                        "bi bi-x-lg";
-
-                } else {
-
-                    icon.className =
-                        "bi bi-list";
-
-                }
-
-            }
-        );
-
-
-        document
-            .querySelectorAll(".menu a")
-            .forEach(link => {
-
-                link.addEventListener(
-                    "click",
-                    () => {
-
-                        menu.classList.remove("active");
-
-                        menuMobile
-                            .querySelector("i")
-                            .className =
-                            "bi bi-list";
-
-                    }
-                );
-
-            });
-
-
-        /* =========================
-           PESQUISA
-        ========================= */
-
-        const botaoPesquisa =
-            document.getElementById("searchButton");
-
-        const overlayPesquisa =
-            document.getElementById("searchOverlay");
-
-        const campoPesquisa =
-            document.getElementById("searchInput");
-
-        const fecharPesquisa =
-            document.getElementById("closeSearch");
-
-        const resultadosPesquisa =
-            document.getElementById("searchResults");
-
+        if (!botao || !overlay || !campo || !fecharBotao || !resultados) return;
 
         const paginas = [
+          [
+            "Início",
+            "Conheça a GrapeDev e nossas soluções digitais.",
+            "home.html",
+          ],
 
-            {
-                titulo: "Início",
+          [
+            "Projetos",
+            "Conheça os projetos desenvolvidos pela GrapeDev.",
+            "projetos.html",
+          ],
 
-                descricao:
-                    "Conheça a GrapeDev e nossas soluções digitais.",
+          [
+            "AquaFlow",
+            "Sistema inteligente de monitoramento e controle de água.",
+            "aquaflow.html",
+          ],
 
-                link:
-                    "home.html"
-            },
+          [
+            "Sobre nós",
+            "Conheça a equipe e a história da GrapeDev.",
+            "sobre_nos.html",
+          ],
 
-            {
-                titulo: "Projetos",
+          [
+            "Cartão de Visita",
+            "Conheça o cartão digital da GrapeDev.",
+            "cartao.html",
+          ],
 
-                descricao:
-                    "Conheça os projetos desenvolvidos pela GrapeDev.",
+          [
+            "Contato",
+            "Entre em contato com a equipe GrapeDev.",
+            "contato.html",
+          ],
 
-                link:
-                    "projetos.html"
-            },
+          [
+            "Produtos AquaFlow",
+            "Conheça os produtos e soluções do AquaFlow.",
+            "produtosaquaflow.html",
+          ],
 
-            {
-                titulo: "PetControl",
+          [
+            "Bem-estar",
+            "Conheça o projeto Bem-estar.",
+            "produtosbemestar.html",
+          ],
 
-                descricao:
-                    "Sistema inteligente para gestão de pet shops.",
+          [
+            "PetControl",
+            "Conheça o projeto PetControl.",
+            "produtospetcontrol.html",
+          ],
 
-                link:
-                    "petcontrol.html"
-            },
+          ["Dashboard", "Acesse o painel do AquaFlow.", "../backend/dashboard/dashboard.php"],
 
-            {
-                titulo: "Produtos PetControl",
-
-                descricao:
-                    "Conheça os produtos e recursos do PetControl.",
-
-                link:
-                    "produtospetcontrol.html"
-            },
-
-            {
-                titulo: "Bem-Estar Academy",
-
-                descricao:
-                    "Sistema inteligente para gestão de academias.",
-
-                link:
-                    "bemestar.html"
-            },
-
-            {
-                titulo: "AquaFlow",
-
-                descricao:
-                    "Sistema inteligente de monitoramento de água.",
-
-                link:
-                    "aquaflow.html"
-            },
-
-            {
-                titulo: "Sobre nós",
-
-                descricao:
-                    "Conheça a equipe e a história da GrapeDev.",
-
-                link:
-                    "sobre_nos.html"
-            },
-
-            {
-                titulo: "Contato",
-
-                descricao:
-                    "Entre em contato com a equipe GrapeDev.",
-
-                link:
-                    "contato.html"
-            },
-
-            {
-                titulo: "Dashboard",
-
-                descricao:
-                    "Acesse o painel do AquaFlow.",
-
-                link:
-                    "dashboard.php"
-            }
-
+          [
+            "Nex",
+            "Conheça o Nex, o assistente virtual da GrapeDev.",
+            "nex.html",
+          ],
         ];
 
-
         function escapar(texto) {
+          const div = document.createElement("div");
 
-            const div =
-                document.createElement("div");
+          div.textContent = texto;
 
-            div.textContent =
-                texto;
-
-            return div.innerHTML;
-
+          return div.innerHTML;
         }
-
 
         function mostrarResultados() {
+          const termo = campo.value.trim().toLowerCase();
 
-            const termo =
-                campoPesquisa.value
-                    .trim()
-                    .toLowerCase();
+          resultados.innerHTML = "";
 
+          if (!termo) {
+            resultados.innerHTML =
+              '<div class="search-empty">Digite algo para pesquisar no site.</div>';
 
-            if (!termo) {
+            return;
+          }
 
-                resultadosPesquisa.innerHTML =
-                    '<div class="search-empty">Digite algo para pesquisar no site.</div>';
-
-                return;
-
-            }
-
-
-            const encontrados =
-                paginas.filter(pagina => {
-
-                    return (
-
-                        pagina.titulo
-                            .toLowerCase()
-                            .includes(termo)
-
-                        ||
-
-                        pagina.descricao
-                            .toLowerCase()
-                            .includes(termo)
-
-                    );
-
-                });
-
-
-            if (!encontrados.length) {
-
-                resultadosPesquisa.innerHTML =
-                    '<div class="search-empty">Nenhum resultado encontrado para "' +
-                    escapar(campoPesquisa.value) +
-                    '".</div>';
-
-                return;
-
-            }
-
-
-            resultadosPesquisa.innerHTML = "";
-
-
-            encontrados.forEach(pagina => {
-
-                const link =
-                    document.createElement("a");
-
-                link.className =
-                    "search-result";
-
-                link.href =
-                    pagina.link;
-
-
-                const titulo =
-                    document.createElement("strong");
-
-                titulo.textContent =
-                    pagina.titulo;
-
-
-                const descricao =
-                    document.createElement("span");
-
-                descricao.textContent =
-                    pagina.descricao;
-
-
-                link.appendChild(titulo);
-
-                link.appendChild(descricao);
-
-                resultadosPesquisa.appendChild(link);
-
-            });
-
-        }
-
-
-        function abrirPesquisa() {
-
-            overlayPesquisa.classList.add("active");
-
-            document.body.style.overflow =
-                "hidden";
-
-            campoPesquisa.value = "";
-
-            mostrarResultados();
-
-
-            setTimeout(
-                () => {
-
-                    campoPesquisa.focus();
-
-                },
-                100
+          const encontrados = paginas.filter(function (pagina) {
+            return (
+              pagina[0].toLowerCase().includes(termo) ||
+              pagina[1].toLowerCase().includes(termo)
             );
+          });
 
+          if (!encontrados.length) {
+            resultados.innerHTML =
+              '<div class="search-empty">Nenhum resultado encontrado para "' +
+              escapar(campo.value) +
+              '".</div>';
+
+            return;
+          }
+
+          encontrados.forEach(function (pagina) {
+            const link = document.createElement("a");
+
+            link.className = "search-result";
+
+            link.href = pagina[2];
+
+            const titulo = document.createElement("strong");
+
+            titulo.textContent = pagina[0];
+
+            const descricao = document.createElement("span");
+
+            descricao.textContent = pagina[1];
+
+            link.appendChild(titulo);
+
+            link.appendChild(descricao);
+
+            resultados.appendChild(link);
+          });
         }
 
+        function abrir() {
+          overlay.classList.add("active");
+
+          document.body.style.overflow = "hidden";
+
+          campo.value = "";
+
+          mostrarResultados();
+
+          setTimeout(function () {
+            campo.focus();
+          }, 100);
+        }
 
         function fechar() {
+          overlay.classList.remove("active");
 
-            overlayPesquisa.classList.remove("active");
+          document.body.style.overflow = "";
 
-            document.body.style.overflow = "";
+          campo.value = "";
 
-            campoPesquisa.value = "";
-
-            resultadosPesquisa.innerHTML = "";
-
+          resultados.innerHTML = "";
         }
 
+        botao.addEventListener("click", abrir);
 
-        botaoPesquisa.addEventListener(
-            "click",
-            abrirPesquisa
-        );
+        fecharBotao.addEventListener("click", fechar);
 
+        campo.addEventListener("input", mostrarResultados);
 
-        fecharPesquisa.addEventListener(
-            "click",
-            fechar
-        );
+        overlay.addEventListener("click", function (evento) {
+          if (evento.target === overlay) {
+            fechar();
+          }
+        });
 
+        document.addEventListener("keydown", function (evento) {
+          if (evento.key === "Escape" && overlay.classList.contains("active")) {
+            fechar();
+          }
+        });
+      })();
 
-        campoPesquisa.addEventListener(
-            "input",
-            mostrarResultados
-        );
-
-
-        overlayPesquisa.addEventListener(
-            "click",
-            evento => {
-
-                if (
-                    evento.target === overlayPesquisa
-                ) {
-
-                    fechar();
-
-                }
-
-            }
-        );
-
-
-        document.addEventListener(
-            "keydown",
-            evento => {
-
-                if (
-                    evento.key === "Escape" &&
-                    overlayPesquisa.classList.contains("active")
-                ) {
-
-                    fechar();
-
-                }
-
-            }
-        );
-
-    </script>
-
+</script>
 </body>
 
 </html>

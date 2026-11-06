@@ -2,7 +2,7 @@
 
 mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
-$host = "10.140.169.12";
+$host = "10.140.169.28";
 $usuario = "root";
 $senha = "123456";
 $banco = "grapedev";

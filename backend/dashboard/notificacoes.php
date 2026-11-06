@@ -4,14 +4,17 @@ session_start();
 
 include("conexao.php");
 
+require_once __DIR__ . "/demo_dados.php";
+
+
 // Verifica se o usuário está logado
 if (!isset($_SESSION["usuario_id"])) {
     header("Location: ../auth/login.php");
     exit();
 }
 
-$usuario_id = $_SESSION["usuario_id"];
-
+$usuario_id = (int) $_SESSION["usuario_id"];
+$modoDemo = ($usuario_id === 8);
 // Busca os alertas do usuário logado
 $sql = "SELECT *
         FROM alertas

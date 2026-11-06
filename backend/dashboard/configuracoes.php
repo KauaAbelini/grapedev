@@ -4,12 +4,16 @@ session_start();
 
 require_once __DIR__ . '/../database/conexao.php';
 
+require_once __DIR__ . "/demo_dados.php";
+
+
+
 if (!isset($_SESSION['usuario_id'])) {
-    header('Location: login.php');
+    header('Location: /../../backend/auth/login.php');
     exit();
 }
-
-$usuarioId = (int) $_SESSION['usuario_id'];
+$usuario_id = (int) $_SESSION["usuario_id"];
+$modoDemo = ($usuario_id === 8);
 $nome = $_SESSION['usuario_nome'] ?? 'Usuário';
 $email = $_SESSION['usuario_email'] ?? '';
 $cidade = $_SESSION['usuario_cidade'] ?? '';

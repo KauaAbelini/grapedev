@@ -12,7 +12,6 @@ if (!isset($_SESSION["usuario_id"])) {
 }
 
 $usuario_id = (int) $_SESSION["usuario_id"];
-
 $nome = $_SESSION["usuario_nome"] ?? "Usuário";
 $email = $_SESSION["usuario_email"] ?? "";
 $cidade = $_SESSION["usuario_cidade"] ?? "";
@@ -24,7 +23,7 @@ $localTipo = $localAtual["tipo_imovel"] ?? "casa";
 
 $primeiraLetra = strtoupper(substr($nome, 0, 1));
 
-$modoDemo = ($usuario_id === 2);
+$modoDemo = ($usuario_id === 8);
 
 $tarifaAgua = 7.50;
 
@@ -414,10 +413,7 @@ href="../../public/css/dashboard.css">
             Configurações
         </a>
 
-        <a href="logout.php" class="logout">
-            <i class="bi bi-box-arrow-right"></i>
-            Sair
-        </a>
+        <a href="/grapedev/backend/auth/logout.php">Sair</a>
 
     </nav>
 
@@ -457,12 +453,12 @@ href="../../public/css/dashboard.css">
     <div class="profile">
 
         <a
-            href="locais.php"
+            href="../locais/locais.php"
             class="aquaflow-3d-button"
             title="Trocar local"
             aria-label="Trocar local"
         >
-            <i class="bi bi-buildings"></i>
+            <i class="bi bi-arrow-left-right"></i>
         </a>
 
         <a
@@ -472,6 +468,15 @@ href="../../public/css/dashboard.css">
             aria-label="Abrir modelos 3D"
         >
             <i class="bi bi-boxes"></i>
+        </a>
+
+        <a
+            href="../../public/pages/cidade_3d.html"
+            class="aquaflow-3d-button"
+            title="Abrir cidade 3D"
+            aria-label="Abrir cidade 3D"
+        >
+            <i class="bi bi-buildings-fill"></i>
         </a>
 
         <div class="notification-container">

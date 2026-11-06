@@ -184,389 +184,6 @@
 
 
         /* =========================
-           HEADER
-        ========================= */
-
-        header {
-            width: min(1280px, 92%);
-            height: 105px;
-
-            margin: auto;
-
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-
-            position: relative;
-
-            z-index: 100;
-        }
-
-
-        /* =========================
-           LOGO
-        ========================= */
-
-        .brand {
-            display: flex;
-            align-items: center;
-
-            gap: 10px;
-
-            color: var(--text);
-
-            font-family: "Nunito", sans-serif;
-            font-size: 18px;
-            font-weight: 800;
-
-            letter-spacing: -.035em;
-
-            white-space: nowrap;
-
-            transition: color .3s ease;
-        }
-
-
-        .brand:hover {
-            color: var(--text);
-        }
-
-
-        .brand-mark {
-            width: 38px;
-            height: 38px;
-
-            display: flex;
-            align-items: center;
-            justify-content: center;
-
-            background: transparent;
-
-            border-radius: 10px;
-
-            overflow: hidden;
-
-            flex-shrink: 0;
-
-            transition: transform .3s ease;
-        }
-
-
-        .brand-mark img {
-            width: 36px;
-            height: 36px;
-
-            object-fit: contain;
-
-            display: block;
-        }
-
-
-        .brand:hover .brand-mark {
-            transform:
-                scale(1.08)
-                rotate(-4deg);
-        }
-
-
-        .brand-name {
-            font-family: "Nunito", sans-serif;
-
-            font-weight: 800;
-
-            line-height: 1;
-        }
-
-
-        /* =========================
-           NAVEGAÇÃO
-        ========================= */
-
-        nav {
-            display: flex;
-            align-items: center;
-
-            gap: 34px;
-        }
-
-
-        nav a {
-            position: relative;
-
-            color: var(--text-soft);
-
-            font-size: 12px; 
-
-            text-transform: uppercase; 
-
-            letter-spacing: 2px;
-
-            font-family: "Nunito", sans-serif;
-
-            font-weight: 800;
-
-            letter-spacing: .11em;
-
-            text-transform: uppercase;
-
-            transition: color .25s ease;
-        }
-
-
-        nav a::after {
-            content: "";
-
-            position: absolute;
-
-            left: 0;
-            bottom: -8px;
-
-            width: 0;
-            height: 1px;
-
-            background: var(--purple-light);
-
-            transition: width .25s ease;
-        }
-
-
-        nav a:hover,
-        nav a.active {
-            color: var(--text);
-        }
-
-
-        nav a:hover::after,
-        nav a.active::after {
-            width: 100%;
-        }
-
-
-        /* =========================
-           HEADER ACTIONS
-        ========================= */
-
-        .header-actions {
-            display: flex;
-            align-items: center;
-
-            gap: 9px;
-        }
-
-
-        /* =========================
-           BOTÕES
-        ========================= */
-
-        .icon-btn {
-            width: 38px;
-            height: 38px;
-
-            border: 1px solid var(--border);
-
-            border-radius: 9px;
-
-            display: flex;
-            align-items: center;
-            justify-content: center;
-
-            background: transparent;
-
-            color: var(--text-soft);
-
-            cursor: pointer;
-
-            transition:
-                color .25s ease,
-                border-color .25s ease,
-                background .25s ease;
-        }
-
-
-        .icon-btn:hover {
-            color: var(--text);
-
-            border-color: var(--border-hover);
-
-            background: rgba(130,71,229,.08);
-        }
-
-
-        /* =========================
-           PESQUISA
-        ========================= */
-
-        .search-button i {
-            font-size: 14px;
-        }
-
-
-        /* =========================
-           LOGIN
-        ========================= */
-
-        .login-btn {
-            height: 38px;
-
-            padding: 0 17px;
-
-            display: flex;
-            align-items: center;
-            justify-content: center;
-
-            gap: 8px;
-
-            border-radius: 9px;
-
-            background: var(--purple);
-
-            color: #fff;
-
-            font-family: "Nunito", sans-serif;
-
-            font-size: 11px;
-            font-weight: 800;
-
-            letter-spacing: .06em;
-
-            text-transform: uppercase;
-
-            transition:
-                background .25s ease,
-                transform .25s ease,
-                box-shadow .25s ease;
-
-            box-shadow:
-                0 8px 25px rgba(130,71,229,.20);
-        }
-
-
-        .login-btn i {
-            font-size: 14px;
-            line-height: 1;
-        }
-
-
-        .login-btn:hover {
-            background: var(--purple-light);
-
-            color: #fff;
-
-            transform: translateY(-2px);
-
-            box-shadow:
-                0 12px 30px rgba(130,71,229,.30);
-        }
-
-
-        /* =========================
-           BOTÃO TEMA
-        ========================= */
-
-        .theme-button {
-            position: relative;
-
-            overflow: hidden;
-        }
-
-
-        .theme-grape {
-            width: 24px;
-            height: 24px;
-
-            object-fit: contain;
-
-            display: block;
-
-            transition: transform .35s ease;
-        }
-
-
-        .theme-button:hover .theme-grape {
-            transform:
-                rotate(10deg)
-                scale(1.12);
-        }
-
-
-        /* =========================
-           MENU MOBILE
-        ========================= */
-
-        .menu-button {
-            display: none;
-        }
-
-
-        .mobile-menu {
-            display: none;
-
-            position: fixed;
-
-            top: 82px;
-
-            left: 4%;
-            right: 4%;
-
-            padding: 18px;
-
-            background: rgba(20,17,30,.97);
-
-            border: 1px solid var(--border);
-
-            border-radius: 16px;
-
-            z-index: 200;
-
-            box-shadow:
-                0 20px 50px rgba(0,0,0,.35);
-
-            backdrop-filter: blur(20px);
-        }
-
-
-        body.light .mobile-menu {
-            background: rgba(255,255,255,.97);
-        }
-
-
-        .mobile-menu.open {
-            display: block;
-        }
-
-
-        .mobile-menu a {
-            display: block;
-
-            padding: 13px 8px;
-
-            color: var(--text-soft);
-
-            font-family: "Nunito", sans-serif;
-
-            font-size: 12px;
-            font-weight: 800;
-
-            letter-spacing: .08em;
-
-            text-transform: uppercase;
-
-            border-bottom: 1px solid var(--border);
-        }
-
-
-        .mobile-menu a:last-child {
-            border-bottom: none;
-        }
-
-
-        .mobile-menu a:hover,
-        .mobile-menu a.active {
-            color: var(--purple-light);
-        }
-
-
-        /* =========================
            MAIN
         ========================= */
 
@@ -1253,11 +870,6 @@
 
         @media (max-width: 1050px) {
 
-            nav {
-                gap: 20px;
-            }
-
-
             .page-heading {
                 grid-template-columns:
                     1fr 280px;
@@ -1293,21 +905,6 @@
         ========================= */
 
         @media (max-width: 850px) {
-
-            header {
-                height: 82px;
-            }
-
-
-            nav {
-                display: none;
-            }
-
-
-            .menu-button {
-                display: flex;
-            }
-
 
             .page-heading {
                 display: block;
@@ -1349,81 +946,10 @@
 
 
         /* =========================
-           DESKTOP
-        ========================= */
-
-        @media (min-width: 851px) {
-
-            .menu-button {
-                display: none;
-            }
-
-        }
-
-
-        /* =========================
            CELULAR
         ========================= */
 
         @media (max-width: 600px) {
-
-            header {
-                width: 90%;
-
-                height: 70px;
-            }
-
-
-            .brand {
-                font-size: 16px;
-            }
-
-
-            .brand-mark {
-                width: 32px;
-                height: 32px;
-            }
-
-
-            .brand-mark img {
-                width: 31px;
-                height: 31px;
-            }
-
-
-            .header-actions {
-                gap: 7px;
-            }
-
-
-            .search-button {
-                display: none;
-            }
-
-
-            .login-btn {
-                width: 38px;
-
-                padding: 0;
-
-                justify-content: center;
-            }
-
-
-            .login-btn span {
-                display: none;
-            }
-
-
-            .theme-button {
-                display: flex;
-            }
-
-
-            .menu-button {
-                display: flex;
-            }
-
 
             main {
                 width: 90%;
@@ -1514,161 +1040,548 @@
 
     </style>
 
+
+<style>
+      /* ================= CABEÇALHO PADRÃO (igual à página inicial) ================= */
+      .header {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 92px;
+        padding: 0 6%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        z-index: 100;
+      }
+
+      .logo {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        text-decoration: none;
+        color: #fff;
+      }
+
+      .logo-grape {
+        width: 38px;
+        height: 42px;
+        object-fit: contain;
+        filter: drop-shadow(0 0 8px rgba(145, 55, 255, 0.7));
+      }
+
+      .logo-text {
+        font-size: 20px;
+        font-weight: 900;
+        letter-spacing: -0.7px;
+      }
+
+      body.light .logo {
+        color: #24152f;
+      }
+      .menu {
+        display: flex;
+        align-items: center;
+        gap: 30px;
+      }
+
+      .menu a {
+        position: relative;
+
+        color: #c9c6d5;
+
+        font-family: "Nunito", sans-serif;
+        font-size: 12px;
+        font-weight: 800;
+
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        text-decoration: none;
+        white-space: nowrap;
+
+        transition: color 0.25s ease;
+      }
+
+      /* Linha roxa invisível (início) */
+      .menu a::after {
+        content: "";
+
+        position: absolute;
+
+        left: 0;
+        bottom: -8px;
+
+        width: 0;
+        height: 2px;
+
+        background: #963cff;
+
+        box-shadow: 0 0 10px rgba(150, 60, 255, 0.5);
+
+        transition: width 0.25s ease;
+      }
+
+      /* Efeito ao passar o mouse (hover) e no link ativo */
+      .menu a:hover,
+      .menu a.active {
+        color: #ffffff;
+      }
+
+      /* Animação da linha expandindo para 100% */
+      .menu a:hover::after,
+      .menu a.active::after {
+        width: 100%;
+      }
+
+      /* Suporte ao Modo Claro (Light Mode) */
+      body.light .menu a {
+        color: #574d61;
+      }
+
+      body.light .menu a:hover,
+      body.light .menu a.active {
+        color: #7022ca;
+      }
+
+      .header-actions {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+      }
+
+      .search {
+        width: 32px;
+        height: 40px;
+        border: 0;
+        background: none;
+        color: #d5d1df;
+        font-size: 19px;
+        cursor: pointer;
+      }
+
+      .search:hover {
+        color: #a744ff;
+      }
+
+      .login {
+        width: 82px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid #7620d5;
+        border-radius: 10px;
+        color: #ddd8e7;
+        text-decoration: none;
+        font-size: 12px;
+        font-weight: 800;
+        transition: 0.25s;
+      }
+
+      .login:hover {
+        border-color: #a744ff;
+        box-shadow: 0 0 20px rgba(150, 60, 255, 0.25);
+      }
+
+      body.light .login {
+        color: #5c496c;
+      }
+
+      .nex-button {
+        height: 40px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
+
+        padding: 0 14px;
+
+        border: 1px solid rgba(167, 68, 255, 0.55);
+        border-radius: 10px;
+
+        background: linear-gradient(
+          135deg,
+          rgba(126, 37, 230, 0.18),
+          rgba(72, 20, 130, 0.1)
+        );
+
+        color: #d8b5ff;
+
+        text-decoration: none;
+
+        font-size: 11px;
+        font-weight: 900;
+
+        box-shadow: 0 0 15px rgba(150, 60, 255, 0.08);
+
+        transition: 0.25s ease;
+      }
+
+      .nex-button i {
+        font-size: 14px;
+        color: #b45cff;
+        transition: 0.25s ease;
+      }
+
+      .nex-button:hover {
+        transform: translateY(-2px);
+
+        border-color: #a744ff;
+
+        color: #fff;
+
+        background: linear-gradient(
+          135deg,
+          rgba(126, 37, 230, 0.35),
+          rgba(72, 20, 130, 0.2)
+        );
+
+        box-shadow: 0 0 22px rgba(150, 60, 255, 0.25);
+      }
+
+      .nex-button:hover i {
+        color: #d38cff;
+        transform: rotate(8deg) scale(1.1);
+      }
+
+      body.light .nex-button {
+        color: #7022ca;
+        border-color: rgba(112, 34, 202, 0.3);
+        background: rgba(112, 34, 202, 0.06);
+      }
+
+      body.light .nex-button i {
+        color: #7022ca;
+      }
+
+      body.light .nex-button:hover {
+        color: #fff;
+        background: #7022ca;
+        border-color: #7022ca;
+      }
+
+      body.light .nex-button:hover i {
+        color: #fff;
+      }
+
+      .theme-button {
+        width: 40px;
+        height: 40px;
+        border: none;
+        border-radius: 10px;
+        background: linear-gradient(145deg, #6c18d8, #4b0ba8);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        box-shadow: 0 7px 20px rgba(78, 16, 170, 0.28);
+        transition: 0.25s;
+      }
+
+      .theme-button:hover {
+        transform: translateY(-2px);
+      }
+
+      .theme-button img {
+        width: 24px;
+        height: 24px;
+        object-fit: contain;
+        filter: brightness(0) invert(1);
+      }
+
+      .mobile-menu {
+        display: none;
+        width: 40px;
+        height: 40px;
+        border: 1px solid #7620d5;
+        border-radius: 10px;
+        background: transparent;
+        color: white;
+        font-size: 20px;
+        cursor: pointer;
+      }
+
+      @media (max-width: 1200px) {
+        .header { padding: 0 4%; }
+        .menu { gap: 20px; }
+      }
+
+      @media (max-width: 900px) {
+        .menu { display: none; }
+        .mobile-menu { display: flex; align-items: center; justify-content: center; }
+        .header-actions { gap: 8px; }
+        .mobile-menu.open { background: #7021e8; }
+        .header.mobile-open .menu {
+          position: absolute; top: 78px; left: 20px; right: 20px;
+          width: auto; height: auto; transform: none;
+          display: flex; flex-direction: column; align-items: flex-start; gap: 0;
+          padding: 15px;
+          border: 1px solid rgba(145, 55, 255, 0.25); border-radius: 14px;
+          background: rgba(10, 6, 20, 0.96); backdrop-filter: blur(20px);
+        }
+        .header.mobile-open .menu a { width: 100%; padding: 14px; }
+        .header.mobile-open .menu a.active::after { display: none; }
+      }
+
+      @media (max-width: 600px) {
+        .header { height: 75px; padding: 0 20px; }
+        .logo-text { font-size: 18px; }
+        .logo-grape { width: 34px; height: 36px; }
+        .search { display: flex !important; }
+        .login { width: 70px; height: 36px; }
+        .nex-button { width: 36px; height: 36px; padding: 0; }
+        .nex-button span { display: none; }
+        .nex-button i { font-size: 16px; }
+        .theme-button { width: 36px; height: 36px; }
+        .mobile-menu { width: 36px; height: 36px; }
+      }
+
+      /* ================= PESQUISA ================= */
+
+      .search-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 99999;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 120px 20px 40px;
+        background: rgba(3, 2, 10, 0.88);
+        backdrop-filter: blur(18px);
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+        transition: 0.25s ease;
+      }
+
+      .search-overlay.active {
+        opacity: 1;
+        visibility: visible;
+        pointer-events: auto;
+      }
+
+      .search-box {
+        width: min(720px, 100%);
+        height: 58px;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 0 16px;
+        border: 1px solid #7620d5;
+        border-radius: 14px;
+        background: #100b1b;
+        box-shadow: 0 0 35px rgba(130, 45, 255, 0.2);
+      }
+
+      .search-box > i {
+        color: #a744ff;
+        font-size: 20px;
+      }
+
+      .search-box input {
+        flex: 1;
+        border: 0;
+        outline: 0;
+        background: transparent;
+        color: #fff;
+        font:
+          700 15px Nunito,
+          sans-serif;
+      }
+
+      .search-box input::placeholder {
+        color: #888195;
+      }
+
+      .search-box button {
+        width: 38px;
+        height: 38px;
+        border: 0;
+        border-radius: 9px;
+        background: transparent;
+        color: #aaa3b5;
+        cursor: pointer;
+        font-size: 17px;
+      }
+
+      .search-box button:hover {
+        color: #fff;
+        background: rgba(255, 255, 255, 0.06);
+      }
+
+      .search-results {
+        width: min(720px, 100%);
+        margin-top: 14px;
+        display: flex;
+        flex-direction: column;
+        gap: 9px;
+        max-height: 65vh;
+        overflow: auto;
+      }
+
+      .search-result {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        padding: 16px 18px;
+        border: 1px solid rgba(150, 68, 255, 0.25);
+        border-radius: 12px;
+        background: rgba(16, 11, 27, 0.94);
+        color: #fff;
+        text-decoration: none;
+        transition: 0.2s;
+      }
+
+      .search-result:hover {
+        border-color: #913bff;
+        transform: translateY(-2px);
+      }
+
+      .search-result strong {
+        font-size: 14px;
+        color: #c47cff;
+      }
+
+      .search-result span {
+        font-size: 12px;
+        color: #aaa3b5;
+        line-height: 1.4;
+      }
+
+      .search-empty {
+        padding: 20px;
+        text-align: center;
+        color: #aaa3b5;
+        font-size: 13px;
+        border: 1px solid rgba(150, 68, 255, 0.2);
+        border-radius: 12px;
+        background: rgba(16, 11, 27, 0.8);
+      }
+
+      body.light .search-overlay {
+        background: rgba(245, 241, 250, 0.88);
+      }
+
+      body.light .search-box,
+      body.light .search-result {
+        background: #fff;
+        color: #24152f;
+      }
+
+      body.light .search-box input {
+        color: #24152f;
+      }
+
+      body.light .search-result span {
+        color: #675b70;
+      }
+
+      body.light .search-empty {
+        background: #fff;
+        color: #675b70;
+      }
+
+      @media (max-width: 600px) {
+        .search {
+          display: flex !important;
+        }
+
+        .search-overlay {
+          padding: 90px 15px 25px;
+        }
+
+        .search-box {
+          height: 54px;
+        }
+
+        .search-results {
+          max-height: 70vh;
+        }
+      }
+
+      .search-box input { width: auto; padding: 0; border-radius: 0; box-shadow: none !important; }
+
+      /* nesta página o cabeçalho fica no fluxo, sem sobrepor o título */
+      .header { position: relative; }
+
+</style>
 </head>
 
 
 <body>
 
 
-    <!-- =========================
-         HEADER
-    ========================= -->
+    <header class="header" id="header">
+      <a href="home.html" class="logo">
+        <img
+          src="../../storage/images/icone_uva_sem_fundo.png"
+          class="logo-grape"
+          alt="GrapeDev"
+        />
 
-    <header>
+        <span class="logo-text"> GrapeDev </span>
+      </a>
 
-        <!-- LOGO -->
+      <nav class="menu">
+        <a href="home.html"> Início </a>
 
-        <a href="home.html" class="brand">
+        <a class="active" href="projetos.html"> Projetos </a>
 
-            <span class="brand-mark">
+        <a href="sobre_nos.html"> Sobre nós </a>
 
-                <img
-                    src="../../storage/images/icone_uva_sem_fundo.png"
-                    alt="GrapeDev"
-                >
+        <a href="cartao.html"> Cartão de Visita </a>
 
-            </span>
+        <a href="contato.html"> Contato </a>
+      </nav>
 
-            <span class="brand-name">
-                GrapeDev
-            </span>
+      <div class="header-actions">
+        <button
+          class="search"
+          id="searchButton"
+          type="button"
+          aria-label="Abrir pesquisa"
+        >
+          <i class="bi bi-search"></i>
+        </button>
 
+        <!-- ================= NEX ================= -->
+
+        <a href="nex.html" class="nex-button" title="Ir para o Nex">
+          <i class="bi bi-stars"></i>
+          <span>Nex</span>
         </a>
 
+        <a href="../../backend/auth/login.php" class="login"> Login </a>
 
-        <!-- NAVEGAÇÃO -->
+        <button class="theme-button" id="themeButton">
+          <img src="../../storage/images/icone_uva_sem_fundo.png" alt="Tema" />
+        </button>
 
-        <nav>
-
-            <a href="home.html">
-                Início
-            </a>
-
-            <a
-                href="projetos.html"
-                class="active"
-            >
-                Projetos
-            </a>
-
-            <a href="sobre_nos.html">
-                Sobre nós
-            </a>
-
-            <a href="cartao.html">
-                Cartão de visita
-            </a>
-
-            <a href="contato.html">
-                Contato
-            </a>
-
-        </nav>
-
-
-        <!-- AÇÕES -->
-
-        <div class="header-actions">
-
-            <!-- PESQUISA -->
-
-            <button
-                class="icon-btn search-button"
-                aria-label="Pesquisar"
-            >
-
-                <i class="bi bi-search"></i>
-
-            </button>
-
-
-            <!-- LOGIN -->
-
-            <a
-                href="#"
-                class="login-btn"
-            >
-
-                <i class="bi bi-person"></i>
-
-                <span>
-                    Login
-                </span>
-
-            </a>
-
-
-            <!-- TEMA -->
-
-            <button
-                class="icon-btn theme-button"
-                aria-label="Alterar tema"
-            >
-
-                <img
-                    src="../../storage/images/icone_uva_sem_fundo.png"
-                    class="theme-grape"
-                    alt="Alterar tema"
-                >
-
-            </button>
-
-
-            <!-- MENU MOBILE -->
-
-            <button
-                class="icon-btn menu-button"
-                aria-label="Abrir menu"
-            >
-
-                <i class="bi bi-list"></i>
-
-            </button>
-
-        </div>
-
+        <button class="mobile-menu" id="mobileMenu">
+          <i class="bi bi-list"></i>
+        </button>
+      </div>
     </header>
 
+    <div class="search-overlay" id="searchOverlay">
+      <div class="search-box">
+        <i class="bi bi-search"></i>
 
-    <!-- =========================
-         MENU MOBILE
-    ========================= -->
+        <input
+          type="search"
+          id="searchInput"
+          placeholder="Pesquisar no site..."
+          autocomplete="off"
+        />
 
-    <div class="mobile-menu">
+        <button type="button" id="closeSearch" aria-label="Fechar pesquisa">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
 
-        <a href="home.html">
-            Início
-        </a>
-
-        <a
-            href="projetos.html"
-            class="active"
-        >
-            Projetos
-        </a>
-
-        <a href="sobre_nos.html">
-            Sobre nós
-        </a>
-
-        <a href="cartao.html">
-            Cartão de visita
-        </a>
-
-        <a href="contato.html">
-            Contato
-        </a>
-
+      <div class="search-results" id="searchResults"></div>
     </div>
 
 
@@ -2038,137 +1951,232 @@
     </main>
 
 
-    <!-- =========================
-         JAVASCRIPT
-    ========================= -->
 
-    <script>
+<script>
+  /* ================= CABEÇALHO: TEMA, MENU MOBILE E PESQUISA ================= */
+  (function () {
+      /* ================= TEMA ================= */
 
-        /* =========================
-           ELEMENTOS
-        ========================= */
+      const themeButton = document.getElementById("themeButton");
 
-        const themeButton =
-            document.querySelector(".theme-button");
+      const body = document.body;
 
-        const menuButton =
-            document.querySelector(".menu-button");
+      const savedTheme = localStorage.getItem("grapedev-theme");
 
-        const mobileMenu =
-            document.querySelector(".mobile-menu");
+      if (savedTheme === "light") {
+        body.classList.add("light");
+      }
 
+      themeButton.addEventListener("click", () => {
+        body.classList.toggle("light");
 
-        /* =========================
-           TEMA
-        ========================= */
+        const isLight = body.classList.contains("light");
 
-        function aplicarTema() {
+        localStorage.setItem("grapedev-theme", isLight ? "light" : "dark");
+      });
 
-            const tema =
-                localStorage.getItem("grapedev-theme");
+      /* ================= MENU MOBILE ================= */
 
+      const mobileMenu = document.getElementById("mobileMenu");
 
-            if (tema === "light") {
+      const header = document.getElementById("header");
 
-                document.body.classList.add("light");
+      mobileMenu.addEventListener("click", () => {
+        header.classList.toggle("mobile-open");
 
-            } else {
+        const icon = mobileMenu.querySelector("i");
 
-                document.body.classList.remove("light");
+        if (header.classList.contains("mobile-open")) {
+          icon.classList.remove("bi-list");
+          icon.classList.add("bi-x-lg");
+        } else {
+          icon.classList.remove("bi-x-lg");
+          icon.classList.add("bi-list");
+        }
+      });
 
-            }
+  })();
 
+      (function () {
+        const botao = document.getElementById("searchButton");
+
+        const overlay = document.getElementById("searchOverlay");
+
+        const campo = document.getElementById("searchInput");
+
+        const fecharBotao = document.getElementById("closeSearch");
+
+        const resultados = document.getElementById("searchResults");
+
+        if (!botao || !overlay || !campo || !fecharBotao || !resultados) return;
+
+        const paginas = [
+          [
+            "Início",
+            "Conheça a GrapeDev e nossas soluções digitais.",
+            "home.html",
+          ],
+
+          [
+            "Projetos",
+            "Conheça os projetos desenvolvidos pela GrapeDev.",
+            "projetos.html",
+          ],
+
+          [
+            "AquaFlow",
+            "Sistema inteligente de monitoramento e controle de água.",
+            "aquaflow.html",
+          ],
+
+          [
+            "Sobre nós",
+            "Conheça a equipe e a história da GrapeDev.",
+            "sobre_nos.html",
+          ],
+
+          [
+            "Cartão de Visita",
+            "Conheça o cartão digital da GrapeDev.",
+            "cartao.html",
+          ],
+
+          [
+            "Contato",
+            "Entre em contato com a equipe GrapeDev.",
+            "contato.html",
+          ],
+
+          [
+            "Produtos AquaFlow",
+            "Conheça os produtos e soluções do AquaFlow.",
+            "produtosaquaflow.html",
+          ],
+
+          [
+            "Bem-estar",
+            "Conheça o projeto Bem-estar.",
+            "produtosbemestar.html",
+          ],
+
+          [
+            "PetControl",
+            "Conheça o projeto PetControl.",
+            "produtospetcontrol.html",
+          ],
+
+          ["Dashboard", "Acesse o painel do AquaFlow.", "../backend/dashboard/dashboard.php"],
+
+          [
+            "Nex",
+            "Conheça o Nex, o assistente virtual da GrapeDev.",
+            "nex.html",
+          ],
+        ];
+
+        function escapar(texto) {
+          const div = document.createElement("div");
+
+          div.textContent = texto;
+
+          return div.innerHTML;
         }
 
+        function mostrarResultados() {
+          const termo = campo.value.trim().toLowerCase();
 
-        aplicarTema();
+          resultados.innerHTML = "";
 
+          if (!termo) {
+            resultados.innerHTML =
+              '<div class="search-empty">Digite algo para pesquisar no site.</div>';
 
-        themeButton.addEventListener(
-            "click",
-            () => {
+            return;
+          }
 
-                document.body.classList.toggle("light");
+          const encontrados = paginas.filter(function (pagina) {
+            return (
+              pagina[0].toLowerCase().includes(termo) ||
+              pagina[1].toLowerCase().includes(termo)
+            );
+          });
 
+          if (!encontrados.length) {
+            resultados.innerHTML =
+              '<div class="search-empty">Nenhum resultado encontrado para "' +
+              escapar(campo.value) +
+              '".</div>';
 
-                const tema =
-                    document.body.classList.contains("light")
-                        ? "light"
-                        : "dark";
+            return;
+          }
 
+          encontrados.forEach(function (pagina) {
+            const link = document.createElement("a");
 
-                localStorage.setItem(
-                    "grapedev-theme",
-                    tema
-                );
+            link.className = "search-result";
 
-            }
-        );
+            link.href = pagina[2];
 
+            const titulo = document.createElement("strong");
 
-        /* =========================
-           MENU MOBILE
-        ========================= */
+            titulo.textContent = pagina[0];
 
-        menuButton.addEventListener(
-            "click",
-            () => {
+            const descricao = document.createElement("span");
 
-                mobileMenu.classList.toggle("open");
+            descricao.textContent = pagina[1];
 
+            link.appendChild(titulo);
 
-                const icon =
-                    menuButton.querySelector("i");
+            link.appendChild(descricao);
 
+            resultados.appendChild(link);
+          });
+        }
 
-                if (
-                    mobileMenu.classList.contains("open")
-                ) {
+        function abrir() {
+          overlay.classList.add("active");
 
-                    icon.className =
-                        "bi bi-x-lg";
+          document.body.style.overflow = "hidden";
 
-                } else {
+          campo.value = "";
 
-                    icon.className =
-                        "bi bi-list";
+          mostrarResultados();
 
-                }
+          setTimeout(function () {
+            campo.focus();
+          }, 100);
+        }
 
-            }
-        );
+        function fechar() {
+          overlay.classList.remove("active");
 
+          document.body.style.overflow = "";
 
-        /* =========================
-           FECHAR MENU
-        ========================= */
+          campo.value = "";
 
-        document
-            .querySelectorAll(".mobile-menu a")
-            .forEach(link => {
+          resultados.innerHTML = "";
+        }
 
-                link.addEventListener(
-                    "click",
-                    () => {
+        botao.addEventListener("click", abrir);
 
-                        mobileMenu.classList.remove(
-                            "open"
-                        );
+        fecharBotao.addEventListener("click", fechar);
 
+        campo.addEventListener("input", mostrarResultados);
 
-                        menuButton
-                            .querySelector("i")
-                            .className =
-                            "bi bi-list";
+        overlay.addEventListener("click", function (evento) {
+          if (evento.target === overlay) {
+            fechar();
+          }
+        });
 
-                    }
-                );
+        document.addEventListener("keydown", function (evento) {
+          if (evento.key === "Escape" && overlay.classList.contains("active")) {
+            fechar();
+          }
+        });
+      })();
 
-            });
-
-    </script>
-
-
+</script>
 </body>
 
 </html>

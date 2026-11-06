@@ -1287,6 +1287,9 @@ let totalWaste = 0;
 
 let lastTime = performance.now();
 
+// Partes animadas (água da piscina, moinho etc.).
+var animatedParts = [];
+
 
 /* =====================================================
    CONFIGURAÇÃO DOS CÔMODOS
@@ -1930,12 +1933,9 @@ function createHouse() {
     addEnvironmentBox(property,null,"Faixa de grama piscina","Paisagismo",4.0,.10,2.6,13.2,.10,-4.45,0x2f6b38);
 
     // =====================================================
-    // PISCINA — integrada ao espaço gourmet, sem atravessar a casa
+    // PISCINA — a piscina real é criada em createPool(); aqui fica só o entorno
     // =====================================================
     const poolX=13.4, poolZ=-8.0;
-    addEnvironmentBox(property,null,"Deck da piscina","Piscina",7.8,.10,5.2,poolX,.05,poolZ,0x765d49);
-    addEnvironmentBox(property,null,"Borda da piscina","Piscina",7.3,.16,4.7,poolX,.28,poolZ,0xb0a18d);
-    addEnvironmentBox(property,null,"Água da piscina","Piscina",6.7,.12,4.1,poolX,.43,poolZ,0x1b6575);
     addEnvironmentBox(property,null,"Gramado junto à piscina","Paisagismo",3.2,.10,3.0,9.25,.10,-8.0,0x2f6b38);
 
     // Canteiro tropical entre lazer e piscina.
@@ -1962,12 +1962,98 @@ function createHouse() {
         if (o.parent) o.parent.remove(o);
     });
 
+
+    // =====================================================
+    // DETALHAMENTO DA CASA — esquadrias, terraço, cobertura e paisagismo
+    // =====================================================
+    {
+        const H = house;
+        const roofTop = 8.50, terraceY = 5.06;
+
+        // Janelas laterais e traseiras (a casa era "cega" fora da fachada).
+        aqWindow(H, null, 8.55, 3.05, 1.6, 1.5, .9, { ry: Math.PI / 2, name: "Janela do banheiro", cols: 1 });
+        aqWindow(H, null, -8.55, 2.45, -2.4, 2.6, 1.7, { ry: -Math.PI / 2, name: "Janela da sala" });
+        aqWindow(H, null, -8.55, 2.95, 2.9, 1.4, .95, { ry: -Math.PI / 2, name: "Janela da lavanderia", cols: 1 });
+        aqWindow(H, null, 6.22, 6.45, -1.7, 2.2, 1.5, { ry: Math.PI / 2, name: "Janela do quarto 2" });
+        aqWindow(H, null, 6.22, 7.05, 2.8, 1.0, .75, { ry: Math.PI / 2, name: "Janela do banheiro 2", cols: 1 });
+        aqWindow(H, null, -6.22, 6.45, -1.7, 2.2, 1.5, { ry: -Math.PI / 2, name: "Janela do quarto 1" });
+        aqWindow(H, null, -6.22, 6.45, 2.6, 1.8, 1.4, { ry: -Math.PI / 2, name: "Janela do escritório" });
+        aqWindow(H, null, -4.6, 2.5, -5.53, 3.4, 2.0, { ry: Math.PI, name: "Janela traseira da sala" });
+        aqWindow(H, null, 2.4, 2.9, -5.53, 2.2, 1.2, { ry: Math.PI, name: "Janela da cozinha" });
+        aqWindow(H, null, -3.4, 6.45, -4.07, 2.4, 1.5, { ry: Math.PI, name: "Janela traseira — quarto 1" });
+        aqWindow(H, null, 3.4, 6.45, -4.07, 2.4, 1.5, { ry: Math.PI, name: "Janela traseira — quarto 2" });
+
+        // Porta pivotante amadeirada com puxador vertical e batente.
+        const veneer = addEnvironmentBox(H, null, "Folha de madeira da porta", "Acesso", 1.5, 2.9, .03, -2.0, 1.55, 5.925, 0x8a5a36);
+        aqTexture(veneer, "wood", .8);
+        addEnvironmentBox(H, null, "Batente da porta", "Acesso", 1.86, .12, .2, -2.0, 3.08, 5.86, 0x1b1f22);
+        [-2.87, -1.13].forEach(x => addEnvironmentBox(H, null, "Batente da porta", "Acesso", .12, 3.0, .2, x, 1.55, 5.86, 0x1b1f22));
+        addEnvironmentBox(H, null, "Puxador da porta", "Acesso", .05, 1.3, .05, -1.45, 1.6, 6.02, 0xb9b3a6);
+        [1.05, 2.15].forEach(y => addEnvironmentBox(H, null, "Suporte do puxador", "Acesso", .04, .04, .1, -1.45, y, 5.97, 0xb9b3a6));
+
+        // Fita de LED sob a marquise da entrada (acende com a iluminação).
+        const led = addEnvironmentBox(H, null, "Fita de LED da marquise", "Iluminação", 4.4, .04, .06, -2.0, 4.41, 7.0, 0xd9c49a, { emissive: 0xffb84a, emissiveIntensity: 0 });
+        aquaGlowMaterials.push(led.material);
+
+        // Brises verticais de madeira no painel grafite do térreo.
+        for (let i = 0; i < 6; i++) {
+            const b = addEnvironmentBox(H, null, "Brise de madeira", "Fachada", .12, 3.5, .22, .2 + i * .3, 2.45, 5.84, 0x7a5236);
+            aqTexture(b, "wood", 1.2);
+        }
+
+        // Terraço sobre a laje: guarda-corpo de vidro e floreiras nos cantos.
+        aqGlassRail(H, null, -8.5, 5.5, .75, 5.5, terraceY, 1.0);
+        aqGlassRail(H, null, 5.45, 5.5, 8.5, 5.5, terraceY, 1.0);
+        aqGlassRail(H, null, -8.5, 5.5, -8.5, -5.5, terraceY, 1.0);
+        aqGlassRail(H, null, 8.5, 5.5, 8.5, -5.5, terraceY, 1.0);
+        aqGlassRail(H, null, -8.5, -5.5, 8.5, -5.5, terraceY, 1.0);
+        [[-7.5, 4.85], [7.5, 4.85], [-7.5, -4.85], [7.5, -4.85]].forEach(([x, z]) => {
+            addEnvironmentBox(H, null, "Floreira do terraço", "Paisagismo", 1.1, .55, .8, x, terraceY + .28, z, 0x3a3d3c);
+            aqShrub(H, null, x, terraceY + .5, z, .75);
+        });
+        const deck = addEnvironmentBox(H, null, "Deck do terraço", "Lazer", 2.0, .05, 9.6, -7.35, terraceY + .03, 0, 0x7a5638);
+        aqTexture(deck, "wood", 1);
+
+        // Cobertura: platibanda nos quatro lados, placas solares, caixa d'água e claraboia.
+        addEnvironmentBox(H, null, "Platibanda", "Acabamento", 12.95, .55, .22, 0, roofTop + .27, 4.47, 0x66645f);
+        addEnvironmentBox(H, null, "Platibanda", "Acabamento", 12.95, .55, .22, 0, roofTop + .27, -4.17, 0x66645f);
+        [-6.37, 6.37].forEach(x => addEnvironmentBox(H, null, "Platibanda", "Acabamento", .22, .55, 8.64, x, roofTop + .27, .15, 0x66645f));
+        aqSolarArray(H, null, 2.8, roofTop, -.6, 4, 2, .32);
+        aqWaterTank(H, null, -4.0, roofTop, -2.3, .85, 1.0, "Caixa d'água da residência");
+        const sky = addEnvironmentBox(H, null, "Claraboia", "Cobertura", 1.8, .3, 1.3, -2.6, roofTop + .15, 2.4, 0x6fb0c8);
+        sky.material = aqMarkTransparent(new THREE.MeshStandardMaterial({ color: 0x7fc4dc, transparent: true, opacity: .55, roughness: .05, metalness: .4 }));
+        addEnvironmentBox(H, null, "Moldura da claraboia", "Cobertura", 2.0, .12, 1.5, -2.6, roofTop + .06, 2.4, 0x2a2d2f);
+
+        // Caminho de pisantes até a porta, balizadores e arbustos no canteiro.
+        [6.55, 7.25, 7.95].forEach(z => {
+            const st = addEnvironmentBox(property, null, "Pisante de pedra", "Paisagismo", 1.3, .06, .5, -2.0, .17, z, 0xbcb5a8);
+            aqTexture(st, "concrete", 1.5);
+        });
+        [[-3.1, 7.6], [-.9, 7.6]].forEach(([x, z]) => aqBollard(property, x, z, .1));
+        [-8.7, -7.1, -5.9].forEach((x, i) => aqShrub(property, null, x, .15, 6.0, .7 + (i % 2) * .15, i === 1 ? 0x3b7d45 : 0x2d6436));
+        [[-12.9, -1.5], [-12.9, 1.4]].forEach(([x, z]) => aqShrub(property, null, x, .15, z, .8));
+        // Caixa de correio e interfone junto à calçada.
+        addEnvironmentBox(property, null, "Pilar do interfone", "Acesso", .45, 1.3, .35, -.4, .7, 8.75, 0x3a3d3c);
+        addEnvironmentBox(property, null, "Interfone", "Acesso", .26, .34, .05, -.4, 1.0, 8.95, 0x1b1f22, { emissive: 0x168cff, emissiveIntensity: .6 });
+    }
+
     property.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=true;}});
     house.add(property);
     houseShellParts.push(property);
 
     house.traverse(function(object){
         if(object.isMesh && houseShellParts.indexOf(object)===-1 && walls.indexOf(object)===-1) houseShellParts.push(object);
+    });
+
+    // Texturas aplicadas por tipo de acabamento (madeira, pedra, concreto, grama e pavimento).
+    house.traverse(o => {
+        if (!o.isMesh || !o.userData.aquaComponent || !o.material || o.material.map || o.material.transparent) return;
+        const n = (o.userData.aquaComponent.name || "").toLowerCase();
+        if (/madeira|ripado|amadeirado|sacada superior|deck do terraço|brise/.test(n)) aqTexture(o, "wood", 1.2);
+        else if (/painel lateral esquerdo|painel superior direito/.test(n)) aqTexture(o, "stone", 1.6);
+        else if (/volume térreo|corpo fechado|painel lateral direito|platibanda|faixa frontal/.test(n)) aqTexture(o, "concrete", 3);
+        else if (/gramado|grama/.test(n)) aqTexture(o, "grass", 1.5);
+        else if (/calçada|piso de acesso|faixa de acesso|piso da área gourmet/.test(n)) aqTexture(o, "pavers", 1.4);
     });
 }
 function makeBox(width, height, depth, x, y, z, color) {
@@ -2710,6 +2796,31 @@ function createPool() {
     const b3=new THREE.Mesh(new THREE.BoxGeometry(.38,.32,4.4),borderMaterial); b3.position.set(3.68,.48,0); poolGroup.add(b3);
     const b4=b3.clone(); b4.position.x=-3.68; poolGroup.add(b4);
     poolGroup.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=true;}});
+    // Acabamento: borda de pedra clara, escada inox, espreguiçadeiras e água com ondulação animada.
+    const coping=new THREE.MeshStandardMaterial({color:0xcfc6b6,roughness:.8});
+    coping.map=aqCanvasTexture("concrete").clone(); coping.map.needsUpdate=true; coping.map.repeat.set(3,1);
+    [[7.95,.12,.7,0,.76,2.275],[7.95,.12,.7,0,.76,-2.275],[.7,.12,3.85,3.575,.76,0],[.7,.12,3.85,-3.575,.76,0]].forEach(([w,h,d,x,y,z])=>{
+        const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),coping); m.position.set(x,y,z); m.castShadow=true; m.receiveShadow=true; poolGroup.add(m);
+    });
+    const waterTex=aqCanvasTexture("water").clone(); waterTex.needsUpdate=true; waterTex.repeat.set(3,2);
+    poolWater.material.map=waterTex; poolWater.material.color.set(0x2a8aa0); poolWater.material.needsUpdate=true;
+    animatedParts.push(d=>{ waterTex.offset.x+=d*.025; waterTex.offset.y+=d*.012; });
+    const inox=new THREE.MeshStandardMaterial({color:0xd5dadf,metalness:.85,roughness:.2});
+    [2.0,2.5].forEach(xx=>{
+        const v=new THREE.Mesh(new THREE.CylinderGeometry(.03,.03,.8,8),inox); v.position.set(xx,.75,1.75); poolGroup.add(v);
+        const arc=new THREE.Mesh(new THREE.TorusGeometry(.25,.03,6,14,Math.PI),inox); arc.rotation.y=Math.PI/2; arc.position.set(xx,1.15,2.0); poolGroup.add(arc);
+        const o=new THREE.Mesh(new THREE.CylinderGeometry(.03,.03,.33,8),inox); o.position.set(xx,.985,2.25); poolGroup.add(o);
+    });
+    [.45,.7].forEach(y=>{const r=new THREE.Mesh(new THREE.BoxGeometry(.5,.04,.12),inox); r.position.set(2.25,y,1.8); poolGroup.add(r);});
+    const cushion=new THREE.MeshStandardMaterial({color:0xe9e3d6,roughness:.85}), frameL=new THREE.MeshStandardMaterial({color:0x3a3d3f,roughness:.5,metalness:.4});
+    [-1.0,1.2].forEach(lx=>{
+        const base=new THREE.Mesh(new THREE.BoxGeometry(1.5,.12,.68),cushion); base.position.set(lx+.15,.42,3.2); poolGroup.add(base);
+        const back=new THREE.Mesh(new THREE.BoxGeometry(.6,.1,.66),cushion); back.position.set(lx-.78,.62,3.2); back.rotation.z=.6; poolGroup.add(back);
+        const fr=new THREE.Mesh(new THREE.BoxGeometry(1.9,.08,.72),frameL); fr.position.set(lx,.33,3.2); poolGroup.add(fr);
+        [-.85,.85].forEach(dx=>[-.3,.3].forEach(dz=>{const l=new THREE.Mesh(new THREE.BoxGeometry(.05,.3,.05),frameL); l.position.set(lx+dx,.15,3.2+dz); poolGroup.add(l);}));
+    });
+    const table=new THREE.Mesh(new THREE.CylinderGeometry(.22,.22,.45,16),frameL); table.position.set(.1,.25,3.2); poolGroup.add(table);
+    poolGroup.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=true;}});
     pool=poolGroup;
 
     // iluminação cênica da piscina
@@ -3151,6 +3262,8 @@ function animate() {
 
     updateWaste(delta);
 
+    animatedParts.forEach(fn => fn(delta));
+
 
     controls.update();
 
@@ -3250,13 +3363,13 @@ const environmentPoints = {
         apartamento4: {label:"Apartamento 202 — banheiro", rate:0.60, pos:[4.5,4.5,-3.5], type:"Banheiro"},
         apartamento5: {label:"Apartamento 301 — cozinha", rate:0.55, pos:[-4.5,7.9,-3.5], type:"Ponto de consumo"},
         apartamento6: {label:"Apartamento 302 — banheiro", rate:0.60, pos:[4.5,7.9,-3.5], type:"Banheiro"},
-        reservatorio: {label:"Reservatório superior", rate:0, pos:[0,11.0,2.8], type:"Reservatório"}
+        reservatorio: {label:"Reservatório superior", rate:0, pos:[0,11.6,2.8], type:"Reservatório"}
     },
     empresa: {
         banheiro: {label:"Banheiro", rate:1.5, pos:[-4.2,1.0,-3.0], type:"Banheiro"},
         copa: {label:"Copa / cozinha", rate:1.2, pos:[4.2,1.0,-3.0], type:"Copa"},
         limpeza: {label:"Ponto de limpeza", rate:0.9, pos:[-4.0,1.0,3.2], type:"Limpeza"},
-        reservatorio: {label:"Reservatório", rate:0, pos:[0,5.2,3.2], type:"Reservatório"}
+        reservatorio: {label:"Reservatório", rate:0, pos:[0,5.6,3.0], type:"Reservatório"}
     },
     predio_comercial: {
         banheiro1: {label:"Banheiro — térreo", rate:2.0, pos:[-4.5,1.0,-3.2], type:"Banheiro"},
@@ -3265,7 +3378,7 @@ const environmentPoints = {
         copa2: {label:"Copa — 2º andar", rate:1.5, pos:[4.5,4.5,-3.2], type:"Copa"},
         banheiro3: {label:"Banheiro — 3º andar", rate:2.0, pos:[-4.5,8.0,-3.2], type:"Banheiro"},
         copa3: {label:"Copa — 3º andar", rate:1.5, pos:[4.5,8.0,-3.2], type:"Copa"},
-        reservatorio: {label:"Reservatório superior", rate:0, pos:[0,11.0,3.0], type:"Reservatório"}
+        reservatorio: {label:"Reservatório superior", rate:0, pos:[0,11.7,2.6], type:"Reservatório"}
     },
     escola: {
         // Os pontos agora ficam exatamente sobre torneiras/lavatórios,
@@ -3286,22 +3399,374 @@ const environmentPoints = {
         reservatorio:{label:"Reservatório", rate:0, pos:[15,5.45,-7.5], type:"Reservatório"}
     },
     industria: {
-        maquina1: {label:"Lavadora industrial", rate:7.5, pos:[-7,.92,-2.5], type:"Máquina industrial"},
-        maquina2: {label:"Centro de processamento", rate:10.2, pos:[-1.8,.92,-2.5], type:"Máquina industrial"},
-        maquina3: {label:"Linha de envase", rate:8.4, pos:[4,.92,-2.5], type:"Máquina industrial"},
-        maquina4: {label:"Prensa hidráulica", rate:9.0, pos:[9,.92,-2.5], type:"Máquina industrial"},
-        lavagem:  {label:"Oficina — lavagem", rate:5.6, pos:[-7.5,.92,7.2], type:"Processo"},
-        esteira:  {label:"Linha de montagem", rate:4.2, pos:[6.5,.92,3.6], type:"Máquina industrial"},
-        torre:    {label:"Torre de resfriamento", rate:4.5, pos:[18,.92,-6], type:"Processo"}
+        maquina1: {label:"Lavadora industrial", rate:7.5, pos:[-7,.92,-4], type:"Máquina industrial"},
+        maquina2: {label:"Centro de processamento", rate:10.2, pos:[-2,.92,-4], type:"Máquina industrial"},
+        maquina3: {label:"Linha de envase", rate:8.4, pos:[3,.92,-4], type:"Máquina industrial"},
+        maquina4: {label:"Prensa hidráulica", rate:9.0, pos:[8,.92,-4], type:"Máquina industrial"},
+        lavagem:  {label:"Oficina — lavagem", rate:5.6, pos:[17.2,.92,2], type:"Processo"},
+        esteira:  {label:"Linha de montagem", rate:4.2, pos:[6.5,.92,.5], type:"Máquina industrial"},
+        torre:    {label:"Torre de resfriamento", rate:4.5, pos:[17.5,1.5,-6.5], type:"Processo"}
     },
     agro: {
-        setorA:    {label:"Irrigação — Setor A", rate:12.0, pos:[-9,0.8,-4], type:"Irrigação"},
-        setorB:    {label:"Irrigação — Setor B", rate:10.5, pos:[0,0.8,-4], type:"Irrigação"},
-        setorC:    {label:"Irrigação — Setor C", rate:9.5, pos:[9,0.8,-4], type:"Irrigação"},
-        bebedouro: {label:"Bebedouro animal", rate:2.2, pos:[7,0.9,6], type:"Ponto de consumo"},
-        bomba:     {label:"Bomba", rate:0, pos:[-8,1,6], type:"Bomba hidráulica"}
+        setorA:    {label:"Irrigação — Setor A", rate:12.0, pos:[-2.2,0.8,-5.5], type:"Irrigação"},
+        setorB:    {label:"Irrigação — Setor B", rate:10.5, pos:[4.2,0.8,-5.5], type:"Irrigação"},
+        setorC:    {label:"Irrigação — Setor C", rate:9.5, pos:[10.6,0.8,-5.5], type:"Irrigação"},
+        bebedouro: {label:"Bebedouro animal", rate:2.2, pos:[-8,1.0,13], type:"Ponto de consumo"},
+        bomba:     {label:"Bomba", rate:0, pos:[-9,1.3,8], type:"Bomba hidráulica"}
     }
 };
+
+
+/* =====================================================
+   DETALHAMENTO 3D — texturas procedurais e peças reutilizáveis
+   (funções declaradas: ficam disponíveis antes de init())
+===================================================== */
+
+var aqTexCache = {};
+function aqCanvasTexture(kind) {
+    if (aqTexCache[kind]) return aqTexCache[kind];
+    const c = document.createElement("canvas");
+    c.width = c.height = 256;
+    const g = c.getContext("2d");
+    let seed = 0;
+    for (let i = 0; i < kind.length; i++) seed = (seed * 31 + kind.charCodeAt(i)) % 2147483647;
+    seed = seed || 7;
+    const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+    const gray = (v, a = 1) => `rgba(${v},${v},${v},${a})`;
+    g.fillStyle = "#ffffff";
+    g.fillRect(0, 0, 256, 256);
+
+    if (kind === "wood") {
+        // tábuas verticais com veios
+        for (let p = 0; p < 4; p++) {
+            const x0 = p * 64;
+            g.fillStyle = gray(225 + Math.floor(rnd() * 30));
+            g.fillRect(x0, 0, 64, 256);
+            for (let k = 0; k < 14; k++) {
+                g.strokeStyle = gray(150 + Math.floor(rnd() * 60), .35);
+                g.lineWidth = 1 + rnd() * 2;
+                g.beginPath();
+                const x = x0 + 4 + rnd() * 56;
+                g.moveTo(x, 0);
+                g.bezierCurveTo(x + rnd() * 6 - 3, 80, x + rnd() * 6 - 3, 170, x + rnd() * 4 - 2, 256);
+                g.stroke();
+            }
+            g.fillStyle = gray(90, .55);
+            g.fillRect(x0, 0, 2, 256);
+        }
+    } else if (kind === "planks") {
+        // tábuas largas de celeiro, com juntas escuras
+        for (let p = 0; p < 4; p++) {
+            g.fillStyle = gray(205 + Math.floor(rnd() * 50));
+            g.fillRect(p * 64, 0, 64, 256);
+            g.fillStyle = gray(60, .7);
+            g.fillRect(p * 64, 0, 4, 256);
+            for (let k = 0; k < 6; k++) {
+                g.fillStyle = gray(140, .18);
+                g.fillRect(p * 64 + 6 + rnd() * 52, rnd() * 256, 2, 30 + rnd() * 90);
+            }
+        }
+    } else if (kind === "concrete") {
+        for (let i = 0; i < 2600; i++) {
+            g.fillStyle = gray(170 + Math.floor(rnd() * 85), .22);
+            g.fillRect(rnd() * 256, rnd() * 256, 2, 2);
+        }
+        g.strokeStyle = gray(120, .25);
+        g.lineWidth = 2;
+        for (let i = 0; i <= 256; i += 128) {
+            g.beginPath(); g.moveTo(0, i); g.lineTo(256, i); g.stroke();
+            g.beginPath(); g.moveTo(i, 0); g.lineTo(i, 256); g.stroke();
+        }
+        for (const [x, y] of [[32, 32], [96, 32], [160, 32], [224, 32], [32, 96], [96, 96], [160, 96], [224, 96]]) {
+            g.fillStyle = gray(110, .35);
+            g.beginPath(); g.arc(x, y, 3, 0, Math.PI * 2); g.fill();
+            g.beginPath(); g.arc(x, y + 128, 3, 0, Math.PI * 2); g.fill();
+        }
+    } else if (kind === "stone") {
+        // pedra filetada / canjiquinha: fiadas irregulares
+        g.fillStyle = gray(80);
+        g.fillRect(0, 0, 256, 256);
+        let y = 0;
+        while (y < 256) {
+            const h = 10 + Math.floor(rnd() * 14);
+            let x = -Math.floor(rnd() * 40);
+            while (x < 256) {
+                const w = 26 + Math.floor(rnd() * 60);
+                g.fillStyle = gray(170 + Math.floor(rnd() * 85));
+                g.fillRect(x + 1, y + 1, w - 2, h - 2);
+                x += w;
+            }
+            y += h;
+        }
+    } else if (kind === "pavers") {
+        for (let r = 0; r < 8; r++)
+            for (let k = 0; k < 4; k++) {
+                g.fillStyle = gray(200 + Math.floor(rnd() * 50));
+                g.fillRect(k * 64 + (r % 2) * 32 + 2, r * 32 + 2, 60, 28);
+                g.fillRect(k * 64 + (r % 2) * 32 - 256 + 2, r * 32 + 2, 60, 28);
+            }
+        g.globalCompositeOperation = "destination-over";
+        g.fillStyle = gray(120);
+        g.fillRect(0, 0, 256, 256);
+        g.globalCompositeOperation = "source-over";
+    } else if (kind === "grass") {
+        for (let i = 0; i < 5000; i++) {
+            g.fillStyle = gray(150 + Math.floor(rnd() * 105), .5);
+            g.fillRect(rnd() * 256, rnd() * 256, 1, 3 + rnd() * 3);
+        }
+    } else if (kind === "tiles") {
+        // telha cerâmica: fiadas horizontais com sombra
+        for (let r = 0; r < 8; r++) {
+            const y0 = r * 32;
+            for (let k = 0; k < 32; k++) {
+                g.fillStyle = gray(255 - Math.floor(110 * Math.pow(k / 32, 2)));
+                g.fillRect(0, y0 + k, 256, 1);
+            }
+            for (let x = (r % 2) * 16; x < 256; x += 32) {
+                g.fillStyle = gray(70, .45);
+                g.fillRect(x, y0, 2, 32);
+            }
+        }
+    } else if (kind === "corrugated") {
+        for (let x = 0; x < 256; x++) {
+            const v = 180 + Math.floor(75 * (0.5 + 0.5 * Math.cos((x / 256) * Math.PI * 2 * 16)));
+            g.fillStyle = gray(v);
+            g.fillRect(x, 0, 1, 256);
+        }
+    } else if (kind === "water") {
+        g.fillStyle = gray(225);
+        g.fillRect(0, 0, 256, 256);
+        for (let i = 0; i < 70; i++) {
+            g.strokeStyle = gray(255, .35 + rnd() * .4);
+            g.lineWidth = 1 + rnd() * 2;
+            const x = rnd() * 256, y = rnd() * 256, l = 20 + rnd() * 50;
+            g.beginPath(); g.moveTo(x, y); g.quadraticCurveTo(x + l / 2, y - 4, x + l, y); g.stroke();
+        }
+    }
+    const t = new THREE.CanvasTexture(c);
+    t.wrapS = t.wrapT = THREE.RepeatWrapping;
+    t.anisotropy = 4;
+    aqTexCache[kind] = t;
+    return t;
+}
+
+/* Aplica uma textura ao material de um mesh, com repetição proporcional ao tamanho da caixa. */
+function aqTexture(mesh, kind, scale = 2) {
+    if (!mesh || !mesh.material || !mesh.geometry) return;
+    const p = mesh.geometry.parameters || {};
+    const dims = [p.width || 1, p.height || 1, p.depth || 1].sort((a, b) => b - a);
+    const t = aqCanvasTexture(kind).clone();
+    t.needsUpdate = true;
+    t.repeat.set(Math.max(1, dims[0] / scale), Math.max(1, dims[1] / scale));
+    mesh.material.map = t;
+    mesh.material.needsUpdate = true;
+}
+
+/* Guarda a transparência original (vidros) para o Raio-X restaurar corretamente. */
+function aqMarkTransparent(mat) {
+    mat.userData = mat.userData || {};
+    mat.userData.aqBase = { transparent: true, opacity: mat.opacity, depthWrite: mat.depthWrite };
+    return mat;
+}
+function aqRestoreMaterial(o) {
+    const m = o.material;
+    const base = m.userData && m.userData.aqBase;
+    m.transparent = base ? base.transparent : false;
+    m.opacity = base ? base.opacity : 1;
+    m.depthWrite = base ? base.depthWrite : true;
+    m.needsUpdate = true;
+}
+
+function aqMesh(group, list, geo, mat, x, y, z, name, type, cast = true) {
+    const m = new THREE.Mesh(geo, mat);
+    m.position.set(x, y, z);
+    m.castShadow = cast;
+    m.receiveShadow = true;
+    if (name) m.userData.aquaComponent = { name, type: type || "Estrutura", details: "" };
+    group.add(m);
+    if (list) list.push(m);
+    return m;
+}
+
+/* Janela completa: luz interna (acende com o botão de iluminação), vidro,
+   caixilho, montante central e peitoril. Por padrão voltada para +Z. */
+function aqWindow(group, list, x, y, z, w, h, opts = {}) {
+    const holder = new THREE.Group();
+    holder.position.set(x, y, z);
+    holder.rotation.y = opts.ry || 0;
+    holder.userData.aquaComponent = { name: opts.name || "Janela", type: "Esquadria", details: "Esquadria da fachada" };
+    const frameMat = makeMaterial(opts.frame !== undefined ? opts.frame : 0x1b1f22);
+    const add = (geo, mat, px, py, pz) => {
+        const m = new THREE.Mesh(geo, mat);
+        m.position.set(px, py, pz);
+        m.castShadow = true;
+        m.receiveShadow = true;
+        m.userData.aquaComponent = holder.userData.aquaComponent;
+        holder.add(m);
+        if (list) list.push(m);
+        return m;
+    };
+    const lightMat = new THREE.MeshStandardMaterial({ color: 0x0e1418, roughness: .9, emissive: opts.light || 0x5c3d18, emissiveIntensity: 0 });
+    aquaGlowMaterials.push(lightMat);
+    add(new THREE.BoxGeometry(w, h, .02), lightMat, 0, 0, 0.0);
+    const glassMat = aqMarkTransparent(new THREE.MeshStandardMaterial({ color: opts.glass || 0x2b4a5a, transparent: true, opacity: .5, roughness: .05, metalness: .55 }));
+    add(new THREE.BoxGeometry(w, h, .04), glassMat, 0, 0, .06);
+    const f = opts.frameW || .09, fd = .16;
+    add(new THREE.BoxGeometry(w + f * 2, f, fd), frameMat, 0, h / 2 + f / 2, .06);
+    add(new THREE.BoxGeometry(w + f * 2, f, fd), frameMat, 0, -h / 2 - f / 2, .06);
+    add(new THREE.BoxGeometry(f, h, fd), frameMat, -w / 2 - f / 2, 0, .06);
+    add(new THREE.BoxGeometry(f, h, fd), frameMat, w / 2 + f / 2, 0, .06);
+    const cols = opts.cols || (w > 1.7 ? Math.max(2, Math.round(w / 1.4)) : 1);
+    for (let i = 1; i < cols; i++) add(new THREE.BoxGeometry(f * .7, h, fd * .8), frameMat, -w / 2 + (w * i) / cols, 0, .07);
+    if (opts.transom) add(new THREE.BoxGeometry(w, f * .7, fd * .8), frameMat, 0, h * .22, .07);
+    if (opts.sill !== false) add(new THREE.BoxGeometry(w + .3, .07, .26), makeMaterial(opts.sillColor || 0x8f8a80), 0, -h / 2 - f - .03, .13);
+    if (opts.shutters) {
+        const sm = makeMaterial(opts.shutters);
+        for (const s of [-1, 1]) {
+            const sh = add(new THREE.BoxGeometry(w * .48, h + .1, .06), sm, s * (w * .74 + f), 0, .05);
+            for (let k = -2; k <= 2; k++) add(new THREE.BoxGeometry(w * .44, .03, .08), frameMat, s * (w * .74 + f), k * h * .18, .08);
+        }
+    }
+    group.add(holder);
+    return holder;
+}
+
+/* Guarda-corpo de vidro com corrimão metálico entre dois pontos (plano XZ). */
+function aqGlassRail(group, list, x1, z1, x2, z2, y, h = 1.0) {
+    const dx = x2 - x1, dz = z2 - z1, len = Math.hypot(dx, dz), ang = -Math.atan2(dz, dx);
+    const glass = aqMarkTransparent(new THREE.MeshStandardMaterial({ color: 0x9fd2e6, transparent: true, opacity: .28, roughness: .05, metalness: .2, depthWrite: false }));
+    const steel = makeMaterial(0x9aa3ab);
+    const g = aqMesh(group, list, new THREE.BoxGeometry(len, h * .9, .04), glass, (x1 + x2) / 2, y + h * .45, (z1 + z2) / 2, "Guarda-corpo de vidro", "Segurança", false);
+    g.rotation.y = ang;
+    const r = aqMesh(group, list, new THREE.BoxGeometry(len, .06, .09), steel, (x1 + x2) / 2, y + h, (z1 + z2) / 2, "Corrimão", "Segurança");
+    r.rotation.y = ang;
+    const n = Math.max(1, Math.round(len / 1.6));
+    for (let i = 0; i <= n; i++) aqMesh(group, list, new THREE.BoxGeometry(.06, h, .06), steel, x1 + (dx * i) / n, y + h / 2, z1 + (dz * i) / n, "Montante", "Segurança");
+}
+
+/* Arbusto em tufos (low-poly) — paisagismo. */
+function aqShrub(group, list, x, y, z, s = 1, color = 0x2f6b3a) {
+    const mat = new THREE.MeshStandardMaterial({ color, roughness: .9, flatShading: true });
+    const geo = new THREE.IcosahedronGeometry(.42 * s, 0);
+    [[0, 0, 0, 1], [.32, -.05, .1, .8], [-.3, -.06, -.08, .78], [.05, .18, -.22, .7]].forEach(([dx, dy, dz, k]) => {
+        const m = aqMesh(group, list, geo, mat, x + dx * s, y + .32 * s + dy * s, z + dz * s, "Arbusto", "Paisagismo");
+        m.scale.setScalar(k);
+    });
+}
+
+/* Árvore com copa em blocos irregulares. */
+function aqTree(group, list, x, z, s = 1, y = 0) {
+    const trunk = aqMesh(group, list, new THREE.CylinderGeometry(.13 * s, .22 * s, 2.2 * s, 8), makeMaterial(0x4f3524), x, y + 1.1 * s, z, "Árvore", "Paisagismo");
+    trunk.material.roughness = .95;
+    const cols = [0x2f6533, 0x3b7a3c, 0x285a2e];
+    const geo = new THREE.IcosahedronGeometry(1, 1);
+    [[0, 2.7, 0, 1.15], [.7, 2.35, .3, .82], [-.65, 2.4, -.25, .85], [.1, 3.3, -.35, .75], [-.2, 2.3, .65, .7]].forEach(([dx, dy, dz, k], i) => {
+        const mat = new THREE.MeshStandardMaterial({ color: cols[i % 3], roughness: .9, flatShading: true });
+        const m = aqMesh(group, list, geo, mat, x + dx * s, y + dy * s, z + dz * s, "Árvore", "Paisagismo");
+        m.scale.set(k * s, k * s * .9, k * s);
+    });
+}
+
+/* Balizador de jardim: só a cúpula acende (sem PointLight extra para não pesar a cena). */
+function aqBollard(group, x, z, y = 0) {
+    aqMesh(group, null, new THREE.CylinderGeometry(.08, .1, .6, 10), makeMaterial(0x26292b), x, y + .3, z, "Balizador", "Iluminação");
+    const lm = new THREE.MeshStandardMaterial({ color: 0xd9c49a, emissive: 0xffb84a, emissiveIntensity: 0 });
+    aquaGlowMaterials.push(lm);
+    aqMesh(group, null, new THREE.CylinderGeometry(.11, .11, .1, 12), lm, x, y + .62, z, "Balizador", "Iluminação");
+}
+
+/* Placas solares inclinadas sobre suportes. */
+function aqSolarArray(group, list, x, y, z, cols, rows, tilt = .32) {
+    const panelMat = new THREE.MeshStandardMaterial({ color: 0x18233f, roughness: .25, metalness: .6, emissive: 0x0a1430, emissiveIntensity: .25 });
+    const frameMat = makeMaterial(0xaab2ba);
+    for (let r = 0; r < rows; r++)
+        for (let c = 0; c < cols; c++) {
+            const px = x + (c - (cols - 1) / 2) * 1.12, pz = z + (r - (rows - 1) / 2) * 1.9;
+            const p = aqMesh(group, list, new THREE.BoxGeometry(1.05, .05, 1.6), panelMat, px, y + .55, pz, "Placa solar", "Energia");
+            p.rotation.x = tilt;
+            const fr = aqMesh(group, list, new THREE.BoxGeometry(1.09, .03, 1.64), frameMat, px, y + .52, pz, "Placa solar", "Energia");
+            fr.rotation.x = tilt;
+            aqMesh(group, list, new THREE.BoxGeometry(.06, .7, .06), frameMat, px, y + .35, pz - Math.sign(tilt) * .55, null);
+        }
+}
+
+/* Caixa d'água com sensor AquaFlow (anel azul aceso). */
+function aqWaterTank(group, list, x, y, z, r = .9, h = 1.1, name = "Caixa d'água") {
+    aqMesh(group, list, new THREE.BoxGeometry(r * 2.3, .14, r * 2.3), makeMaterial(0x3c4044), x, y + .07, z, "Base da caixa d'água", "Estrutura");
+    const body = aqMesh(group, list, new THREE.CylinderGeometry(r, r * .92, h, 28), makeMaterial(0x8f99a3), x, y + .14 + h / 2, z, name, "Reservatório");
+    body.userData.aquaComponent.details = "Reservatório monitorado por sensor de nível AquaFlow";
+    aqMesh(group, list, new THREE.CylinderGeometry(r * 1.04, r * 1.04, .16, 28), makeMaterial(0x6d757d), x, y + .14 + h + .06, z, name, "Reservatório");
+    const ring = aqMesh(group, list, new THREE.CylinderGeometry(r * 1.015, r * 1.015, .08, 28, 1, true), new THREE.MeshStandardMaterial({ color: 0x168cff, emissive: 0x168cff, emissiveIntensity: 1.4 }), x, y + .14 + h * .62, z, "Sensor de nível AquaFlow", "Sensor");
+    aqMesh(group, list, new THREE.BoxGeometry(.22, .18, .12), makeMaterial(0x7654ff, 0x7654ff, .9), x, y + .14 + h * .62, z + r + .05, "Módulo AquaFlow", "Sensor");
+    return body;
+}
+
+/* Carro simples (estacionamentos dos prédios). */
+function aqCar(group, x, z, ry, color, s = .82) {
+    const car = new THREE.Group();
+    const body = makeMaterial(color); body.metalness = .45; body.roughness = .3;
+    const dark = makeMaterial(0x15181a);
+    const glass = makeMaterial(0x24343b); glass.metalness = .5; glass.roughness = .1;
+    const parts = [
+        [new THREE.BoxGeometry(2.3, .6, 4.3), body, 0, .72, 0],
+        [new THREE.BoxGeometry(1.95, .75, 2.2), glass, 0, 1.38, -.2],
+        [new THREE.BoxGeometry(1.85, .1, 2.0), body, 0, 1.8, -.2],
+        [new THREE.BoxGeometry(2.25, .18, .16), dark, 0, .55, 2.17],
+        [new THREE.BoxGeometry(2.25, .18, .16), dark, 0, .55, -2.17],
+    ];
+    parts.forEach(([g, m, px, py, pz]) => { const o = new THREE.Mesh(g, m); o.position.set(px, py, pz); o.castShadow = true; car.add(o); });
+    [-1.02, 1.02].forEach(xx => [-1.35, 1.35].forEach(zz => {
+        const t = new THREE.Mesh(new THREE.CylinderGeometry(.42, .42, .26, 16), dark);
+        t.rotation.z = Math.PI / 2; t.position.set(xx, .45, zz); car.add(t);
+    }));
+    car.scale.setScalar(s);
+    car.position.set(x, 0, z);
+    car.rotation.y = ry;
+    car.userData.aquaComponent = { name: "Veículo", type: "Estacionamento", details: "" };
+    group.add(car);
+    return car;
+}
+
+/* Vaca low-poly (fazenda). */
+function aqCow(group, x, z, ry) {
+    const cow = new THREE.Group();
+    const white = makeMaterial(0xe9e4da), black = makeMaterial(0x1f1c1a), pink = makeMaterial(0xd99a94);
+    white.roughness = black.roughness = .9;
+    const box = (w, h, d, m, px, py, pz) => { const o = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), m); o.position.set(px, py, pz); o.castShadow = true; o.receiveShadow = true; cow.add(o); };
+    box(1.7, .8, .78, white, 0, 1.0, 0);
+    box(.7, .66, .8, black, -.3, 1.08, 0);
+    box(.45, .4, .8, black, .45, .9, 0);
+    box(.55, .5, .5, white, 1.05, 1.25, 0);
+    box(.22, .3, .48, pink, 1.35, 1.12, 0);
+    box(.12, .14, .9, black, .95, 1.5, 0);
+    [-.6, .6].forEach(lx => [-.27, .27].forEach(lz => { box(.18, .62, .18, white, lx, .31, lz); box(.2, .12, .2, black, lx, .06, lz); }));
+    box(.06, .6, .06, black, -.88, .9, 0);
+    cow.position.set(x, 0, z);
+    cow.rotation.y = ry;
+    cow.userData.aquaComponent = { name: "Gado", type: "Pecuária", details: "Animais abastecidos pelo bebedouro monitorado" };
+    group.add(cow);
+    return cow;
+}
+
+/* Telhado de duas águas com cumeeira ao longo de X, beiral e oitões na cor da parede. */
+function aqGableRoof(group, list, cx, y, cz, len, depth, rise, o, roofMat, wallColor, t = .16) {
+    const a = Math.atan2(rise, depth / 2);
+    const L = Math.hypot(depth / 2, rise) + o / Math.cos(a);
+    for (const s of [1, -1]) {
+        const u = [0, -Math.sin(a), s * Math.cos(a)];
+        const n = [0, Math.cos(a), s * Math.sin(a)];
+        const m = aqMesh(group, list, new THREE.BoxGeometry(len + 2 * o, t, L), roofMat, cx, y + rise + (u[1] * L) / 2 + (n[1] * t) / 2, cz + (u[2] * L) / 2 + (n[2] * t) / 2, "Telhado", "Cobertura");
+        m.rotation.x = s * a;
+    }
+    aqMesh(group, list, new THREE.BoxGeometry(len + 2 * o + .1, .14, .22), makeMaterial(0x4a2c20), cx, y + rise + t / Math.cos(a), cz, "Cumeeira", "Cobertura");
+    const shape = new THREE.Shape();
+    shape.moveTo(-depth / 2, 0); shape.lineTo(depth / 2, 0); shape.lineTo(0, rise); shape.closePath();
+    const geo = new THREE.ExtrudeGeometry(shape, { depth: .12, bevelEnabled: false });
+    for (const s of [-1, 1]) {
+        const gm = aqMesh(group, list, geo, makeMaterial(wallColor), cx + s * len / 2 - .06, y, cz, "Oitão", "Fachada");
+        gm.rotation.y = Math.PI / 2;
+    }
+}
 
 function makeMaterial(color, emissive = 0x000000, intensity = 0) {
     return new THREE.MeshStandardMaterial({
@@ -3324,35 +3789,6 @@ function addEnvironmentBox(group, list, name, type, w,h,d,x,y,z,color, extra={})
     return mesh;
 }
 
-function createSimpleBuilding(group, shell, w, d, h, color=0xcfd4dc) {
-    // Base estrutural mais detalhada: paredes, pilares, marquise e telhado.
-    addEnvironmentBox(group,shell,"Piso da edificação","Estrutura",w,.35,d,0,.18,0,0x59636e);
-    addEnvironmentBox(group,shell,"Parede frontal","Estrutura",w,h,.28,0,h/2,-d/2,color);
-    addEnvironmentBox(group,shell,"Parede traseira","Estrutura",w,h,.28,0,h/2,d/2,color);
-    addEnvironmentBox(group,shell,"Parede esquerda","Estrutura",.28,h,d,-w/2,h/2,0,color);
-    addEnvironmentBox(group,shell,"Parede direita","Estrutura",.28,h,d,w/2,h/2,0,color);
-
-    // Telhado de duas águas usando dois planos inclinados.
-    const roofMat=makeMaterial(0x343a42);
-    const roofA=new THREE.Mesh(new THREE.BoxGeometry(w+1,.35,d/2+1),roofMat);
-    roofA.position.set(0,h+.55,-d/4);
-    roofA.rotation.x=-Math.PI*.12;
-    roofA.castShadow=true; roofA.receiveShadow=true;
-    group.add(roofA); shell.push(roofA);
-    const roofB=roofA.clone();
-    roofB.position.z=d/4; roofB.rotation.x=Math.PI*.12;
-    group.add(roofB); shell.push(roofB);
-
-    // Porta principal.
-    addEnvironmentBox(group,shell,"Entrada principal","Acesso",2.8,4.3,.18,0,2.15,-d/2-.16,0x28303a);
-
-    // Janelas frontais para a leitura imediata de escola.
-    for(let x=-w*.32;x<=w*.32;x+=w*.32){
-        const win=addEnvironmentBox(group,shell,"Janela","Esquadria",4.0,2.2,.12,x,h*.55,-d/2-.2,0x7dc8e8,{emissive:0x164c68,emissiveIntensity:.25});
-        win.userData.aquaComponent={name:"Janela",type:"Esquadria",details:"Elemento da fachada"};
-    }
-}
-
 let activeBuildGroup = null;
 let activeBuildEquipment = null;
 
@@ -3372,123 +3808,132 @@ function addCylinder(name, type, x, y, z, radius, height, color, details = "") {
     return mesh;
 }
 
-function createMultiFloorBuilding(group, shell, equipment, options = {}) {
-    const floors = options.floors || 3;
-    const width = options.width || 13;
-    const depth = options.depth || 9;
-    const floorHeight = options.floorHeight || 3.4;
-    const facade = options.facade || 0x596273;
-    const accent = options.accent || 0x7654ff;
-    const title = options.title || "Edifício";
-
-    for(let floor=0; floor<floors; floor++) {
-        const y = floor * floorHeight;
-        addEnvironmentBox(group,shell,`${title} — piso ${floor+1}`,"Estrutura",width,.25,depth,0,y+.12,0,0x343c4a);
-        addEnvironmentBox(group,shell,"Fachada frontal","Estrutura",width,3.05,.22,0,y+1.65,-depth/2,facade);
-        addEnvironmentBox(group,shell,"Fachada traseira","Estrutura",width,3.05,.22,0,y+1.65,depth/2,facade);
-        addEnvironmentBox(group,shell,"Parede lateral","Estrutura",.22,3.05,depth,-width/2,y+1.65,0,facade);
-        addEnvironmentBox(group,shell,"Parede lateral","Estrutura",.22,3.05,depth,width/2,y+1.65,0,facade);
-
-        [-4.2,0,4.2].forEach(x=>{
-            const win=addEnvironmentBox(group,equipment,"Janela panorâmica","Esquadria",3.0,1.55,.10,x,y+1.8,-depth/2-.13,0x6ebcff,{emissive:0x163c68,emissiveIntensity:.32});
-            win.userData.aquaComponent={name:`Janela do piso ${floor+1}`,type:"Esquadria",details:"Esquadria da fachada monitorada."};
-        });
-
-        addEnvironmentBox(group,equipment,"Sacada / circulação","Estrutura",width*.86,.16,1.05,0,y+.38,-depth/2-.58,0x4b5363);
-
-        if(floor < floors-1){
-            addEnvironmentBox(group,equipment,"Laje","Estrutura",width,.18,depth,0,y+floorHeight-.08,0,0x454d5c);
-        }
-    }
-
-    addEnvironmentBox(group,shell,"Entrada principal","Acesso",3.2,3.0,.22,0,1.5,-depth/2-.15,0x202734);
-    addEnvironmentBox(group,equipment,"Portaria / recepção","Recepção",5.4,2.1,2.2,0,1.05,depth/2-1.8,0x242d3b);
-
-    // Núcleo central com prumadas hidráulicas aparentes no Raio-X.
-    const pipeMat = new THREE.MeshStandardMaterial({color:0x168cff,emissive:0x006cff,emissiveIntensity:1.6,metalness:.35,roughness:.2});
-    const baseX = 0;
-    const z = 1.8;
-    const pts = [];
-    for(let f=0; f<floors; f++) pts.push([baseX, f*floorHeight+.75, z]);
-    for(let i=0;i<pts.length-1;i++) createSystemPipe(group,[],[pts[i],pts[i+1]]);
-
-    // reservatório superior
-    const tank = new THREE.Mesh(new THREE.CylinderGeometry(1.45,1.45,1.9,24),makeMaterial(0x7d8798,0x15263c,.2));
-    tank.position.set(0,floors*floorHeight+1.05,1.8);
-    tank.castShadow=true;
-    group.add(tank);
-    equipment.push(tank);
-    tank.userData.aquaComponent={name:"Reservatório superior",type:"Reservatório",details:"Reservatório de abastecimento do edifício."};
-
-    // Cobertura técnica.
-    addEnvironmentBox(group,shell,"Cobertura técnica","Cobertura",width+1,.25,depth+1,0,floors*floorHeight+2.15,0,0x252c38);
-}
-
 function createResidentialBuildingEnvironment() {
     const group=new THREE.Group();
     const shell=[],equipment=[],systems=[];
     const W=15.5,D=10.5,H=3.35;
-    const body=0x303744, dark=0x121923, concrete=0x747d89, glass=0x3d9ee8, purple=0x7654ff;
+    const body=0x2f3540, slabColor=0xb7b9bb, dark=0x14191f, wood=0x7a5236, purple=0x7654ff;
+    const front=-D/2;
 
-    // Terreno e acesso frontal
+    // Terreno, calçada, jardim frontal e acesso
     addEnvironmentBox(group,shell,"Terreno residencial","Terreno",32,.2,28,0,.02,0,0x20262f);
-    addEnvironmentBox(group,shell,"Calçada frontal","Acesso",27,.1,4,0,.18,-10.5,0x59616c);
-    addEnvironmentBox(group,shell,"Jardim esquerdo","Paisagismo",5,.08,8,-10.2,.27,-7,0x304535);
-    addEnvironmentBox(group,shell,"Jardim direito","Paisagismo",5,.08,8,10.2,.27,-7,0x304535);
+    aqTexture(addEnvironmentBox(group,shell,"Calçada frontal","Acesso",27,.1,4,0,.18,-10.5,0x6a6f75),"pavers",1.4);
+    aqTexture(addEnvironmentBox(group,shell,"Jardim frontal esquerdo","Paisagismo",11.9,.08,3.0,-7.55,.17,-6.8,0x2f5a35),"grass",1.5);
+    aqTexture(addEnvironmentBox(group,shell,"Jardim frontal direito","Paisagismo",11.9,.08,3.0,7.55,.17,-6.8,0x2f5a35),"grass",1.5);
+    aqTexture(addEnvironmentBox(group,shell,"Passeio de entrada","Acesso",3.2,.1,3.1,0,.18,-6.8,0x8c8a85),"pavers",1.2);
 
-    // Edifício moderno: três volumes exatamente alinhados sobre a mesma base.
+    // Muro baixo de pedra com gradil metálico e portão de pedestres
+    const fenceMat=makeMaterial(0x23282e);
+    [[-7.75,11.5],[7.75,11.5]].forEach(([x,w])=>{
+        aqTexture(addEnvironmentBox(group,shell,"Mureta de pedra","Fechamento",w,.6,.35,x,.5,-8.35,0x6f675c),"stone",1.2);
+        addEnvironmentBox(group,shell,"Gradil","Fechamento",w,.06,.06,x,1.75,-8.35,0x23282e);
+        for(let k=-w/2+.15;k<=w/2-.1;k+=.28){
+            const bar=new THREE.Mesh(new THREE.BoxGeometry(.04,1.0,.04),fenceMat); bar.position.set(x+k,1.25,-8.35); bar.castShadow=true; group.add(bar); shell.push(bar);
+        }
+    });
+    [-1.75,1.75].forEach(x=>aqTexture(addEnvironmentBox(group,shell,"Pilar do portão","Fechamento",.45,1.9,.45,x,.95,-8.35,0x6f675c),"stone",1));
+    addEnvironmentBox(group,equipment,"Portão de pedestres","Acesso",3.0,1.5,.05,0,1.0,-8.3,0x23282e,{emissive:0x168cff,emissiveIntensity:.08});
+
+    // Base do edifício
     addEnvironmentBox(group,shell,"Base do edifício","Estrutura",W+.5,.3,D+.5,0,.35,0,0x1a212a);
+
     for(let f=0;f<3;f++){
-        const y=.5+f*H, cy=y+H/2;
-        addEnvironmentBox(group,shell,`Pavimento ${f+1}`,"Estrutura",W,3.05,D,0,cy,0,body);
-        addEnvironmentBox(group,shell,"Painel arquitetônico","Fachada",3.2,3.05,.28,-5.8,cy,-D/2-.08,concrete);
-        addEnvironmentBox(group,shell,"Painel escuro","Fachada",2.2,3.05,.28,6.55,cy,-D/2-.08,dark);
-        [-3.25,.05,3.35].forEach((x,i)=>addEnvironmentBox(group,equipment,`Janela ${f+1}-${i+1}`,"Esquadria",2.55,1.72,.1,x,cy+.05,-D/2-.25,glass,{emissive:0x07599b,emissiveIntensity:.5}));
-        addEnvironmentBox(group,equipment,`Varanda ${f+1}º pavimento`,"Sacada",9.4,.18,1.35,-.25,y+.35,-D/2-.7,dark);
-        addEnvironmentBox(group,equipment,`Guarda-corpo ${f+1}º pavimento`,"Sacada",9.0,.82,.08,-.25,y+.95,-D/2-1.2,glass,{emissive:0x07599b,emissiveIntensity:.3});
-        [-4.5,-2.25,0,2.25,4.5].forEach(x=>addEnvironmentBox(group,equipment,"Perfil do guarda-corpo","Sacada",.055,.88,.055,x,y+.96,-D/2-1.2,0x9aa4b2));
-        addEnvironmentBox(group,equipment,"Linha de iluminação","Iluminação",W*.84,.06,.08,0,y+3.02,-D/2-.18,purple,{emissive:purple,emissiveIntensity:1.8});
-        addEnvironmentBox(group,equipment,"Friso entre pavimentos","Fachada",W+.08,.08,.1,0,y-.02,-D/2-.16,0x5b6472);
+        const y0=.5+f*H, cy=y0+.3+(H-.3)/2;
+        const vol=addEnvironmentBox(group,shell,`Pavimento ${f+1}`,"Estrutura",W,H-.3,D,0,cy,0,body);
+        aqTexture(vol,"concrete",4);
+        // Laje aparente: faixa clara que marca cada pavimento.
+        aqTexture(addEnvironmentBox(group,shell,`Laje do ${f+1}º pavimento`,"Estrutura",W+.5,.3,D+.5,0,y0+.15,0,slabColor),"concrete",4);
+
+        // Revestimento amadeirado nas extremidades da fachada.
+        [-1,1].forEach(s=>aqTexture(addEnvironmentBox(group,shell,"Revestimento de madeira","Fachada",1.4,H-.3,.12,s*(W/2-.7),cy,front-.07,wood),"wood",1.2));
+
+        // Esquadrias de cada apartamento (x01 à esquerda, x02 à direita).
+        [-1,1].forEach(s=>{
+            aqWindow(group,equipment,s*4.2,y0+1.5,front-.02,3.2,2.3,{ry:Math.PI,name:`Porta de correr — apto ${f+1}0${s<0?1:2}`,cols:3});
+            if(f>0) aqWindow(group,equipment,s*1.6,y0+1.95,front-.02,1.2,1.2,{ry:Math.PI,name:`Janela — apto ${f+1}0${s<0?1:2}`,cols:1});
+        });
+
+        if(f>0){
+            // Sacadas com piso, guarda-corpo de vidro, floreira e divisória central.
+            [-1,1].forEach(s=>{
+                const bx=s*3.525;
+                addEnvironmentBox(group,equipment,`Sacada ${f+1}0${s<0?1:2}`,"Sacada",6.75,.3,1.6,bx,y0+.15,front-.8,slabColor);
+                aqGlassRail(group,equipment,s*.15,front-1.55,s*6.85,front-1.55,y0+.3,1.0);
+                aqGlassRail(group,equipment,s*6.85,front-.05,s*6.85,front-1.55,y0+.3,1.0);
+                addEnvironmentBox(group,equipment,"Floreira da sacada","Paisagismo",1.0,.45,.5,s*6.1,y0+.53,front-.45,0x3a3d3c);
+                aqShrub(group,equipment,s*6.1,y0+.65,front-.45,.55);
+            });
+            addEnvironmentBox(group,shell,"Divisória entre sacadas","Fachada",.3,H-.3,1.65,0,cy,front-.82,slabColor);
+        }
+
+        // Laterais e fundos
+        [-1,1].forEach(s=>{
+            aqWindow(group,equipment,s*(W/2+.02),y0+1.85,-2.0,1.9,1.5,{ry:s*Math.PI/2,name:"Janela lateral"});
+            aqWindow(group,equipment,s*(W/2+.02),y0+1.85,2.4,1.9,1.5,{ry:s*Math.PI/2,name:"Janela lateral"});
+            aqWindow(group,equipment,s*4.6,y0+1.85,D/2+.02,2.6,1.5,{name:"Janela dos fundos"});
+        });
+        aqWindow(group,equipment,0,y0+2.3,D/2+.02,.9,.7,{name:"Janela do banheiro",cols:1});
+        addEnvironmentBox(group,equipment,"Linha de iluminação","Iluminação",f>0?13.4:W*.84,.05,.06,0,y0+.15,f>0?front-1.63:front-.28,purple,{emissive:purple,emissiveIntensity:1.6});
     }
 
-    // Fachada frontal: entrada central + garagem lateral
-    addEnvironmentBox(group,shell,"Hall de entrada","Acesso",4.2,2.75,.24,-3.7,1.9,-D/2-.08,dark);
-    addEnvironmentBox(group,equipment,"Porta principal","Acesso",1.55,2.35,.1,-3.7,1.42,-D/2-.32,glass,{emissive:0x07599b,emissiveIntensity:.7});
-    addEnvironmentBox(group,equipment,"Moldura da entrada","Fachada",2.05,2.75,.12,-3.7,1.45,-D/2-.36,concrete);
-    addEnvironmentBox(group,equipment,"Garagem","Garagem",4.8,2.55,.22,3.9,1.45,-D/2-.14,dark);
-    addEnvironmentBox(group,equipment,"Portão da garagem","Garagem",4.25,2.25,.1,3.9,1.3,-D/2-.32,0x4b5664);
+    // Térreo: hall de entrada com porta de vidro, marquise iluminada e totem
+    aqWindow(group,equipment,0,1.95,front-.04,2.4,2.7,{ry:Math.PI,name:"Porta do hall",cols:2,light:0x6a4a20,sill:false});
+    addEnvironmentBox(group,shell,"Moldura do hall","Fachada",3.1,.3,.2,0,3.5,front-.1,dark);
+    [-1.4,1.4].forEach(x=>addEnvironmentBox(group,shell,"Moldura do hall","Fachada",.3,3.0,.2,x,2.0,front-.1,dark));
+    addEnvironmentBox(group,equipment,"Marquise do hall","Cobertura",4.6,.2,2.3,0,3.55,front-1.15,slabColor);
+    const canopyLed=addEnvironmentBox(group,equipment,"Fita de LED da marquise","Iluminação",4.2,.04,.06,0,3.43,front-2.1,0xd9c49a,{emissive:0xffb84a,emissiveIntensity:0});
+    aquaGlowMaterials.push(canopyLed.material);
+    [-2.0,2.0].forEach(x=>addEnvironmentBox(group,equipment,"Pilar da marquise","Estrutura",.12,3.0,.12,x,1.95,front-2.2,0x9aa3ab));
+    addEnvironmentBox(group,equipment,"Totem do condomínio","Identificação",.5,1.6,.25,-2.6,.95,-7.9,dark);
+    addEnvironmentBox(group,equipment,"Logo AquaFlow","Identificação",.3,.3,.03,-2.6,1.4,-8.04,purple,{emissive:purple,emissiveIntensity:1.4});
+    [[-1.3,-6.2],[1.3,-6.2],[-1.3,-7.6],[1.3,-7.6]].forEach(([x,z])=>aqBollard(group,x,z,.2));
+    [-12,-9.5,-6.8,6.8,9.5,12].forEach((x,i)=>aqShrub(group,shell,x,.2,-7.7,.85,i%2?0x3b7d45:0x2d6436));
 
-    // Cobertura única, baixa e apoiada diretamente no terceiro pavimento.
-    const roofY=.5+3*H+.08;
-    addEnvironmentBox(group,shell,"Cobertura superior","Cobertura",W+.45,.24,D+.45,0,roofY,0,dark);
-    addEnvironmentBox(group,shell,"Platibanda frontal","Cobertura",W+.35,.5,.25,0,roofY+.34,-D/2-.1,body);
-    addEnvironmentBox(group,shell,"Platibanda traseira","Cobertura",W+.35,.5,.25,0,roofY+.34,D/2+.1,body);
+    // Cobertura: laje, platibanda, casa de máquinas, reservatório, placas solares e terraço com pergolado
+    const roofY=.5+3*H+.3;
+    [[W+.5,.9,.25,0,-D/2-.12],[W+.5,.9,.25,0,D/2+.12]].forEach(([w,h,d,x,z])=>aqTexture(addEnvironmentBox(group,shell,"Platibanda","Cobertura",w,h,d,x,roofY+h/2,z,slabColor),"concrete",3));
+    [-1,1].forEach(s=>aqTexture(addEnvironmentBox(group,shell,"Platibanda","Cobertura",.25,.9,D+.5,s*(W/2+.12),roofY+.45,0,slabColor),"concrete",3));
+    addEnvironmentBox(group,equipment,"Linha de iluminação da cobertura","Iluminação",W+.4,.06,.08,0,roofY+.92,-D/2-.27,purple,{emissive:purple,emissiveIntensity:1.8});
+    aqTexture(addEnvironmentBox(group,shell,"Casa de máquinas","Estrutura",3.2,2.4,3.0,-4.8,roofY+1.2,2.6,0x5b616a),"concrete",2);
+    addEnvironmentBox(group,shell,"Laje da casa de máquinas","Cobertura",3.5,.15,3.3,-4.8,roofY+2.47,2.6,dark);
+    addEnvironmentBox(group,equipment,"Porta da casa de máquinas","Acesso",.9,1.9,.06,-4.8,roofY+.95,1.07,0x2c3036);
+    const tank=aqWaterTank(group,equipment,0,roofY,2.8,1.15,1.3,"Reservatório superior");
+    tank.userData.aquaComponent={name:"Reservatório superior",type:"Reservatório",details:"Reservatório de abastecimento do edifício residencial, com sensor de nível AquaFlow."};
+    aqSolarArray(group,equipment,-4.6,roofY,-2.6,3,1,-.32);
+    const deck=addEnvironmentBox(group,equipment,"Deck do terraço","Lazer",6.4,.1,3.8,3.8,roofY+.05,-1.6,0x6a4b33);
+    aqTexture(deck,"wood",1);
+    [[1.0,-3.2],[6.6,-3.2],[1.0,0],[6.6,0]].forEach(([x,z])=>aqTexture(addEnvironmentBox(group,equipment,"Pilar do pergolado","Estrutura",.16,2.3,.16,x,roofY+1.15,z,wood),"wood",1));
+    [-3.2,0].forEach(z=>addEnvironmentBox(group,equipment,"Viga do pergolado","Estrutura",5.9,.16,.16,3.8,roofY+2.3,z,wood));
+    for(let x=1.2;x<=6.4;x+=.55) addEnvironmentBox(group,equipment,"Ripa do pergolado","Estrutura",.08,.14,3.6,x,roofY+2.42,-1.6,wood);
+    addEnvironmentBox(group,equipment,"Sofá externo","Lazer",3.0,.45,.8,3.8,roofY+.32,-.5,0x4b4f55);
+    addEnvironmentBox(group,equipment,"Encosto do sofá","Lazer",3.0,.45,.18,3.8,roofY+.7,-.15,0x4b4f55);
+    addEnvironmentBox(group,equipment,"Mesa de centro","Lazer",1.2,.3,.6,3.8,roofY+.25,-1.9,wood);
+    [[1.5,-2.6],[6.1,-2.6]].forEach(([x,z])=>aqShrub(group,equipment,x,roofY+.1,z,.75));
 
-    // Terraço com pergolado
-    addEnvironmentBox(group,equipment,"Deck do terraço","Lazer",6.3,.12,3.6,3.5,roofY+.2,1.2,0x555e6a);
-    addEnvironmentBox(group,equipment,"Pergolado","Lazer",6.1,.14,3.4,3.5,roofY+2.1,1.2,dark);
-    [-2.9,2.9].forEach(x=>addEnvironmentBox(group,equipment,"Pilar do pergolado","Estrutura",.14,1.9,.14,3.5+x/2,roofY+1.15,1.2,purple,{emissive:purple,emissiveIntensity:1.2}));
-    [-.8,.4,1.6,2.8].forEach(z=>addEnvironmentBox(group,equipment,"Viga do pergolado","Estrutura",6.2,.1,.13,3.5,roofY+2.17,z,0x8e98a7));
+    // Estacionamento lateral com vagas demarcadas
+    aqTexture(addEnvironmentBox(group,shell,"Estacionamento","Estacionamento",6.4,.06,9.6,12.4,.15,.8,0x2a2e33),"concrete",3);
+    [-3.2,-.6,2.0,4.6].forEach(z=>addEnvironmentBox(group,shell,"Faixa de vaga","Estacionamento",4.6,.02,.08,12.9,.19,z+.8-.8,0xe8e6e0));
+    aqCar(group,12.9,-1.9,Math.PI/2,0x3c4248);
+    aqCar(group,12.9,3.3,Math.PI/2,0x8a8f96);
 
-    // Reservatório discreto atrás da platibanda
-    const tank=new THREE.Mesh(new THREE.CylinderGeometry(1.15,1.15,1.5,28),makeMaterial(0x687487,0x142238,.25));
-    tank.position.set(-4.2,roofY+1,2.6); tank.castShadow=true; group.add(tank); equipment.push(tank);
-    tank.userData.aquaComponent={name:"Reservatório superior",type:"Reservatório",details:"Reservatório de abastecimento do edifício residencial."};
-
-    // Piscina nos fundos, longe da fachada frontal
-    addEnvironmentBox(group,equipment,"Deck da piscina","Lazer",15,.16,6,0,.3,9.5,0x555d68);
+    // Piscina nos fundos, com borda de pedra e espreguiçadeiras
+    aqTexture(addEnvironmentBox(group,equipment,"Deck da piscina","Lazer",15,.16,6,0,.3,9.5,0x6b5d50),"wood",1.2);
     const pool=new THREE.Mesh(new THREE.BoxGeometry(9.4,.55,4.5),makeMaterial(0x168cff,0x006cff,.55));
     pool.position.set(0,.64,10); pool.receiveShadow=true; pool.castShadow=true; group.add(pool); equipment.push(pool);
+    const pTex=aqCanvasTexture("water").clone(); pTex.needsUpdate=true; pTex.repeat.set(3,2); pool.material.map=pTex;
+    animatedParts.push(d=>{ pTex.offset.x+=d*.025; });
     pool.userData.aquaComponent={name:"Piscina residencial",type:"Lazer",details:"Área de lazer do edifício residencial."};
-    addEnvironmentBox(group,equipment,"Borda da piscina","Lazer",9.9,.12,.2,0,.94,7.68,0x858d98);
-    addEnvironmentBox(group,equipment,"Borda da piscina","Lazer",9.9,.12,.2,0,.94,12.32,0x858d98);
+    [[10.2,.6,10,7.6],[10.2,.6,10,12.4]].forEach(([w,d,x,z])=>aqTexture(addEnvironmentBox(group,equipment,"Borda da piscina","Lazer",w,.12,d,0,.97,z,0xcfc6b6),"concrete",2));
+    [-1,1].forEach(s=>aqTexture(addEnvironmentBox(group,equipment,"Borda da piscina","Lazer",.6,.12,4.2,s*5.0,.97,10,0xcfc6b6),"concrete",2));
+    [-4.5,-2.8,2.8,4.5].forEach(x=>{
+        addEnvironmentBox(group,equipment,"Espreguiçadeira","Lazer",.7,.14,1.5,x,.35,13.2,0xe9e3d6);
+        const back=addEnvironmentBox(group,equipment,"Encosto da espreguiçadeira","Lazer",.66,.1,.6,x,.55,12.65,0xe9e3d6);
+        back.rotation.x=-.6;
+    });
 
     // Paisagismo traseiro
-    [-10,-7,7,10].forEach((x,i)=>{
-        const tr=new THREE.Mesh(new THREE.CylinderGeometry(.14,.2,1.5,8),makeMaterial(0x503522)); tr.position.set(x,.98,6.8+(i%2)*3.8); tr.castShadow=true; group.add(tr); shell.push(tr);
-        const cr=new THREE.Mesh(new THREE.SphereGeometry(.85,12,10),makeMaterial(0x2f6533)); cr.position.set(x,2.05,6.8+(i%2)*3.8); cr.scale.y=1.15; cr.castShadow=true; group.add(cr); shell.push(cr);
-    });
-    [-6.5,6.5].forEach(x=>addEnvironmentLightPole(group,x,-7.2,4.7,"Iluminação frontal residencial"));
+    [[-11.5,7.5],[-9.6,11.8],[9.6,11.8],[11.5,7.5],[-13.5,-2],[-13.5,3]].forEach(([x,z])=>aqTree(group,shell,x,z,.9,.1));
+    [-6.5,6.5].forEach(x=>addEnvironmentLightPole(group,x,-9.2,4.7,"Iluminação frontal residencial"));
     [-9,9].forEach(x=>addEnvironmentLightPole(group,x,6.5,3.8,"Iluminação da área de lazer"));
 
     // Prumada e ramais hidráulicos
@@ -3502,16 +3947,186 @@ function createResidentialBuildingEnvironment() {
     environmentSystems.predio_residencial={shell,equipment,systems,flow:[]};
     addEnvironmentMarkers("predio_residencial",group,environmentPoints.predio_residencial);
 }
+
+function createSimpleBuilding(group, shell, w, d, h, color=0xcfd4dc) {
+    // Escritório térreo moderno: paredes reais (o Raio-X mostra o interior),
+    // janelas em fita, laje plana com platibanda e entrada envidraçada.
+    aqTexture(addEnvironmentBox(group,shell,"Piso da edificação","Estrutura",w+.4,.35,d+.4,0,.18,0,0x3a414b),"concrete",3);
+    [["Parede frontal",w,h,.28,0,h/2+.35,-d/2],["Parede traseira",w,h,.28,0,h/2+.35,d/2],
+     ["Parede esquerda",.28,h,d,-w/2,h/2+.35,0],["Parede direita",.28,h,d,w/2,h/2+.35,0]].forEach(([n,ww,hh,dd,x,y,z])=>
+        aqTexture(addEnvironmentBox(group,shell,n,"Estrutura",ww,hh,dd,x,y,z,color),"concrete",3));
+    const top=h+.35;
+    aqTexture(addEnvironmentBox(group,shell,"Laje de cobertura","Cobertura",w+.8,.32,d+.8,0,top+.16,0,0x2b313a),"concrete",3);
+    [[w+.8,.6,.2,0,-d/2-.3],[w+.8,.6,.2,0,d/2+.3]].forEach(([ww,hh,dd,x,z])=>addEnvironmentBox(group,shell,"Platibanda","Cobertura",ww,hh,dd,x,top+.62,z,0x3a414b));
+    [-1,1].forEach(s=>addEnvironmentBox(group,shell,"Platibanda","Cobertura",.2,.6,d+.8,s*(w/2+.3),top+.62,0,0x3a414b));
+    addEnvironmentBox(group,shell,"Linha de iluminação","Iluminação",w+.8,.05,.06,0,top+.05,-d/2-.42,0x7654ff,{emissive:0x7654ff,emissiveIntensity:1.6});
+    addEnvironmentBox(group,shell,"Linha de iluminação","Iluminação",w+.8,.05,.06,0,top+.05,d/2+.42,0x7654ff,{emissive:0x7654ff,emissiveIntensity:1.6});
+
+    // Janelas em fita
+    const wy=.35+h*.56;
+    [-4.3,4.3].forEach(x=>aqWindow(group,shell,x,wy,-d/2-.15,3.6,1.8,{ry:Math.PI,name:"Janela frontal",frame:0x20262d}));
+    [-4.4,0,4.4].forEach(x=>aqWindow(group,shell,x,wy,d/2+.15,3.4,1.8,{name:"Janela dos fundos",frame:0x20262d}));
+    [-1,1].forEach(s=>[-2.2,2.2].forEach(z=>aqWindow(group,shell,s*(w/2+.15),wy,z,2.6,1.8,{ry:s*Math.PI/2,name:"Janela lateral",frame:0x20262d})));
+
+    // Entrada envidraçada com marquise iluminada e degraus
+    aqWindow(group,shell,0,.35+1.4,-d/2-.15,2.4,2.7,{ry:Math.PI,name:"Entrada principal",cols:2,sill:false,frame:0x20262d,light:0x6a4a20});
+    addEnvironmentBox(group,shell,"Marquise da entrada","Cobertura",4.4,.2,2.2,0,3.55,-d/2-1.2,0x2b313a);
+    const led=addEnvironmentBox(group,shell,"Fita de LED da marquise","Iluminação",4.0,.04,.06,0,3.43,-d/2-2.2,0xd9c49a,{emissive:0xffb84a,emissiveIntensity:0});
+    aquaGlowMaterials.push(led.material);
+    [-1.9,1.9].forEach(x=>addEnvironmentBox(group,shell,"Pilar da marquise","Estrutura",.12,3.2,.12,x,1.8,-d/2-2.2,0x9aa3ab));
+    [0,1].forEach(i=>addEnvironmentBox(group,shell,"Degrau","Acesso",3.4,.14,.5,0,.07+i*.14,-d/2-.9+i*.35,0x8c8a85));
+}
+
+function createMultiFloorBuilding(group, shell, equipment, options = {}) {
+    const floors = options.floors || 3;
+    const width = options.width || 13;
+    const depth = options.depth || 9;
+    const floorHeight = options.floorHeight || 3.4;
+    const accent = options.accent || 0x7654ff;
+    const title = options.title || "Edifício";
+    const systems = options.systems || [];
+    const front = -depth/2;
+    const glass = 0x355f86, metal = 0x2b323d, light = 0x9aa3ab;
+
+    aqTexture(addEnvironmentBox(group,shell,"Embasamento","Estrutura",width+.8,.3,depth+.8,0,.15,0,0x1d232b),"stone",1.5);
+
+    for(let floor=0; floor<floors; floor++) {
+        const y = floor * floorHeight + .3;
+        const cy = y + .3 + (floorHeight-.3)/2, gh = floorHeight-.55;
+        addEnvironmentBox(group,shell,`${title} — piso ${floor+1}`,"Estrutura",width+.3,.3,depth+.3,0,y+.15,0,metal);
+        addEnvironmentBox(group,shell,`${title} — núcleo do piso ${floor+1}`,"Estrutura",width-.3,floorHeight-.3,depth-.3,0,cy,0,0x161c26);
+        // Pele de vidro nas quatro faces (com luz interna que acende à noite)
+        aqWindow(group,equipment,0,cy,front+.13,width-.7,gh,{ry:Math.PI,name:`Fachada de vidro — piso ${floor+1}`,cols:Math.round(width/1.4),frame:metal,glass,sill:false,light:0x4a3a20});
+        aqWindow(group,equipment,0,cy,-front-.13,width-.7,gh,{name:`Fachada de vidro — piso ${floor+1}`,cols:Math.round(width/1.4),frame:metal,glass,sill:false,light:0x4a3a20});
+        [-1,1].forEach(s=>aqWindow(group,equipment,s*(width/2-.13),cy,0,depth-.7,gh,{ry:s*Math.PI/2,name:`Fachada lateral — piso ${floor+1}`,cols:Math.round(depth/1.4),frame:metal,glass,sill:false,light:0x4a3a20}));
+    }
+    const topY = floors*floorHeight + .3;
+    addEnvironmentBox(group,shell,"Laje de cobertura","Cobertura",width+.3,.3,depth+.3,0,topY+.15,0,metal);
+
+    // Pilares de canto e brises verticais em toda a altura da fachada principal
+    const fullH = topY + .3;
+    [-1,1].forEach(sx=>[-1,1].forEach(sz=>addEnvironmentBox(group,shell,"Pilar de canto","Estrutura",.45,fullH,.45,sx*(width/2),fullH/2,sz*(depth/2),light)));
+    for(let x=-width/2+1.4; x<width/2-.6; x+=1.4) if(Math.abs(x)>2)
+        addEnvironmentBox(group,equipment,"Brise vertical","Fachada",.08,fullH-.3,.4,x,(fullH-.3)/2+.3,front-.32,light);
+
+    // Platibanda com linha iluminada na cor da marca
+    [[width+.5,front-.05],[width+.5,-front+.05]].forEach(([w,z])=>addEnvironmentBox(group,shell,"Platibanda","Cobertura",w,1.0,.2,0,topY+.8,z,0x3a414b));
+    [-1,1].forEach(s=>addEnvironmentBox(group,shell,"Platibanda","Cobertura",.2,1.0,depth+.5,s*(width/2+.15),topY+.8,0,0x3a414b));
+    addEnvironmentBox(group,equipment,"Coroamento iluminado","Iluminação",width+.55,.08,.08,0,topY+1.33,front-.17,accent,{emissive:accent,emissiveIntensity:1.8});
+
+    // Entrada principal envidraçada e recepção
+    aqWindow(group,equipment,0,1.75,front-.45,3.0,2.7,{ry:Math.PI,name:"Entrada principal",cols:2,frame:0x20262d,sill:false,light:0x6a4a20});
+    addEnvironmentBox(group,equipment,"Portaria / recepção","Recepção",5.4,2.1,2.2,0,1.35,depth/2-1.8,0x242d3b);
+
+    // Prumada central com ramais até as copas e banheiros de cada andar
+    const z = 1.8;
+    const pts = [];
+    for(let f=0; f<floors; f++) pts.push([0, f*floorHeight+.75, z]);
+    pts.push([0, topY+.5, z]);
+    for(let i=0;i<pts.length-1;i++) createSystemPipe(group,systems,[pts[i],pts[i+1]]);
+    for(let f=0; f<floors; f++){
+        const py=f*floorHeight+.75;
+        [-4.5,4.5].forEach(x=>createSystemPipe(group,systems,[[0,py,z],[x,py,z],[x,py,-3.2]]));
+    }
+
+    // Cobertura técnica: reservatório com sensor AquaFlow, casa de máquinas e condensadoras
+    const tank=aqWaterTank(group,equipment,0,topY+.3,1.8,1.45,1.6,"Reservatório superior");
+    tank.userData.aquaComponent={name:"Reservatório superior",type:"Reservatório",details:"Reservatório de abastecimento do edifício, com sensor de nível AquaFlow."};
+    aqTexture(addEnvironmentBox(group,shell,"Casa de máquinas","Estrutura",3.0,2.2,2.6,4.4,topY+1.4,1.6,0x4a515b),"concrete",2);
+    [-4.6,-2.6].forEach(x=>{
+        addEnvironmentBox(group,equipment,"Condensadora","Climatização",1.6,1.0,1.2,x,topY+.8,-2.4,0x8e969e);
+        const fan=new THREE.Mesh(new THREE.CylinderGeometry(.48,.48,.06,20),makeMaterial(0x1f2428));
+        fan.position.set(x,topY+1.33,-2.4); group.add(fan); equipment.push(fan);
+    });
+}
+
 function createCompanyEnvironment() {
     const group=new THREE.Group();
     const shell=[],equipment=[],systems=[];
+    aqTexture(addEnvironmentBox(group,shell,"Pátio do escritório","Área externa",26,.1,20,0,.02,0,0x4a4f55),"pavers",1.6);
+    aqTexture(addEnvironmentBox(group,shell,"Gramado","Paisagismo",6,.06,18,-10.5,.09,0,0x2f5a35),"grass",1.5);
     createSimpleBuilding(group,shell,14,9,4.2,0x4d5665);
-    addEnvironmentBox(group,equipment,"Recepção","Administrativo",5.5,2.0,2.4,-3.2,1.0,1.5,0x242d3b);
-    addEnvironmentBox(group,equipment,"Sala de reunião","Administrativo",5.5,2.0,2.4,3.2,1.0,1.5,0x242d3b);
-    addEnvironmentBox(group,equipment,"Copa","Copa",4.0,1.0,3.0,4.0,.5,-2.3,0x303a48);
-    addEnvironmentBox(group,equipment,"Banheiro","Banheiro",4.0,1.0,3.0,-4.0,.5,-2.3,0x303a48);
+    // Interior (visível no Raio-X): banheiro, copa, recepção, estações de trabalho, sala de reunião e DML
+    const F0=.35, white=0xe8e6e0, wood=0x8a6a48;
+    const part=(n,w,h,d,x,z,c=0xcfd2d4)=>addEnvironmentBox(group,equipment,n,"Divisória",w,h,d,x,F0+h/2,z,c);
+    part("Parede do banheiro",5.5,2.8,.1,-4.25,-1.3); part("Parede do banheiro",.1,2.8,1.6,-1.5,-3.7);
+    const glassP=aqMarkTransparent(new THREE.MeshStandardMaterial({color:0x9fd2e6,transparent:true,opacity:.25,roughness:.05,depthWrite:false}));
+    [[5.5,.06,4.25,-1.3],[.06,3.2,1.5,-2.9]].forEach(([w,d,x,z])=>aqMesh(group,equipment,new THREE.BoxGeometry(w,2.8,d),glassP,x,F0+1.4,z,"Divisória de vidro da copa","Divisória",false));
+    // Banheiro: bancada com cubas, cabines e vasos
+    addEnvironmentBox(group,equipment,"Bancada do banheiro","Banheiro",2.4,.12,.55,-4.2,F0+.85,-2.9,0x3a3d3f);
+    [-4.8,-3.6].forEach(x=>addEnvironmentBox(group,equipment,"Cuba","Ponto de consumo",.45,.06,.35,x,F0+.93,-2.9,white));
+    addEnvironmentBox(group,equipment,"Espelho","Banheiro",2.2,.8,.03,-4.2,F0+1.6,-1.37,0xb9c6cc);
+    [-6.4,-5.3].forEach(x=>{
+        addEnvironmentBox(group,equipment,"Vaso sanitário","Banheiro",.4,.4,.55,x,F0+.2,-4.1,white);
+        addEnvironmentBox(group,equipment,"Caixa acoplada","Banheiro",.4,.35,.15,x,F0+.55,-4.38,white);
+        addEnvironmentBox(group,equipment,"Divisória da cabine","Banheiro",.04,1.9,1.1,x+.55,F0+1.0,-3.9,0x7a8288);
+    });
+    // Copa: bancada com pia, geladeira, mesa e cadeiras
+    addEnvironmentBox(group,equipment,"Bancada da copa","Copa",3.0,.9,.6,4.2,F0+.45,-3.0,0x3a3d3f);
+    addEnvironmentBox(group,equipment,"Cuba da copa","Ponto de consumo",.6,.06,.4,4.2,F0+.93,-3.0,0xc7ccd0);
+    addEnvironmentBox(group,equipment,"Geladeira","Copa",.75,1.8,.7,6.4,F0+.9,-3.9,0xd8dadc);
+    addEnvironmentBox(group,equipment,"Mesa da copa","Copa",1.2,.06,.8,2.6,F0+.75,-2.1,wood);
+    [-1,1].forEach(s=>addEnvironmentBox(group,equipment,"Cadeira da copa","Copa",.4,.45,.4,2.6+s*.8,F0+.23,-2.1,0x2f3438));
+    // Recepção e estações de trabalho com monitores
+    addEnvironmentBox(group,equipment,"Balcão da recepção","Administrativo",2.4,1.05,.6,0,F0+.52,-.4,0x2a3038);
+    addEnvironmentBox(group,equipment,"Tampo da recepção","Administrativo",2.5,.06,.7,0,F0+1.08,-.4,wood);
+    [-1,1].forEach(s=>[.5,2.0].forEach(z=>[1.9,3.4,4.9].forEach(dx=>{
+        const x=s*dx;
+        addEnvironmentBox(group,equipment,"Estação de trabalho","Mobiliário",1.4,.05,.7,x,F0+.74,z,0xd8d4cc);
+        addEnvironmentBox(group,equipment,"Monitor","Mobiliário",.6,.36,.04,x,F0+1.05,z+.22,0x14191f,{emissive:0x1d4a6a,emissiveIntensity:.6});
+        addEnvironmentBox(group,equipment,"Cadeira","Mobiliário",.45,.5,.45,x,F0+.3,z-.55,0x2f3438);
+    })));
+    // Sala de reunião envidraçada e depósito de limpeza (DML)
+    [[3.5,.06,5.25,2.6],[.06,1.9,3.5,3.55]].forEach(([w,d,x,z])=>aqMesh(group,equipment,new THREE.BoxGeometry(w,2.8,d),glassP,x,F0+1.4,z,"Divisória da sala de reunião","Divisória",false));
+    addEnvironmentBox(group,equipment,"Mesa de reunião","Administrativo",2.4,.06,1.0,5.25,F0+.75,3.55,wood);
+    [-.8,0,.8].forEach(dx=>[-1,1].forEach(s=>addEnvironmentBox(group,equipment,"Cadeira de reunião","Administrativo",.4,.45,.4,5.25+dx,F0+.23,3.55+s*.75,0x2f3438)));
+    part("Parede do DML",2.8,2.8,.1,-4.0,2.5); part("Parede do DML",.1,2.8,1.9,-2.6,3.5);
+    addEnvironmentBox(group,equipment,"Tanque de limpeza","Ponto de consumo",.7,.8,.55,-4.0,F0+.4,3.3,0xc7ccd0);
+    const tank=aqWaterTank(group,equipment,0,4.87,3.0,.8,1.2,"Reservatório");
+    tank.userData.aquaComponent={name:"Reservatório",type:"Reservatório",details:"Caixa d'água do escritório com sensor de nível AquaFlow."};
+    [-4.2,4.2].forEach(x=>{
+        addEnvironmentBox(group,equipment,"Condensadora","Climatização",1.4,.9,1.0,x,5.35,2.6,0x8e969e);
+        const fan=new THREE.Mesh(new THREE.CylinderGeometry(.4,.4,.06,20),makeMaterial(0x1f2428)); fan.position.set(x,5.83,2.6); group.add(fan); equipment.push(fan);
+    });
+    createSystemPipe(group,systems,[[0,5.0,3.0],[0,3.5,3.0],[0,3.5,3.5]]);
     createSystemPipe(group,systems,[[0,3.5,3.5],[0,1.0,3.5],[-4.2,1.0,3.5]]);
     createSystemPipe(group,systems,[[0,1.0,3.5],[4.2,1.0,3.5]]);
+
+    // Cisterna de água de chuva com calha e condutor vindo da cobertura
+    const cis=aqWaterTank(group,equipment,-8.7,.07,3.0,.95,1.7,"Cisterna de água de chuva");
+    cis.userData.aquaComponent.details="Reaproveitamento de água da chuva para limpeza e jardim, monitorado pelo AquaFlow";
+    addEnvironmentBox(group,shell,"Calha","Cobertura",.2,.15,9.6,-7.5,4.85,0,0x8a9096);
+    const dp=new THREE.Mesh(new THREE.CylinderGeometry(.07,.07,3.5,10),makeMaterial(0x8a9096)); dp.position.set(-7.5,3.1,3.0); group.add(dp); shell.push(dp);
+    addEnvironmentBox(group,shell,"Condutor até a cisterna","Cobertura",.9,.12,.12,-7.95,1.4,3.0,0x8a9096);
+
+    // Carport com placas solares sobre as vagas
+    [[8.7,-2.0],[12.5,-2.0],[8.7,5.2],[12.5,5.2]].forEach(([x,z])=>addEnvironmentBox(group,shell,"Pilar do carport","Estrutura",.18,2.9,.18,x,1.5,z,0x5a6168));
+    [8.7,12.5].forEach(x=>addEnvironmentBox(group,shell,"Viga do carport","Estrutura",.2,.25,7.6,x,3.0,1.6,0x5a6168));
+    aqSolarArray(group,equipment,10.6,2.6,1.6,3,3,.18);
+
+    // Deck com pergolado e mesas na área de convivência dos fundos
+    aqTexture(addEnvironmentBox(group,shell,"Deck de convivência","Lazer",8,.12,3.2,0,.12,6.9,0x6a4b33),"wood",1);
+    [[-3.8,5.5],[3.8,5.5],[-3.8,8.3],[3.8,8.3]].forEach(([x,z])=>addEnvironmentBox(group,shell,"Pilar do pergolado","Estrutura",.14,2.7,.14,x,1.45,z,0x6a4b33));
+    [5.5,8.3].forEach(z=>addEnvironmentBox(group,shell,"Viga do pergolado","Estrutura",7.8,.14,.14,0,2.8,z,0x6a4b33));
+    for(let x=-3.6;x<=3.6;x+=.6) addEnvironmentBox(group,shell,"Ripa do pergolado","Estrutura",.08,.12,3.0,x,2.92,6.9,0x7a5236);
+    [-2,2].forEach(x=>{
+        const t=new THREE.Mesh(new THREE.CylinderGeometry(.5,.5,.06,20),makeMaterial(0xd8d4cc)); t.position.set(x,.95,6.9); group.add(t); equipment.push(t);
+        const leg=new THREE.Mesh(new THREE.CylinderGeometry(.05,.05,.75,8),makeMaterial(0x2f3438)); leg.position.set(x,.55,6.9); group.add(leg); equipment.push(leg);
+        [-1,1].forEach(s=>addEnvironmentBox(group,equipment,"Cadeira externa","Lazer",.4,.45,.4,x+s*.75,.4,6.9,0x2f3438));
+    });
+    [-5.5,5.5].forEach(x=>aqShrub(group,shell,x,.1,6.9,.9));
+
+    // Estacionamento, paisagismo e iluminação
+    [-1.5,1.5,4.5].forEach(z=>addEnvironmentBox(group,shell,"Faixa de vaga","Estacionamento",4.2,.02,.08,10.6,.08,z,0xe8e6e0));
+    aqCar(group,10.6,0,Math.PI/2,0x3c4248);
+    aqCar(group,10.6,3.0,Math.PI/2,0x7a2e2e);
+    [[-10.5,-6],[-10.5,0],[-10.5,6]].forEach(([x,z])=>aqTree(group,shell,x,z,.85,.1));
+    [-8.6,-7.4].forEach(x=>aqShrub(group,shell,x,.1,-5.6,.8));
+    addEnvironmentBox(group,equipment,"Totem da empresa","Identificação",.5,1.8,.3,4.2,1.0,-7.6,0x14191f);
+    addEnvironmentBox(group,equipment,"Logo AquaFlow","Identificação",.32,.32,.03,4.2,1.5,-7.77,0x7654ff,{emissive:0x7654ff,emissiveIntensity:1.4});
+    [[-3.2,-8.2],[3.2,-8.2]].forEach(([x,z])=>aqBollard(group,x,z,.07));
+    [-6,6].forEach(x=>addEnvironmentLightPole(group,x,-9.0,4.6,"Iluminação do escritório"));
+
     scene.add(group);
     environmentGroups.empresa=group;
     environmentSystems.empresa={shell,equipment,systems,flow:[]};
@@ -3521,10 +4136,70 @@ function createCompanyEnvironment() {
 function createCommercialBuildingEnvironment() {
     const group=new THREE.Group();
     const shell=[],equipment=[],systems=[];
-    createMultiFloorBuilding(group,shell,equipment,{floors:3,width:14,depth:9.5,floorHeight:3.4,facade:0x465267,accent:0x168cff,title:"Prédio comercial"});
-    addEnvironmentBox(group,equipment,"Calçada frontal","Área externa",18,.18,4,0,.1,-7.1,0x343b48);
-    addEnvironmentBox(group,equipment,"Marquise de entrada","Cobertura",6,.25,2.2,0,3.35,-5.5,0x7654ff);
-    [-6,0,6].forEach(x=>addEnvironmentLightPole(group,x,-9.0,5.0,"Poste do prédio comercial"));
+    createMultiFloorBuilding(group,shell,equipment,{floors:3,width:14,depth:9.5,floorHeight:3.4,facade:0x465267,accent:0x7654ff,title:"Prédio comercial",systems});
+    aqTexture(addEnvironmentBox(group,equipment,"Praça de acesso","Área externa",22,.12,5,0,.06,-7.6,0x5a5f66),"pavers",1.6);
+    aqTexture(addEnvironmentBox(group,equipment,"Calçada lateral","Área externa",2.2,.1,12,8.4,.05,-.5,0x5a5f66),"pavers",1.6);
+    // Marquise de vidro com borda iluminada
+    const canopy=addEnvironmentBox(group,equipment,"Marquise de entrada","Cobertura",6.4,.16,2.6,0,3.35,-6.3,0x9fd2e6);
+    canopy.material=aqMarkTransparent(new THREE.MeshStandardMaterial({color:0x9fd2e6,transparent:true,opacity:.45,roughness:.05,metalness:.3}));
+    addEnvironmentBox(group,equipment,"Borda da marquise","Iluminação",6.5,.08,.08,0,3.35,-7.62,0x7654ff,{emissive:0x7654ff,emissiveIntensity:1.6});
+    [-2.9,2.9].forEach(x=>addEnvironmentBox(group,equipment,"Tirante da marquise","Estrutura",.06,.06,2.7,x,3.48,-6.3,0x9aa3ab));
+    // Floreiras com árvores, bicicletário e totem
+    [-7.5,7.5].forEach(x=>{
+        aqTexture(addEnvironmentBox(group,equipment,"Floreira","Paisagismo",2.2,.6,2.2,x,.42,-7.4,0x3a3f45),"concrete",1);
+        aqTree(group,equipment,x,-7.4,.75,.7);
+    });
+    for(let i=0;i<5;i++){
+        const ring=new THREE.Mesh(new THREE.TorusGeometry(.35,.03,6,16,Math.PI),makeMaterial(0x9aa3ab));
+        ring.position.set(-4.6+i*.55,.12,-9.4); ring.rotation.y=Math.PI/2; group.add(ring); equipment.push(ring);
+    }
+    addEnvironmentBox(group,equipment,"Totem do edifício","Identificação",.6,2.4,.35,4.4,1.3,-9.3,0x14191f);
+    addEnvironmentBox(group,equipment,"Logo AquaFlow","Identificação",.36,.36,.03,4.4,2.0,-9.49,0x7654ff,{emissive:0x7654ff,emissiveIntensity:1.4});
+    [-6,0,6].forEach(x=>addEnvironmentLightPole(group,x,-10.6,5.0,"Poste do prédio comercial"));
+
+    // Interiores por andar (Raio-X): banheiro e copa nos pontos monitorados + estações de trabalho
+    for(let f=0;f<3;f++){
+        const y=f*3.4+.6;
+        addEnvironmentBox(group,equipment,"Bancada do banheiro","Banheiro",2.2,.12,.5,-4.5,y+.85,-3.2,0x3a3d3f);
+        [-5.0,-4.0].forEach(x=>addEnvironmentBox(group,equipment,"Cuba","Ponto de consumo",.42,.06,.32,x,y+.93,-3.2,0xe8e6e0));
+        addEnvironmentBox(group,equipment,"Parede do banheiro","Divisória",3.4,2.6,.08,-4.5,y+1.3,-2.3,0xcfd2d4);
+        addEnvironmentBox(group,equipment,"Bancada da copa","Copa",2.6,.9,.55,4.5,y+.45,-3.2,0x3a3d3f);
+        addEnvironmentBox(group,equipment,"Geladeira","Copa",.7,1.7,.65,6.1,y+.85,-3.6,0xd8dadc);
+        if(f>0) [-3.6,-1.2,1.2,3.6].forEach(x=>{
+            addEnvironmentBox(group,equipment,"Estação de trabalho","Mobiliário",1.6,.05,.8,x,y+.74,.3,0xd8d4cc);
+            addEnvironmentBox(group,equipment,"Monitor","Mobiliário",.6,.36,.04,x,y+1.05,.6,0x14191f,{emissive:0x1d4a6a,emissiveIntensity:.6});
+        });
+    }
+    // Telhado verde sobre a cobertura
+    const roofTop=3*3.4+.6;
+    aqTexture(addEnvironmentBox(group,equipment,"Telhado verde","Paisagismo",4.0,.25,2.4,-4.2,roofTop+.12,2.6,0x2f5a35),"grass",1);
+    [-5.5,-4.2,-2.9].forEach(x=>aqShrub(group,equipment,x,roofTop+.2,2.6,.6));
+    // Cisterna de água de chuva na lateral esquerda
+    const cis=aqWaterTank(group,equipment,-9.3,.05,1.5,1.1,2.0,"Cisterna de água de chuva");
+    cis.userData.aquaComponent.details="Reaproveitamento de água da chuva para descargas e jardim";
+    const dp=new THREE.Mesh(new THREE.CylinderGeometry(.08,.08,roofTop-1.0,10),makeMaterial(0x8a9096)); dp.position.set(-7.35,(roofTop-1.0)/2+1.0,1.5); group.add(dp); shell.push(dp);
+    addEnvironmentBox(group,shell,"Condutor até a cisterna","Cobertura",.9,.12,.12,-7.8,1.6,1.5,0x8a9096);
+
+    // Galpão anexo (logística) com portão, doca e caminhão — leitura comercial/industrial
+    const gx=13, gz=4.5, GW=7, GD=7, GH=4.6;
+    aqTexture(addEnvironmentBox(group,shell,"Pátio de carga","Logística",8,.06,9,gx,.03,gz-8,0x2b2f33),"concrete",3);
+    aqTexture(addEnvironmentBox(group,shell,"Piso do galpão anexo","Logística",GW+.3,.25,GD+.3,gx,.12,gz,0x55524c),"concrete",2);
+    [["Fachada do galpão",GW,.2,gx,gz-GD/2],["Fundo do galpão",GW,.2,gx,gz+GD/2],["Lateral do galpão",.2,GD,gx-GW/2,gz],["Lateral do galpão",.2,GD,gx+GW/2,gz]].forEach(([n,w,d,x,z])=>{
+        aqTexture(addEnvironmentBox(group,shell,n,"Logística",w,GH,d,x,GH/2+.25,z,0x6f7a82),"corrugated",2.5);
+    });
+    const gr=addEnvironmentBox(group,shell,"Cobertura do galpão","Cobertura",GW+.6,.18,GD+.6,gx,GH+.35,gz,0x4a5055);
+    aqTexture(gr,"corrugated",1.2);
+    addEnvironmentBox(group,equipment,"Portão de enrolar","Logística",3.4,3.6,.06,gx,2.05,gz-GD/2-.12,0x9aa3ab);
+    for(let k=1;k<12;k++) addEnvironmentBox(group,equipment,"Lâmina do portão","Logística",3.4,.04,.08,gx,.25+k*.3,gz-GD/2-.14,0x6a7177);
+    addEnvironmentBox(group,equipment,"Caixa do portão","Logística",3.7,.4,.35,gx,4.05,gz-GD/2-.2,0x2a2f33);
+    [-1,1].forEach(s=>addEnvironmentBox(group,equipment,"Proteção do portão","Segurança",.25,1.1,.25,gx+s*2.1,.8,gz-GD/2-.4,0xd9a92b));
+    addEnvironmentBox(group,equipment,"Placa do galpão","Identificação",3.0,.5,.05,gx,4.4,gz-GD/2-.13,0x14191f);
+    addEnvironmentBox(group,equipment,"Logo AquaFlow","Identificação",.36,.36,.03,gx-1.1,4.4,gz-GD/2-.17,0x7654ff,{emissive:0x7654ff,emissiveIntensity:1.4});
+    aqTruck(group,equipment,gx,gz-GD/2-4.6,Math.PI,0x2c4a6e);
+    [[gx+2.6,gz-GD/2-1.2],[gx+2.6,gz-GD/2-2.4]].forEach(([x,z])=>{
+        addEnvironmentBox(group,equipment,"Palete","Logística",1.1,.15,1.1,x,.12,z,0x8a6a48);
+        addEnvironmentBox(group,equipment,"Carga paletizada","Logística",1.0,.8,1.0,x,.6,z,0xb08a5a);
+    });
     scene.add(group);
     environmentGroups.predio_comercial=group;
     environmentSystems.predio_comercial={shell,equipment,systems,flow:[]};
@@ -3571,198 +4246,223 @@ function createSchoolEnvironment() {
     const shell = [], equipment = [], systems = [];
 
     // =====================================================
-    // ESCOLA — referência visual na Escola SESI-SP Pedro
-    // Sukadolnik (CE 357), em Mococa: volume horizontal,
-    // fachada com faixa amarela, base escura, jardim frontal,
-    // acesso central e áreas esportivas separadas.
+    // ESCOLA — volume horizontal com duas alas e hall central,
+    // faixa amarela, base vermelha, brises sobre as janelas,
+    // jardim com mastros, quadra poliesportiva cercada,
+    // placas solares e caixa d'água elevada com sensor AquaFlow.
     // =====================================================
-    const wall = 0xc8b99c;
-    const wallDark = 0x6b5140;
-    const yellow = 0xe4b72d;
-    const red = 0xa92f2a;
-    const glass = 0x416d73;
-    const roof = 0x55504a;
-    const floor = 0x8a806f;
-    const green = 0x4e7b42;
+    const wall = 0xc8b99c, wallDark = 0x6b5140, yellow = 0xe4b72d, red = 0xa92f2a, roof = 0x55504a;
 
-    // Terreno e jardim frontal.
-    addEnvironmentBox(group,shell,"Campus escolar","Terreno",42,.25,30,0,.05,0,0x567844);
-    addEnvironmentBox(group,shell,"Calçada frontal","Acesso",32,.10,4,0,.22,13.0,0x9a9080);
-    addEnvironmentBox(group,shell,"Caminho de entrada","Acesso",4.0,.10,10,0,.25,8.0,0xb0a58e);
-    addEnvironmentBox(group,shell,"Jardim frontal","Área verde",30,.08,7,0,.18,10.0,0x638b4d);
+    // Terreno, calçada, acesso e jardins
+    aqTexture(addEnvironmentBox(group,shell,"Campus escolar","Terreno",42,.25,30,0,.05,0,0x567844),"grass",2);
+    aqTexture(addEnvironmentBox(group,shell,"Calçada frontal","Acesso",42,.10,1.8,0,.22,14.1,0x9a9080),"pavers",1.4);
+    aqTexture(addEnvironmentBox(group,shell,"Caminho de entrada","Acesso",4.0,.10,8.4,0,.22,9.4,0xb0a58e),"pavers",1.2);
+    aqTexture(addEnvironmentBox(group,shell,"Jardim frontal","Área verde",17,.08,7.6,-10.5,.2,9.4,0x638b4d),"grass",1.5);
+    aqTexture(addEnvironmentBox(group,shell,"Passeio lateral","Acesso",42,.08,1.2,0,.2,-12.4,0x9a9080),"pavers",1.4);
 
-    // Bloco principal horizontal, com duas alas e acesso central.
-    addEnvironmentBox(group,shell,"Ala A — salas de aula","Edificação",13.5,5.0,8.0,-9.2,2.65,1.2,wall);
-    addEnvironmentBox(group,shell,"Ala B — salas de aula","Edificação",13.5,5.0,8.0,9.2,2.65,1.2,wall);
-    addEnvironmentBox(group,shell,"Bloco central — hall","Edificação",5.2,5.2,8.4,0,2.75,1.0,wallDark);
+    // Blocos principais
+    [["Ala A — salas de aula",13.5,5.0,8.0,-9.2,2.65,1.2,wall],["Ala B — salas de aula",13.5,5.0,8.0,9.2,2.65,1.2,wall],
+     ["Bloco central — hall",5.2,5.2,8.4,0,2.75,1.0,wallDark]].forEach(([n,w,h,d,x,y,z,c])=>aqTexture(addEnvironmentBox(group,shell,n,"Edificação",w,h,d,x,y,z,c),"concrete",3));
 
-    // Faixa amarela característica da fachada e base escura.
-    addEnvironmentBox(group,equipment,"Faixa amarela da fachada","Identidade visual",26.8,1.0,.22,0,3.55,5.30,yellow);
-    addEnvironmentBox(group,equipment,"Faixa inferior da fachada","Acabamento",27.0,.75,.24,0,.85,5.31,red);
+    // Faixa amarela (topo) e base vermelha da fachada
+    addEnvironmentBox(group,equipment,"Faixa amarela da fachada","Identidade visual",26.8,.95,.22,0,4.5,5.30,yellow);
+    [-1,1].forEach(s=>addEnvironmentBox(group,equipment,"Faixa inferior da fachada","Acabamento",10.9,.75,.24,s*8.05,.85,5.31,red));
 
-    // Coberturas baixas, assentadas diretamente nos blocos.
+    // Coberturas com platibanda, placas solares e claraboias
     addEnvironmentBox(group,shell,"Cobertura ala A","Cobertura",14.1,.32,8.5,-9.2,5.18,1.2,roof);
     addEnvironmentBox(group,shell,"Cobertura ala B","Cobertura",14.1,.32,8.5,9.2,5.18,1.2,roof);
     addEnvironmentBox(group,shell,"Cobertura bloco central","Cobertura",5.8,.32,8.9,0,5.38,1.0,roof);
-
-    // Fachada frontal: vidro, portas, pilares e marquise.
-    addEnvironmentBox(group,equipment,"Marquise da entrada","Cobertura",7.0,.28,2.2,0,5.0,6.45,red);
-    addEnvironmentBox(group,equipment,"Porta principal","Acesso",3.2,3.1,.20,0,1.85,5.36,0x30332f);
-    addEnvironmentBox(group,equipment,"Placa vertical SESI","Identificação",1.0,5.0,.28,4.25,2.7,5.38,red,{details:"Escola SESI-SP Pedro Sukadolnik — CE 357"});
-    [-12.8,-9.4,-6.0,-2.5,2.5,6.0,9.4,12.8].forEach(x=>{
-        addEnvironmentBox(group,equipment,"Janela da sala","Esquadria",2.35,1.85,.16,x,3.0,5.35,glass);
+    [-9.2,9.2].forEach(x=>{
+        [[14.1,.5,.2,x,5.55,5.35],[14.1,.5,.2,x,5.55,-2.95],[.2,.5,8.5,x-6.95,5.55,1.2],[.2,.5,8.5,x+6.95,5.55,1.2]].forEach(([w,h,d,px,py,pz])=>addEnvironmentBox(group,shell,"Platibanda","Cobertura",w,h,d,px,py,pz,wallDark));
+        aqSolarArray(group,equipment,x-1.2,5.34,1.2,8,2,.3);
+        addEnvironmentBox(group,equipment,"Claraboia do corredor","Cobertura",1.0,.25,6.0,x+5.4,5.46,1.2,0x7fc4dc,{emissive:0x1d4a5a,emissiveIntensity:.3});
     });
+
+    // Janelas das salas com brises horizontais
+    [-13.8,-10.65,-7.5,-4.35,6.3,8.95,11.6,14.25].forEach(x=>{
+        aqWindow(group,equipment,x,2.75,5.21,2.35,1.85,{name:"Janela da sala",cols:2,frame:0x2a2d2b});
+        addEnvironmentBox(group,equipment,"Brise horizontal","Fachada",2.5,.1,.75,x,3.85,5.6,wallDark);
+    });
+    [[-12.8,-2.81],[-9.4,-2.81],[9.4,-2.81],[12.8,-2.81]].forEach(([x,z])=>aqWindow(group,equipment,x,2.75,z,2.35,1.85,{ry:Math.PI,name:"Janela do corredor",cols:2,frame:0x2a2d2b}));
+    [-1,1].forEach(s=>[-0.8,3.2].forEach(z=>aqWindow(group,equipment,s*15.96,2.75,z,2.2,1.7,{ry:s*Math.PI/2,name:"Janela lateral",cols:2,frame:0x2a2d2b})));
     [-15.7,-2.9,2.9,15.7].forEach(x=>addEnvironmentBox(group,equipment,"Pilar da fachada","Estrutura",.28,4.9,.34,x,2.65,5.05,wallDark));
 
-    // Pátio coberto CENTRAL atrás do hall, não no canto.
+    // Hall: porta de vidro, painel superior, marquise com pilares e placa da escola
+    aqWindow(group,equipment,0,1.85,5.21,3.0,2.7,{name:"Porta principal",cols:2,sill:false,frame:0x1f2220,light:0x6a4a20});
+    aqWindow(group,equipment,0,3.65,5.21,4.0,.6,{name:"Visor do hall",cols:4,sill:false,frame:0x1f2220});
+    addEnvironmentBox(group,equipment,"Marquise da entrada","Cobertura",7.0,.28,2.2,0,5.0,6.45,red);
+    const led=addEnvironmentBox(group,equipment,"Fita de LED da marquise","Iluminação",6.4,.04,.06,0,4.85,7.5,0xd9c49a,{emissive:0xffb84a,emissiveIntensity:0});
+    aquaGlowMaterials.push(led.material);
+    [-3.2,3.2].forEach(x=>addEnvironmentBox(group,equipment,"Pilar da marquise","Estrutura",.22,4.7,.22,x,2.6,7.35,wallDark));
+    addEnvironmentBox(group,equipment,"Placa vertical SESI","Identificação",1.0,5.0,.28,4.25,2.7,5.38,red,{details:"Escola SESI-SP Pedro Sukadolnik — CE 357"});
+    addEnvironmentBox(group,equipment,"Letreiro da placa","Identificação",.6,3.2,.04,4.25,2.9,5.54,0xf2efe8,{emissive:0xffffff,emissiveIntensity:.15});
+
+    // Pátio coberto central
     addEnvironmentBox(group,shell,"Pátio coberto central","Pátio",15.5,.20,7.0,0,.38,-5.4,0x776d5f);
     addEnvironmentBox(group,shell,"Cobertura do pátio","Cobertura",15.0,.30,6.5,0,5.05,-5.4,roof);
     [-6,-3,3,6].forEach(x=>addEnvironmentBox(group,shell,"Pilar do pátio","Estrutura",.28,4.7,.28,x,2.65,-5.4,wallDark));
+    [-4.5,4.5].forEach(x=>{
+        addEnvironmentBox(group,equipment,"Mesa do refeitório","Mobiliário",3.0,.1,1.0,x,1.25,-3.4,0x8a6a48);
+        [-1,1].forEach(s=>addEnvironmentBox(group,equipment,"Banco do refeitório","Mobiliário",3.0,.08,.35,x,.8,-3.4+s*.8,0x6a4a34));
+    });
 
-    // Bloco de serviços ao fundo: cozinha, depósito e apoio.
+    // Bloco de serviços ao fundo
     addEnvironmentBox(group,shell,"Cozinha escolar","Serviço",7.0,3.5,4.0,-9.0,2.0,-7.5,0x8b806d,{details:"Cozinha com pias e pontos de água"});
     addEnvironmentBox(group,shell,"Depósito e limpeza","Serviço",4.0,3.5,4.0,-2.5,2.0,-7.5,0x756d61);
     addEnvironmentBox(group,shell,"Administração","Administrativo",7.0,3.5,4.0,9.0,2.0,-7.5,0x887b69);
+    [-9.0,9.0].forEach(x=>aqWindow(group,equipment,x,2.3,-9.52,2.4,1.2,{ry:Math.PI,name:"Janela de serviço",cols:2,frame:0x2a2d2b}));
 
-    // Banheiros agrupados nas extremidades das alas, próximos aos corredores.
-    const bathrooms = [
-        [-13.0,-1.7],[ -8.8,-1.7 ],
-        [  8.8,-1.7],[ 13.0,-1.7 ],
-        [-13.0, 2.5],[ 13.0, 2.5 ],
-        [-2.5,-7.5],[ 2.5,-7.5 ]
-    ];
+    // Banheiros (interior, visíveis no Raio-X)
+    const bathrooms = [[-13.0,-1.7],[-8.8,-1.7],[8.8,-1.7],[13.0,-1.7],[-13.0,2.5],[13.0,2.5],[-2.5,-7.5],[2.5,-7.5]];
     bathrooms.forEach((v,i)=>{
         addEnvironmentBox(group,equipment,"Banheiro "+(i+1),"Banheiros",3.0,2.35,2.5,v[0],1.38,v[1],0x70685d,{details:"Conjunto de vasos, lavatórios e pontos de água"});
-        // divisórias internas para a leitura do banheiro no Raio-X
         addEnvironmentBox(group,equipment,"Parede divisória sanitária","Banheiros",.12,2.0,2.2,v[0],1.35,v[1],0x514b44);
         addEnvironmentBox(group,equipment,"Lavatório","Ponto de consumo",.9,.55,.45,v[0],.95,v[1]+.75,0x9a9b93);
     });
 
-    // Bebedouros distribuídos nos corredores/pátio, não aleatoriamente.
-    const fountains=[[-5.8,4.7],[5.8,4.7],[-5.8,-4.8],[5.8,-4.8],[0,9.0]];
-    fountains.forEach((v,i)=>addEnvironmentBox(group,equipment,"Bebedouro "+(i+1),"Bebedouro",1.0,1.25,.55,v[0],.92,v[1],0x72766d,{details:"Ponto de água para alunos"}));
+    // Bebedouros nos corredores, no pátio e no hall
+    [[-5.8,4.7],[5.8,4.7],[-5.8,-4.8],[5.8,-4.8],[0,3.9]].forEach((v,i)=>{
+        addEnvironmentBox(group,equipment,"Bebedouro "+(i+1),"Bebedouro",1.0,1.25,.55,v[0],.92,v[1],0x8a9096,{details:"Ponto de água para alunos"});
+        addEnvironmentBox(group,equipment,"Cuba do bebedouro","Bebedouro",.8,.06,.4,v[0],1.57,v[1],0xc7ccd0);
+    });
 
-    // Cozinha: bancadas e pias, deixando claro que existe consumo.
+    // Cozinha: bancadas e pias
     addEnvironmentBox(group,equipment,"Bancada da cozinha","Cozinha",5.2,.85,.85,-9.0,1.0,-5.9,0x5d554b);
     addEnvironmentBox(group,equipment,"Pia da cozinha","Ponto de consumo",1.3,.55,.65,-7.2,1.45,-5.9,0x9b9d95);
     addEnvironmentBox(group,equipment,"Lavagem de utensílios","Ponto de consumo",1.3,.55,.65,-10.8,1.45,-5.9,0x9b9d95);
     addEnvironmentBox(group,equipment,"Tanque de limpeza","Ponto de consumo",1.2,.55,.60,-2.5,1.45,-5.9,0x9b9d95,{details:"Ponto de água para limpeza e manutenção"});
 
-    // Reservatório e casa de bombas em uma área técnica externa.
-    // O reservatório agora é uma caixa d'água elevada, com torre,
-    // plataforma, pernas de sustentação e tampa — sem ficar flutuando.
-    addEnvironmentBox(group,shell,"Base técnica","Estrutura",6.0,.25,5.0,15.0,.18,-7.5,0x4e514b);
+    // Caixa d'água elevada com torre treliçada, escada e sensor AquaFlow
+    aqTexture(addEnvironmentBox(group,shell,"Base técnica","Estrutura",6.0,.25,5.0,15.0,.18,-7.5,0x4e514b),"concrete",2);
     addEnvironmentBox(group,shell,"Plataforma da caixa d'água","Estrutura",4.2,.28,4.2,15.0,4.02,-7.5,0x454a45);
-    [[13.55,-8.85],[16.45,-8.85],[13.55,-6.15],[16.45,-6.15]].forEach(([x,z])=>{
-        addEnvironmentBox(group,shell,"Pé da torre do reservatório","Estrutura",.28,3.75,.28,x,2.0,z,0x555a54);
-    });
-
-    const tankMaterial = makeMaterial(0xb8beb8,0x000000,0);
-    const tank = new THREE.Mesh(
-        new THREE.CylinderGeometry(1.72,1.82,2.65,32),
-        tankMaterial
-    );
-    tank.position.set(15,5.48,-7.5);
-    tank.castShadow=true;
-    tank.receiveShadow=true;
-    group.add(tank);
-    equipment.push(tank);
-    tank.userData.aquaComponent={
-        name:"Reservatório escolar",
-        type:"Reservatório",
-        details:"Caixa d'água elevada — capacidade demonstrativa: 10.000 L"
-    };
-
-    // Tampa superior levemente abaulada e anel de acabamento.
-    const tankTop = new THREE.Mesh(
-        new THREE.SphereGeometry(1.73,.70,32,16,0,Math.PI*2,0,Math.PI/2),
-        tankMaterial
-    );
-    tankTop.position.set(15,6.80,-7.5);
-    tankTop.scale.y=.72;
-    tankTop.castShadow=true;
-    group.add(tankTop);
-    equipment.push(tankTop);
-
-    const tankBase = new THREE.Mesh(
-        new THREE.CylinderGeometry(1.78,1.88,.18,32),
-        makeMaterial(0x747b73)
-    );
-    tankBase.position.set(15,4.15,-7.5);
-    tankBase.castShadow=true;
-    group.add(tankBase);
-    shell.push(tankBase);
-
-    // Bomba de recalque protegida dentro da área técnica.
+    const legs=[[13.55,-8.85],[16.45,-8.85],[13.55,-6.15],[16.45,-6.15]];
+    legs.forEach(([x,z])=>addEnvironmentBox(group,shell,"Pé da torre do reservatório","Estrutura",.28,3.75,.28,x,2.0,z,0x555a54));
+    [[15,-8.85,2.9,.08],[15,-6.15,2.9,.08]].forEach(([x,z,w,d])=>addEnvironmentBox(group,shell,"Travamento da torre","Estrutura",w,.12,d,x,2.1,z,0x555a54));
+    [13.55,16.45].forEach(x=>addEnvironmentBox(group,shell,"Travamento da torre","Estrutura",.08,.12,2.7,x,2.1,-7.5,0x555a54));
+    const tankMaterial = makeMaterial(0xb8beb8);
+    const tank = new THREE.Mesh(new THREE.CylinderGeometry(1.72,1.82,2.65,32), tankMaterial);
+    tank.position.set(15,5.48,-7.5); tank.castShadow=true; tank.receiveShadow=true;
+    group.add(tank); equipment.push(tank);
+    tank.userData.aquaComponent={name:"Reservatório escolar",type:"Reservatório",details:"Caixa d'água elevada com sensor de nível AquaFlow — 10.000 L"};
+    const tankTop = new THREE.Mesh(new THREE.SphereGeometry(1.73,32,16,0,Math.PI*2,0,Math.PI/2), tankMaterial);
+    tankTop.position.set(15,6.80,-7.5); tankTop.scale.y=.32; tankTop.castShadow=true; group.add(tankTop); equipment.push(tankTop);
+    const tankBase = new THREE.Mesh(new THREE.CylinderGeometry(1.78,1.88,.18,32), makeMaterial(0x747b73));
+    tankBase.position.set(15,4.15,-7.5); tankBase.castShadow=true; group.add(tankBase); shell.push(tankBase);
+    aqMesh(group,equipment,new THREE.CylinderGeometry(1.79,1.79,.14,32,1,true),new THREE.MeshStandardMaterial({color:0x168cff,emissive:0x168cff,emissiveIntensity:1.4}),15,5.9,-7.5,"Sensor de nível AquaFlow","Sensor");
+    [-1,1].forEach(s=>addEnvironmentBox(group,shell,"Escada da torre","Acesso",.05,4.0,.05,16.6+s*.22,2.15,-5.95,0x3a3d3a));
+    for(let y=.6;y<4.1;y+=.35) addEnvironmentBox(group,shell,"Degrau","Acesso",.44,.03,.04,16.6,y,-5.95,0x3a3d3a);
     addEnvironmentBox(group,equipment,"Bomba de recalque","Bomba",2.2,1.35,1.8,11.8,.95,-7.5,0x30342f,{details:"Pressurização da rede hidráulica escolar"});
 
-    // Área esportiva separada do prédio, na lateral direita.
-    addEnvironmentBox(group,shell,"Quadra esportiva","Esporte",15.5,.08,9.5,10.5,.45,10.0,0x477049);
-    addEnvironmentBox(group,shell,"Linha central da quadra","Esporte",.08,.04,9.0,10.5,.53,10.0,0xd5cdbd);
-    addEnvironmentBox(group,shell,"Linha lateral da quadra","Esporte",14.8,.04,.08,10.5,.53,5.5,0xd5cdbd);
-    addEnvironmentBox(group,shell,"Linha lateral da quadra","Esporte",14.8,.04,.08,10.5,.53,14.5,0xd5cdbd);
-    [-1.8,22.8].forEach(x=>{
-        addEnvironmentBox(group,equipment,"Tabela de basquete","Esporte",.22,3.2,.22,x,2.0,10.0,0x292d2b);
-        addEnvironmentBox(group,equipment,"Aro de basquete","Esporte",1.2,.12,.12,x,3.55,9.25,0xc28f32);
+    // Quadra poliesportiva cercada (alambrado), com traves e linhas
+    const cx=11.6, cz=9.6, CW=13, CD=5.6;
+    aqTexture(addEnvironmentBox(group,shell,"Piso externo da quadra","Esporte",15,.08,7.2,cx,.2,cz,0x8a8a84),"concrete",2);
+    addEnvironmentBox(group,shell,"Quadra poliesportiva","Esporte",CW,.06,CD,cx,.27,cz,0x2f6f8f);
+    const line=(w,d,x,z)=>addEnvironmentBox(group,shell,"Linha da quadra","Esporte",w,.02,d,x,.31,z,0xf2efe8);
+    line(CW,.08,cx,cz-CD/2); line(CW,.08,cx,cz+CD/2); line(.08,CD,cx-CW/2,cz); line(.08,CD,cx+CW/2,cz); line(.08,CD,cx,cz);
+    const circle=new THREE.Mesh(new THREE.RingGeometry(1.0,1.08,40),makeMaterial(0xf2efe8)); circle.rotation.x=-Math.PI/2; circle.position.set(cx,.315,cz); group.add(circle); shell.push(circle);
+    [-1,1].forEach(s=>{
+        const ga=new THREE.Mesh(new THREE.RingGeometry(1.6,1.68,24,1,-Math.PI/2,Math.PI),makeMaterial(0xf2efe8));
+        ga.rotation.x=-Math.PI/2; ga.rotation.z=s>0?Math.PI:0; ga.position.set(cx+s*CW/2,.315,cz); group.add(ga); shell.push(ga);
+        const gx=cx+s*(CW/2+.05);
+        [-1,1].forEach(t=>addEnvironmentBox(group,equipment,"Trave","Esporte",.1,1.8,.1,gx,1.2,cz+t*1.2,0xf2efe8));
+        addEnvironmentBox(group,equipment,"Travessão","Esporte",.1,.1,2.5,gx,2.1,cz,0xf2efe8);
+        const net=aqMesh(group,equipment,new THREE.BoxGeometry(.8,1.8,2.4),aqMarkTransparent(new THREE.MeshStandardMaterial({color:0xdddddd,transparent:true,opacity:.18,depthWrite:false})),gx+s*.4,1.2,cz,"Rede do gol","Esporte",false);
+    });
+    const fenceMat=aqMarkTransparent(new THREE.MeshStandardMaterial({color:0x8a9096,transparent:true,opacity:.22,roughness:.6,metalness:.5,depthWrite:false}));
+    const fx0=cx-7.4, fx1=cx+7.4, fz0=cz-3.5, fz1=cz+3.5, FH=3.0;
+    [[fx0,fz0,fx1,fz0],[fx0,fz1,fx1,fz1],[fx1,fz0,fx1,fz1],[fx0,fz0,fx0,cz-1],[fx0,cz+1,fx0,fz1]].forEach(([x1,z1,x2,z2])=>{
+        const len=Math.hypot(x2-x1,z2-z1), horiz=Math.abs(z2-z1)<.01;
+        const panel=aqMesh(group,shell,new THREE.BoxGeometry(horiz?len:.03,FH,horiz?.03:len),fenceMat,(x1+x2)/2,.25+FH/2,(z1+z2)/2,"Alambrado da quadra","Esporte",false);
+        const n=Math.max(1,Math.round(len/2.5));
+        for(let i=0;i<=n;i++) addEnvironmentBox(group,shell,"Poste do alambrado","Esporte",.08,FH+.1,.08,x1+(x2-x1)*i/n,.25+FH/2,z1+(z2-z1)*i/n,0x5a6168);
+        addEnvironmentBox(group,shell,"Travessa do alambrado","Esporte",horiz?len:.06,.06,horiz?.06:len,(x1+x2)/2,.25+FH,(z1+z2)/2,0x5a6168);
     });
 
-    // Jardim e árvores como na leitura de campus real.
-    [[-18,10],[-15,10],[18,10],[20,7],[-18,-5],[19,-5]].forEach(([x,z])=>{
-        const trunk=new THREE.Mesh(new THREE.CylinderGeometry(.11,.15,1.5,8),makeMaterial(0x5a3d2a));
-        trunk.position.set(x,.95,z); trunk.castShadow=true; group.add(trunk); shell.push(trunk);
-        const crown=new THREE.Mesh(new THREE.SphereGeometry(.9,10,8),makeMaterial(0x3e6d3c));
-        crown.position.set(x,2.0,z); crown.castShadow=true; group.add(crown); shell.push(crown);
+    // Jardim: árvores, arbustos, bancos, mastros com bandeiras e bicicletário
+    [[-18,8],[-15,12.2],[-9.5,12.4],[-18.5,-11],[18.5,-11.5],[-19,1]].forEach(([x,z])=>aqTree(group,shell,x,z,.95,.1));
+    [-13,-11.5,-7.5,-6].forEach((x,i)=>aqShrub(group,shell,x,.2,6.3,.8,i%2?0x3b7d45:0x2d6436));
+    [-12,-7].forEach(x=>{
+        aqTexture(addEnvironmentBox(group,equipment,"Banco do jardim","Mobiliário",2.0,.1,.5,x,.62,9.0,0x8a6a48),"wood",1);
+        [-.8,.8].forEach(dx=>addEnvironmentBox(group,equipment,"Pé do banco","Mobiliário",.1,.45,.45,x+dx,.4,9.0,0x2a2d2f));
     });
+    [[-3.4,0x2e8b3a],[-4.4,0xf2efe8],[-5.4,red]].forEach(([x,c])=>{
+        addEnvironmentBox(group,equipment,"Mastro","Identificação",.08,6.2,.08,x,3.3,7.4,0xc0c4c8);
+        addEnvironmentBox(group,equipment,"Bandeira","Identificação",.03,.6,.9,x,5.95,7.4+.45,c);
+    });
+    for(let i=0;i<5;i++){
+        const ring=new THREE.Mesh(new THREE.TorusGeometry(.35,.03,6,16,Math.PI),makeMaterial(0x9aa3ab));
+        ring.position.set(2.8,.25,10.5+i*.55); ring.rotation.y=Math.PI/2; group.add(ring); equipment.push(ring);
+    }
 
     // =====================================================
-    // REDE HIDRÁULICA REALISTA DA ESCOLA
-    // A tubulação acompanha corredores e paredes, com
-    // descidas verticais até cada ponto de consumo.
+    // REDE HIDRÁULICA DA ESCOLA (inalterada)
     // =====================================================
-    const mainY=.92;
-    const ceilingY=4.65;
-
-    // Alimentação principal: reservatório -> prumada -> corredor central.
+    const mainY=.92, ceilingY=4.65;
     createSystemPipe(group,systems,[[15,4.15,-7.5],[15,ceilingY,-7.5],[0,ceilingY,-7.5],[0,ceilingY,4.7],[0,mainY,4.7]]);
     createSystemPipe(group,systems,[[0,mainY,4.7],[0,mainY,-1.7]]);
-
-    // Ala A: linha de distribuição junto à parede/corredor.
     createSystemPipe(group,systems,[[0,mainY,-1.7],[-8.8,mainY,-1.7],[-13,mainY,-1.7]]);
     createSystemPipe(group,systems,[[-13,mainY,-1.7],[-13,1.45,-0.95]]);
     createSystemPipe(group,systems,[[-8.8,mainY,-1.7],[-8.8,1.45,-0.95]]);
     createSystemPipe(group,systems,[[-13,mainY,2.5],[-13,1.45,3.25]]);
     createSystemPipe(group,systems,[[-13,mainY,-1.7],[-13,mainY,2.5]]);
     createSystemPipe(group,systems,[[-8.8,mainY,-1.7],[-8.8,mainY,2.5]]);
-
-    // Ala B.
     createSystemPipe(group,systems,[[0,mainY,-1.7],[8.8,mainY,-1.7],[13,mainY,-1.7]]);
     createSystemPipe(group,systems,[[8.8,mainY,-1.7],[8.8,1.45,-0.95]]);
     createSystemPipe(group,systems,[[13,mainY,-1.7],[13,1.45,-0.95]]);
     createSystemPipe(group,systems,[[13,mainY,2.5],[13,1.45,3.25]]);
     createSystemPipe(group,systems,[[8.8,mainY,-1.7],[8.8,mainY,2.5]]);
     createSystemPipe(group,systems,[[13,mainY,-1.7],[13,mainY,2.5]]);
-
-    // Bebedouros: ramais curtos saindo da linha principal e descendo
-    // exatamente até a altura das torneiras.
     createSystemPipe(group,systems,[[0,mainY,4.7],[-5.8,mainY,4.7],[-5.8,1.55,4.7]]);
     createSystemPipe(group,systems,[[0,mainY,4.7],[5.8,mainY,4.7],[5.8,1.55,4.7]]);
     createSystemPipe(group,systems,[[0,mainY,-1.7],[0,mainY,-4.8],[-5.8,mainY,-4.8],[-5.8,1.55,-4.8]]);
     createSystemPipe(group,systems,[[0,mainY,-1.7],[0,mainY,-4.8],[5.8,mainY,-4.8],[5.8,1.55,-4.8]]);
     createSystemPipe(group,systems,[[0,mainY,4.7],[0,mainY,3.9],[0,1.55,3.9]]);
-
-    // Cozinha: ramal pela parede até a pia e ponto de lavagem.
     createSystemPipe(group,systems,[[-8.8,mainY,-1.7],[-8.8,mainY,-5.9],[-7.2,mainY,-5.9],[-7.2,1.45,-5.9]]);
     createSystemPipe(group,systems,[[-8.8,mainY,-5.9],[-2.5,mainY,-5.9],[-2.5,1.45,-5.9]]);
 
-    // POSTES DE ILUMINAÇÃO — distribuídos pelo pátio e acesso.
-    [-13.8,-7.0,0,7.0,13.8].forEach(x=>addEnvironmentLightPole(group,x,8.0,4.8,"Poste do pátio escolar"));
-    [-12.5,0,12.5].forEach(x=>addEnvironmentLightPole(group,x,-9.0,4.5,"Poste da área externa escolar"));
+    // POSTES DE ILUMINAÇÃO — calçada, quadra e fundos
+    [-14,-6.5,-2.8].forEach(x=>addEnvironmentLightPole(group,x,13.3,4.8,"Poste do pátio escolar"));
+    [[3.6,5.6],[19.6,13.2]].forEach(([x,z])=>addEnvironmentLightPole(group,x,z,6.0,"Refletor da quadra"));
+    [-12.5,0,9].forEach(x=>addEnvironmentLightPole(group,x,-11.6,4.5,"Poste da área externa escolar"));
 
-    group.rotation.y=0;
     scene.add(group);
     environmentGroups.escola=group;
     environmentSystems.escola={shell,equipment,systems,flow:[]};
     addEnvironmentMarkers("escola",group,environmentPoints.escola);
+}
+
+/* Caminhão baú com cabine avançada (frente voltada para +Z local). */
+function aqTruck(group, list, x, z, ry, cabColor = 0x8f2924) {
+    const t = new THREE.Group();
+    const add = (geo, mat, px, py, pz, cast = true) => {
+        const m = new THREE.Mesh(geo, mat); m.position.set(px, py, pz); m.castShadow = cast; m.receiveShadow = true;
+        m.userData.aquaComponent = { name: "Caminhão de carga", type: "Veículo industrial", details: "Caminhão encostado na doca de carregamento" };
+        t.add(m); if (list) list.push(m); return m;
+    };
+    const cab = makeMaterial(cabColor), dark = makeMaterial(0x1c1f21), metal = makeMaterial(0x8a9096), white = makeMaterial(0xd8d6cf);
+    const glass = makeMaterial(0x24343b); glass.metalness = .5; glass.roughness = .1;
+    add(new THREE.BoxGeometry(2.2, .35, 8.2), dark, 0, .8, 0);
+    add(new THREE.BoxGeometry(2.45, 2.5, 2.2), cab, 0, 2.2, 2.95);
+    add(new THREE.BoxGeometry(2.2, 1.0, .06), glass, 0, 2.75, 4.06, false);
+    [-1.23, 1.23].forEach(sx => add(new THREE.BoxGeometry(.06, .9, 1.2), glass, sx, 2.75, 3.2, false));
+    add(new THREE.BoxGeometry(1.6, .5, .08), dark, 0, 1.55, 4.07);
+    add(new THREE.BoxGeometry(2.55, .3, .3), metal, 0, 1.0, 4.15);
+    [-1.4, 1.4].forEach(sx => add(new THREE.BoxGeometry(.1, .45, .3), dark, sx, 2.7, 3.9));
+    const box = add(new THREE.BoxGeometry(2.55, 3.0, 5.5), white, 0, 2.6, -1.1);
+    aqTexture(box, "planks", 2.5);
+    add(new THREE.BoxGeometry(2.58, .35, 5.52), makeMaterial(0x7654ff, 0x7654ff, .5), 0, 2.2, -1.1);
+    add(new THREE.BoxGeometry(2.6, .12, 5.6), dark, 0, 4.15, -1.1);
+    add(new THREE.BoxGeometry(2.5, .25, .2), makeMaterial(0xd9a92b), 0, .85, -3.95);
+    const hl = new THREE.MeshStandardMaterial({ color: 0xffd27a, emissive: 0xffa83d, emissiveIntensity: 0 });
+    aquaGlowMaterials.push(hl);
+    [-.85, .85].forEach(sx => add(new THREE.BoxGeometry(.4, .22, .08), hl, sx, 1.45, 4.08, false));
+    [[2.95, .55], [-2.0, .58], [-3.2, .58]].forEach(([wz, r]) => [-1.12, 1.12].forEach(sx => {
+        const w = add(new THREE.CylinderGeometry(r, r, .42, 20), dark, sx, r, wz); w.rotation.z = Math.PI / 2;
+        const h = add(new THREE.CylinderGeometry(r * .4, r * .4, .45, 14), metal, sx, r, wz); h.rotation.z = Math.PI / 2;
+    }));
+    t.position.set(x, 0, z); t.rotation.y = ry;
+    group.add(t);
+    return t;
 }
 
 function createIndustryEnvironment() {
@@ -3772,235 +4472,242 @@ function createIndustryEnvironment() {
     activeBuildEquipment = equipment;
 
     // =====================================================
-    // INDÚSTRIA — reconstruída para ficar apoiada no terreno.
-    // Nada de volumes atravessando paredes ou telhados soltos.
+    // INDÚSTRIA — galpão com cobertura em shed, prédio administrativo,
+    // área de utilidades (torre de resfriamento, tanques, chaminé),
+    // lavagem de veículos, doca com caminhão e reservatório AquaFlow.
+    // Frente voltada para +Z (câmera).
     // =====================================================
-    const concrete=0x68655e, wall=0x505654, dark=0x202522, steel=0x414a47;
-    const roof=0x292d2c, glass=0x315a5a, red=0x9f352b, yellow=0xc59d32;
+    const metalWall=0x6f7a82, concrete=0x77736b, dark=0x202522, steel=0x414a47, roofC=0x4a5055;
+    const yellow=0xd9a92b, red=0x9f352b, purple=0x7654ff;
 
-    // Terreno e piso do pátio.
-    addEnvironmentBox(group,shell,"Terreno industrial","Terreno",42,.30,30,0,.00,0,0x454b47);
-    addEnvironmentBox(group,shell,"Pátio de manobra","Acesso",40,.10,8,0,.20,10.0,0x77736a);
-    addEnvironmentBox(group,shell,"Faixa de segurança","Sinalização",30,.06,.5,0,.31,5.8,yellow);
-
-    // -------------------------
-    // ADMINISTRAÇÃO
-    // -------------------------
-    addEnvironmentBox(group,shell,"Fundação administrativa","Fundação",11.2,.25,7.4,-14,.17,1.5,0x3c403d);
-    addEnvironmentBox(group,shell,"Piso administrativo","Piso",10.7,.12,7.0,-14,.36,1.5,0x66635c);
-    addEnvironmentBox(group,shell,"Prédio administrativo","Administrativo",10.5,4.3,6.8,-14,2.56,1.5,0x77746b);
-    // Telhado diretamente apoiado sobre as paredes.
-    addEnvironmentBox(group,shell,"Cobertura administrativa","Cobertura",11.0,.28,7.3,-14,4.83,1.5,roof);
-    addEnvironmentBox(group,equipment,"Recepção","Acesso",3.6,2.7,.16,-14,1.65,-1.96,dark);
-    [-17,-14,-11].forEach(x=>addEnvironmentBox(group,equipment,"Janela administrativa","Esquadria",2.0,1.35,.12,x,2.9,-1.97,glass));
-    addEnvironmentBox(group,equipment,"Porta administrativa","Acesso",1.5,2.8,.18,-14,1.55,-1.99,red);
+    // Terreno, pátio de manobras e calçada
+    aqTexture(addEnvironmentBox(group,shell,"Terreno industrial","Terreno",42,.3,30,0,0,0,0x3d4440),"concrete",4);
+    aqTexture(addEnvironmentBox(group,shell,"Pátio de manobras","Acesso",42,.06,9.4,0,.18,10.0,0x2b2f33),"concrete",3);
+    for(let x=-8;x<20;x+=3) addEnvironmentBox(group,shell,"Faixa de rolamento","Sinalização",1.6,.02,.16,x,.22,11.6,0xe8e6e0);
+    [-19.5,-16.6,-13.7,-10.8].forEach(x=>addEnvironmentBox(group,shell,"Faixa de vaga","Estacionamento",.12,.02,4.4,x,.22,8.9,0xe8e6e0));
+    aqCar(group,-18.05,9.0,Math.PI,0x3c4248);
+    aqCar(group,-15.15,9.0,Math.PI,0x8a8f96);
+    aqCar(group,-12.25,9.0,Math.PI,0x2c4a6e);
 
     // -------------------------
-    // NAVE PRINCIPAL
+    // GALPÃO PRINCIPAL — x -10..12, z -11..5
     // -------------------------
-    // Fundação, piso e paredes têm a mesma projeção: o prédio nasce do chão.
-    const naveX=2.5, naveZ=-1.2, naveW=25.0, naveD=22.0, naveH=7.0;
-    addEnvironmentBox(group,shell,"Fundação da nave","Fundação",naveW+.5,.28,naveD+.5,naveX,.14,naveZ,0x343937);
-    addEnvironmentBox(group,shell,"Piso da nave","Piso",naveW,.16,naveD,naveX,.36,naveZ,0x555650);
-
-    // Parede frontal dividida em trechos, deixando três vãos reais de garagem.
-    // Os dois vãos laterais permanecem fechados por portões; o vão central fica aberto para o caminhão.
-    const frontZ = naveZ - naveD/2;
-    const bayW = 5.0;
-    const gapW = (naveW - bayW*3) / 4;
-    const frontSegments = [
-        {x:naveX-naveW/2+gapW/2, w:gapW},
-        {x:naveX-naveW/2+gapW+bayW+gapW/2, w:gapW},
-        {x:naveX-naveW/2+gapW*2+bayW*2+gapW/2, w:gapW},
-        {x:naveX-naveW/2+gapW*3+bayW*3+gapW/2, w:gapW}
-    ];
-    frontSegments.forEach((seg,i)=>{
-        addEnvironmentBox(group,shell,"Parede frontal — trecho "+(i+1),"Edificação",seg.w,naveH,.28,seg.x,naveH/2+.44,frontZ,wall);
-    });
-    addEnvironmentBox(group,shell,"Parede traseira da nave","Edificação",naveW,naveH,.28,naveX,naveH/2+.44,naveZ+naveD/2,wall);
-    addEnvironmentBox(group,shell,"Parede esquerda da nave","Edificação",.28,naveH,naveD,naveX-naveW/2,naveH/2+.44,naveZ,wall);
-    addEnvironmentBox(group,shell,"Parede direita da nave","Edificação",.28,naveH,naveD,naveX+naveW/2,naveH/2+.44,naveZ,wall);
-
-    // Cobertura única, apoiada sobre o topo das paredes.
-    addEnvironmentBox(group,shell,"Telhado principal da fábrica","Cobertura",naveW+.45,.34,naveD+.45,naveX,naveH+.61,naveZ,roof);
-    // Faixa superior/fachada, presa à parede frontal.
-    addEnvironmentBox(group,equipment,"Faixa de identificação","Identificação",12,.85,.16,naveX,5.65,naveZ-naveD/2-.16,red,{details:"Planta industrial monitorada pelo AquaFlow"});
-
-    // =====================================================
-    // FACHADA DA FÁBRICA — UMA ÚNICA GARAGEM ABERTA
-    // Os três vãos têm exatamente a mesma largura e ficam alinhados
-    // com a estrutura da nave. Apenas o vão central permanece aberto.
-    // =====================================================
-    const bayCenters = [naveX-7.5, naveX, naveX+7.5];
-
-    // Fecha completamente as duas baias laterais.
-    [bayCenters[0], bayCenters[2]].forEach((x,i)=>{
-        addEnvironmentBox(group,shell,"Parede de fechamento da baia "+(i===0?1:3),"Edificação",bayW-.12,naveH,.24,x,naveH/2+.44,frontZ,wall);
-        // Porta metálica desenhada na parede, sem criar um segundo vão.
-        addEnvironmentBox(group,equipment,"Porta metálica da baia "+(i===0?1:3),"Logística",bayW-.35,4.35,.035,x,2.55,frontZ-.145,dark);
-        addEnvironmentBox(group,equipment,"Faixa da porta da baia "+(i===0?1:3),"Sinalização",bayW-.75,.12,.05,x,4.62,frontZ-.18,yellow);
-    });
-
-    // Uma única garagem aberta: o vão central.
-    addEnvironmentBox(group,equipment,"Faixa de segurança da garagem central","Sinalização",bayW+.5,.10,.25,naveX,.58,frontZ-.30,yellow);
-    addEnvironmentBox(group,equipment,"Piso da garagem central","Logística",bayW,.12,5.8,naveX,.50,naveZ-7.9,0x4b4a45);
-
-    // Parede imediatamente atrás do caminhão: fecha visualmente a garagem
-    // sem deixar a área de máquinas aparecendo pelo vão frontal.
-    const garageBackZ = naveZ - 5.15;
-    addEnvironmentBox(group,shell,"Parede de fundo da garagem central","Edificação",bayW-.12,5.2,.24,naveX,2.95,garageBackZ,wall);
-
-    // Janelas laterais — presas às paredes, sem atravessar a estrutura.
-    // Elas ficam no lado externo da nave, em vez de ocupar a fachada da garagem.
-    [-5.8,0.5,6.8].forEach(z=>{
-        addEnvironmentBox(group,equipment,"Janela lateral esquerda da produção","Esquadria",.10,1.20,3.0,naveX-naveW/2-.17,5.15,z,glass);
-        addEnvironmentBox(group,equipment,"Janela lateral direita da produção","Esquadria",.10,1.20,3.0,naveX+naveW/2+.17,5.15,z,glass);
-    });
-    addEnvironmentBox(group,equipment,"Entrada de funcionários","Acesso",2.0,3.0,.18,naveX+naveW/2+.20,1.9,naveZ-naveD/2-.18,red);
-
-    // Marquise frontal: pequena, horizontal e sustentada por postes.
-    addEnvironmentBox(group,equipment,"Marquise industrial","Cobertura",24.2,.28,1.7,naveX,6.10,naveZ-naveD/2-1.05,roof);
-    [-9,-1,7,14].forEach(x=>addEnvironmentBox(group,equipment,"Suporte da marquise","Estrutura",.22,1.55,.22,x,5.28,naveZ-naveD/2-1.05,dark));
-
-    // -------------------------
-    // OFICINA E UTILIDADES
-    // -------------------------
-    addEnvironmentBox(group,shell,"Fundação da oficina","Fundação",9.7,.25,8.7,-7.5,.17,7.2,0x393e3b);
-    addEnvironmentBox(group,shell,"Piso da oficina","Piso",9.2,.12,8.2,-7.5,.36,7.2,0x5c5a53);
-    addEnvironmentBox(group,shell,"Oficina e manutenção","Oficina",9.0,4.8,8.0,-7.5,2.77,7.2,concrete);
-    addEnvironmentBox(group,shell,"Telhado da oficina","Cobertura",9.5,.30,8.5,-7.5,5.35,7.2,roof);
-
-    addEnvironmentBox(group,shell,"Fundação das utilidades","Fundação",7.7,.25,6.7,12.8,.17,7.2,0x393e3b);
-    addEnvironmentBox(group,shell,"Piso das utilidades","Piso",7.2,.12,6.2,12.8,.36,7.2,0x555851);
-    addEnvironmentBox(group,shell,"Casa de utilidades","Utilidades",7.0,5.2,6.0,12.8,2.96,7.2,steel);
-    addEnvironmentBox(group,shell,"Telhado das utilidades","Cobertura",7.5,.30,6.5,12.8,5.72,7.2,roof);
-
-    // -------------------------
-    // MÁQUINAS — todas dentro do piso da nave.
-    // -------------------------
-    function factoryMachine(x,z,w,d,h,bodyColor,name,accent){
-        addEnvironmentBox(group,equipment,"Base — "+name,"Estrutura",w+.65,.22,d+.65,x,.56,z,dark);
-        addEnvironmentBox(group,equipment,name,"Máquina industrial",w,h,d,x,.68+h/2,z,bodyColor,{details:"Equipamento de produção com consumo de água monitorado"});
-        addEnvironmentBox(group,equipment,"Painel de controle — "+name,"Controle",.75,1.15,.16,x,1.45,z-d/2-.10,accent);
-        addEnvironmentBox(group,equipment,"Módulo superior — "+name,"Máquina",w*.55,.55,d*.45,x,.68+h+.28,z,accent);
-    }
-    factoryMachine(-7,1.8,3.2,2.6,2.5,0x6e5542,"Lavadora industrial",red);
-    factoryMachine(-1.8,1.8,4.0,3.0,3.0,0x4d5551,"Centro de processamento",yellow);
-    factoryMachine(4.0,1.8,3.4,2.7,2.6,0x6b4c3c,"Linha de envase",red);
-    factoryMachine(9.0,1.8,3.0,2.5,2.8,0x4a514d,"Prensa hidráulica",yellow);
-
-    addEnvironmentBox(group,equipment,"Esteira de produção","Máquina",11.5,.42,1.2,0,1.15,6.0,dark,{details:"Linha transportadora da fábrica"});
-    for(let x=-4.8;x<=4.8;x+=2.4){
-        const roller=new THREE.Mesh(new THREE.CylinderGeometry(.24,.24,1.0,16),makeMaterial(0x181d1b));
-        roller.rotation.z=Math.PI/2; roller.position.set(x,1.40,6.0); roller.castShadow=true; group.add(roller); equipment.push(roller);
-    }
-    addEnvironmentBox(group,equipment,"Estação de montagem","Máquina",3.3,2.3,2.6,6.5,1.72,6.0,0x555b56);
-
-    // -------------------------
-    // UTILIDADES EXTERNAS — todos os equipamentos apoiados no pátio.
-    // -------------------------
-    addEnvironmentBox(group,shell,"Pátio de utilidades","Utilidades",15,.25,8,13,.34,-7.0,0x343936);
-    addCylinder("Tanque de processo 01","Reservatório",9.5,2.35,-7.0,1.55,4.1,0x68706b,"Tanque de processo");
-    addCylinder("Tanque de processo 02","Reservatório",13.5,2.15,-7.0,1.35,3.7,0x5b625d,"Tanque auxiliar");
-    addCylinder("Torre de resfriamento","Resfriamento",18.0,3.0,-6.0,2.0,5.5,0x515955,"Circuito de água de resfriamento");
-    addEnvironmentBox(group,equipment,"Chaminé industrial","Utilidade",1.35,8,1.35,18,4.0,.6,dark,{details:"Exaustão da planta"});
-    addEnvironmentBox(group,equipment,"Bomba principal","Bomba",2.4,1.5,2.0,8.2,1.0,6.7,0x282c2a,{details:"Bombeamento da rede de processo"});
-
-    // Doca traseira: cobertura apoiada em pilares, sem teto flutuante.
-    addEnvironmentBox(group,shell,"Doca de carga","Logística",13,.55,4,-10,.66,9.0,0x625e55);
-    [-14,-10,-6].forEach(x=>addEnvironmentBox(group,equipment,"Porta da doca","Logística",2.6,3.6,.20,x,2.45,7.0,dark));
-    addEnvironmentBox(group,equipment,"Cobertura da doca","Cobertura",13.6,.30,3.3,-10,4.90,9.0,roof);
-    [-15.5,-10,-4.5].forEach(x=>addEnvironmentBox(group,equipment,"Pilar da doca","Estrutura",.24,4.2,.24,x,2.75,10.25,dark));
-
-    // -------------------------
-    // GARAGEM CENTRAL ABERTA + CAMINHÃO INDUSTRIAL
-    // -------------------------
-    // O caminhão ocupa exatamente o vão central da fachada.
-    // Não existe uma segunda garagem sobreposta ao prédio. A cobertura é a própria marquise frontal.
-    const truck = new THREE.Group();
-    truck.position.set(naveX, .62, naveZ-8.8);
-    truck.rotation.y = 0;
-    truck.userData.aquaComponent = {
-        name: "Caminhão de abastecimento",
-        type: "Veículo industrial",
-        details: "Caminhão de apoio estacionado na garagem central aberta."
+    const nx=1, nz=-3, NW=22, ND=16, NH=7.5, fz=nz+ND/2, bz=nz-ND/2, lx=nx-NW/2, rx=nx+NW/2;
+    aqTexture(addEnvironmentBox(group,shell,"Fundação do galpão","Fundação",NW+.4,.3,ND+.4,nx,.15,nz,0x55524c),"concrete",3);
+    addEnvironmentBox(group,shell,"Piso epóxi","Piso",NW-.4,.04,ND-.4,nx,.32,nz,0x4f5a55);
+    const wallPart=(name,w,d,x,z)=>{
+        aqTexture(addEnvironmentBox(group,shell,name+" — base de concreto","Edificação",w,1.2,d,x,.9,z,concrete),"concrete",2);
+        const m=addEnvironmentBox(group,shell,name,"Edificação",w,6.0,d,x,4.5,z,metalWall);
+        aqTexture(m,"corrugated",3);
     };
+    wallPart("Fachada frontal do galpão",NW,.25,nx,fz);
+    wallPart("Fachada traseira do galpão",NW,.25,nx,bz);
+    wallPart("Lateral esquerda do galpão",.25,ND,lx,nz);
+    wallPart("Lateral direita do galpão",.25,ND,rx,nz);
+    // Pilares metálicos aparentes
+    [-10,-4.5,1,6.5,12].forEach(x=>[fz,bz].forEach(z=>addEnvironmentBox(group,shell,"Pilar metálico","Estrutura",.4,7.4,.4,x,3.95,z+(z>nz?.12:-.12),steel)));
+    [-11,-7,-3,1,5].forEach(z=>[lx,rx].forEach(x=>addEnvironmentBox(group,shell,"Pilar metálico","Estrutura",.4,7.4,.4,x+(x>nx?.12:-.12),3.95,z,steel)));
+    // Janelas altas (lanternim lateral) entre os pilares
+    [-7.25,-1.75,3.75,9.25].forEach(x=>{
+        aqWindow(group,equipment,x,6.65,fz+.14,4.4,.9,{name:"Janela alta do galpão",cols:4,sill:false,frame:dark});
+        aqWindow(group,equipment,x,6.65,bz-.14,4.4,.9,{ry:Math.PI,name:"Janela alta do galpão",cols:4,sill:false,frame:dark});
+    });
+    [-9,-5,-1,3].forEach(z=>[-1,1].forEach(s=>aqWindow(group,equipment,s<0?lx-.14:rx+.14,6.65,z,3.2,.9,{ry:s*Math.PI/2,name:"Janela alta do galpão",cols:3,sill:false,frame:dark})));
 
-    const truckRed = makeMaterial(0x8f2924);
-    const truckDark = makeMaterial(0x202522);
-    const truckMetal = makeMaterial(0x666c67);
-    const truckGlass = makeMaterial(0x31535a);
-    const truckWhite = makeMaterial(0xb9b5aa);
-
-    function truckPart(geo, mat, x,y,z, cast=true){
-        const m=new THREE.Mesh(geo,mat);
-        m.position.set(x,y,z); m.castShadow=cast; m.receiveShadow=true; truck.add(m);
-        return m;
+    // Cobertura em shed (dentes de serra) com vidros voltados para a frente
+    addEnvironmentBox(group,shell,"Laje da cobertura","Cobertura",NW+.6,.25,ND+.6,nx,NH+.12,nz,roofC);
+    const teeth=4, tDepth=ND/teeth, rise=1.6, ang=Math.atan2(rise,tDepth), slopeL=Math.hypot(tDepth,rise);
+    const triShape=new THREE.Shape(); triShape.moveTo(0,0); triShape.lineTo(tDepth,0); triShape.lineTo(0,rise); triShape.closePath();
+    const triGeo=new THREE.ExtrudeGeometry(triShape,{depth:.2,bevelEnabled:false});
+    for(let k=0;k<teeth;k++){
+        const z0=bz+k*tDepth, base=NH+.25;
+        const sl=addEnvironmentBox(group,shell,"Telhado em shed","Cobertura",NW+.6,.16,slopeL+.1,nx,base+rise/2+.08*Math.cos(ang),z0+tDepth/2-.08*Math.sin(ang),roofC);
+        sl.rotation.x=-ang;
+        aqTexture(sl,"corrugated",1.2);
+        aqWindow(group,shell,nx,base+rise/2,z0+tDepth-.06,NW-.6,rise-.2,{name:"Vidro do shed",cols:11,sill:false,frame:dark,light:0x4a4a3a});
+        [lx-.3,rx+.1].forEach(x=>{const tri=aqMesh(group,shell,triGeo,makeMaterial(metalWall),x,base,z0+tDepth,"Oitão do shed","Cobertura"); tri.rotation.y=Math.PI/2;});
     }
 
-    // Chassi
-    truckPart(new THREE.BoxGeometry(2.25,.35,6.7),truckDark,0,.38,0);
-    // Cabine na frente, voltada para fora da garagem.
-    truckPart(new THREE.BoxGeometry(2.35,2.65,2.35),truckRed,0,1.73,-2.05);
-    truckPart(new THREE.BoxGeometry(2.15,.75,1.05),truckRed,0,1.03,-3.42);
-    truckPart(new THREE.BoxGeometry(2.0,1.0,.08),truckGlass,0,2.10,-3.25,false);
-    [-1.18,1.18].forEach(x=>truckPart(new THREE.BoxGeometry(.08,1.0,1.25),truckGlass,x,2.10,-2.10,false));
-
-    // Espelhos, para-choque e grade.
-    [-1.45,1.45].forEach(x=>truckPart(new THREE.BoxGeometry(.12,.35,.42),truckDark,x,1.95,-3.35));
-    truckPart(new THREE.BoxGeometry(2.5,.32,.32),truckMetal,0,.73,-3.92);
-    truckPart(new THREE.BoxGeometry(1.55,.32,.12),truckDark,0,1.05,-3.98);
-
-    // Carroceria de carga, alinhada atrás da cabine.
-    truckPart(new THREE.BoxGeometry(2.45,3.05,3.65),truckWhite,0,1.93,1.15);
-    truckPart(new THREE.BoxGeometry(2.58,.18,3.78),truckDark,0,3.50,1.15);
-    [-1.28,1.28].forEach(x=>truckPart(new THREE.BoxGeometry(.04,.20,3.35),truckRed,x,2.43,1.15));
-
-    function truckWheel(x,z,r){
-        const wheel=truckPart(new THREE.CylinderGeometry(r,r,.46,24),truckDark,x,.16,z);
-        wheel.rotation.z=Math.PI/2;
-        const hub=truckPart(new THREE.CylinderGeometry(r*.30,r*.30,.50,16),truckMetal,x,.16,z);
-        hub.rotation.z=Math.PI/2;
-    }
-    truckWheel(-1.30,-2.65,.62); truckWheel(1.30,-2.65,.62);
-    truckWheel(-1.30,1.35,.72); truckWheel(1.30,1.35,.72);
-    truckWheel(-1.30,2.45,.72); truckWheel(1.30,2.45,.72);
-
-    // Faróis controlados pela iluminação geral.
-    const headlightMat = new THREE.MeshStandardMaterial({color:0xffd27a,emissive:0xffa83d,emissiveIntensity:0});
-    [-.72,.72].forEach(x=>{
-        truckPart(new THREE.BoxGeometry(.38,.28,.10),headlightMat,x,1.08,-3.96,false);
-        aquaGlowMaterials.push(headlightMat);
-    });
-
-    // Iluminação discreta dentro da garagem central.
-    [-1.5,1.5].forEach(x=>{
-        const fixtureMat=new THREE.MeshStandardMaterial({color:0xb98a4d,emissive:0xffb84d,emissiveIntensity:0});
-        truckPart(new THREE.CylinderGeometry(.20,.24,.12,16),fixtureMat,x,5.92,frontZ-naveZ+1.0,false);
-        aquaGlowMaterials.push(fixtureMat);
-        const light=new THREE.PointLight(0xffc766,0,10,2);
-        light.position.set(x,5.70,frontZ-naveZ+1.0);
-        truck.add(light); aquaLights.push(light);
-    });
-
-    group.add(truck); equipment.push(truck);
+    // Fachada: identificação, portões seccionados, doca e porta de funcionários
+    addEnvironmentBox(group,equipment,"Painel de identificação","Identificação",4.6,.95,.12,-1.75,5.55,fz+.2,0x14191f);
+    addEnvironmentBox(group,equipment,"Logo AquaFlow","Identificação",.55,.55,.04,-3.5,5.55,fz+.28,purple,{emissive:purple,emissiveIntensity:1.5});
+    addEnvironmentBox(group,equipment,"Faixa iluminada","Identificação",2.8,.12,.04,-1.4,5.55,fz+.28,0xb46cff,{emissive:0xb46cff,emissiveIntensity:1.2});
+    const sectional=(x,w,h,name)=>{
+        addEnvironmentBox(group,equipment,name,"Logística",w,h,.08,x,.3+h/2,fz+.17,0x9aa3ab);
+        for(let k=1;k<Math.round(h/.6);k++) addEnvironmentBox(group,equipment,"Gomo do portão","Logística",w,.05,.1,x,.3+k*.6,fz+.19,0x6a7177);
+        addEnvironmentBox(group,equipment,"Batente do portão","Logística",w+.4,.25,.2,x,.3+h+.12,fz+.17,dark);
+        [-1,1].forEach(s=>{
+            addEnvironmentBox(group,equipment,"Proteção de pilar","Segurança",.3,1.2,.3,x+s*(w/2+.45),.9,fz+.6,yellow);
+            addEnvironmentBox(group,equipment,"Faixa zebrada","Segurança",.32,.12,.32,x+s*(w/2+.45),1.1,fz+.6,dark);
+        });
+    };
+    sectional(-7.25,4.0,4.2,"Portão de expedição");
+    sectional(3.75,4.0,4.6,"Portão da doca");
+    addEnvironmentBox(group,equipment,"Abrigo de doca","Logística",4.8,5.0,.5,3.75,2.8,fz+.4,0x18191a);
+    addEnvironmentBox(group,equipment,"Cobertura da doca","Cobertura",5.2,.18,2.4,3.75,5.45,fz+1.3,roofC);
+    [-2.0,2.0].forEach(dx=>addEnvironmentBox(group,equipment,"Batente de borracha","Logística",.4,.6,.3,3.75+dx,1.1,fz+.8,0x111111));
+    addEnvironmentBox(group,equipment,"Porta de funcionários","Acesso",1.1,2.3,.08,10.5,1.45,fz+.17,red);
+    addEnvironmentBox(group,equipment,"Marquise da porta","Cobertura",1.8,.12,1.0,10.5,2.85,fz+.6,roofC);
+    aqTruck(group,equipment,3.75,fz+4.5,0);
 
     // -------------------------
-    // REDE HIDRÁULICA — mantida como sistema do AquaFlow.
+    // INTERIOR (visível no Raio-X)
+    // -------------------------
+    [-1.5,2.6].forEach(z=>addEnvironmentBox(group,equipment,"Faixa de circulação","Sinalização",NW-1.2,.02,.14,nx,.35,z,yellow));
+    function factoryMachine(x,z,w,d,h,bodyColor,name,accent){
+        addEnvironmentBox(group,equipment,"Demarcação — "+name,"Sinalização",w+1.4,.02,d+1.4,x,.345,z,yellow);
+        addEnvironmentBox(group,equipment,"Base — "+name,"Estrutura",w+.5,.25,d+.5,x,.47,z,dark);
+        addEnvironmentBox(group,equipment,name,"Máquina industrial",w,h,d,x,.6+h/2,z,bodyColor,{details:"Equipamento de produção com consumo de água monitorado"});
+        addEnvironmentBox(group,equipment,"Faixa — "+name,"Máquina",w+.02,.18,d+.02,x,.6+h*.72,z,accent);
+        addEnvironmentBox(group,equipment,"Módulo superior — "+name,"Máquina",w*.55,.6,d*.5,x,.6+h+.3,z,0x3a403e);
+        addEnvironmentBox(group,equipment,"Painel de controle — "+name,"Controle",.8,1.2,.35,x+w/2-.6,1.4,z+d/2+.25,0x2a2f33);
+        addEnvironmentBox(group,equipment,"Tela — "+name,"Controle",.55,.4,.03,x+w/2-.6,1.7,z+d/2+.44,0x3fd08a,{emissive:0x22aa66,emissiveIntensity:1.1});
+        const motor=new THREE.Mesh(new THREE.CylinderGeometry(.38,.38,.9,16),makeMaterial(0x2f5d8a)); motor.rotation.z=Math.PI/2;
+        motor.position.set(x-w/2-.45,1.0,z); motor.castShadow=true; group.add(motor); equipment.push(motor);
+    }
+    factoryMachine(-7,-4,3.4,2.8,2.4,0x6e5542,"Lavadora industrial",red);
+    factoryMachine(-2,-4,4.0,3.0,3.0,0x4d5551,"Centro de processamento",yellow);
+    factoryMachine(3,-4,3.6,2.6,2.4,0x6b4c3c,"Linha de envase",red);
+    factoryMachine(8,-4,3.0,2.6,3.4,0x4a514d,"Prensa hidráulica",yellow);
+
+    // Esteira com caixas em movimento e estação de montagem com braço robótico
+    addEnvironmentBox(group,equipment,"Esteira de produção","Máquina",10.5,.3,1.2,0,1.05,.5,dark,{details:"Linha transportadora da fábrica"});
+    for(let x=-4.8;x<=4.8;x+=1.6) [-1,1].forEach(s=>addEnvironmentBox(group,equipment,"Pé da esteira","Estrutura",.12,.8,.12,x,.7,.5+s*.5,steel));
+    for(let x=-5;x<=5;x+=.5){const r=new THREE.Mesh(new THREE.CylinderGeometry(.09,.09,1.15,10),makeMaterial(0x7f878c)); r.rotation.x=Math.PI/2; r.position.set(x,1.22,.5); group.add(r); equipment.push(r);}
+    const boxes=[];
+    for(let i=0;i<5;i++){const b=addEnvironmentBox(group,equipment,"Caixa em produção","Produto",.7,.5,.7,-5+i*2.1,1.55,.5,0xb08a5a); boxes.push(b);}
+    animatedParts.push(d=>boxes.forEach(b=>{b.position.x+=d*.9; if(b.position.x>5) b.position.x-=10.5;}));
+    addEnvironmentBox(group,equipment,"Estação de montagem","Máquina",2.6,.9,2.0,7.6,.8,.5,0x555b56);
+    const armMat=makeMaterial(0xe0782b);
+    const armBase=new THREE.Mesh(new THREE.CylinderGeometry(.35,.45,.5,16),armMat); armBase.position.set(7.6,1.5,.5); group.add(armBase); equipment.push(armBase);
+    const arm=new THREE.Group(); arm.position.set(7.6,1.75,.5); group.add(arm);
+    const l1=new THREE.Mesh(new THREE.BoxGeometry(.25,1.4,.25),armMat); l1.position.y=.7; l1.rotation.z=.4; arm.add(l1); equipment.push(l1);
+    const l2=new THREE.Mesh(new THREE.BoxGeometry(1.2,.2,.2),armMat); l2.position.set(-.55,1.3,0); arm.add(l2); equipment.push(l2);
+    animatedParts.push(d=>{arm.rotation.y+=d*.6;});
+
+    // Ponte rolante e porta-paletes
+    [-10.4,4.4].forEach(z=>addEnvironmentBox(group,equipment,"Trilho da ponte rolante","Estrutura",NW-.6,.3,.3,nx,6.4,z,steel));
+    addEnvironmentBox(group,equipment,"Ponte rolante","Movimentação",.6,.5,15,2.0,6.1,-3,yellow);
+    addEnvironmentBox(group,equipment,"Talha","Movimentação",.7,.6,.7,2.0,5.6,-3,dark);
+    [-8,-5,-2].forEach(x=>{
+        [-1,1].forEach(s=>addEnvironmentBox(group,equipment,"Montante do porta-palete","Armazenagem",.12,4.2,.12,x+s*1.4,2.4,-9.8,0xe0782b));
+        [1.2,2.6,4.0].forEach(y=>{
+            addEnvironmentBox(group,equipment,"Longarina","Armazenagem",2.9,.12,1.0,x,y,-9.8,0x2f5d8a);
+            addEnvironmentBox(group,equipment,"Carga paletizada","Armazenagem",2.4,.7,.85,x,y+.42,-9.8,0xb08a5a);
+        });
+    });
+
+    // -------------------------
+    // PRÉDIO ADMINISTRATIVO — x -19.5..-11, z -2..5
+    // -------------------------
+    const ax=-15.25, az=1.5, AW=8.5, AD=7, AF=3.3;
+    for(let f=0;f<2;f++){
+        const y0=.3+f*AF;
+        addEnvironmentBox(group,shell,"Laje administrativa","Estrutura",AW+.3,.3,AD+.3,ax,y0+.15,az,0xb7b9bb);
+        aqTexture(addEnvironmentBox(group,shell,"Prédio administrativo","Administrativo",AW,AF-.3,AD,ax,y0+.3+(AF-.3)/2,az,0x3a414b),"concrete",3);
+        aqWindow(group,equipment,ax+.4,y0+1.75,az+AD/2+.02,AW-1.6,2.1,{name:"Fachada de vidro administrativa",cols:5,sill:false,frame:dark,glass:0x355f86});
+        aqWindow(group,equipment,ax-AW/2-.02,y0+1.75,az,AD-1.4,1.6,{ry:-Math.PI/2,name:"Janela administrativa",cols:4,frame:dark});
+    }
+    addEnvironmentBox(group,shell,"Laje de cobertura","Cobertura",AW+.3,.3,AD+.3,ax,.3+2*AF+.15,az,0xb7b9bb);
+    [[AW+.3,az+AD/2+.1],[AW+.3,az-AD/2-.1]].forEach(([w,z])=>addEnvironmentBox(group,shell,"Platibanda","Cobertura",w,.7,.2,ax,.3+2*AF+.65,z,0x3a414b));
+    addEnvironmentBox(group,equipment,"Linha de iluminação","Iluminação",AW+.3,.06,.06,ax,.3+2*AF+.95,az+AD/2+.22,purple,{emissive:purple,emissiveIntensity:1.6});
+    addEnvironmentBox(group,equipment,"Marquise da recepção","Cobertura",3.6,.18,2.2,ax-2.6,3.2,az+AD/2+1.1,0xb7b9bb);
+    [-4.2,-1.0].forEach(dx=>addEnvironmentBox(group,equipment,"Pilar da marquise","Estrutura",.1,2.9,.1,ax+dx,1.75,az+AD/2+2.05,0x9aa3ab));
+    aqWindow(group,equipment,ax-2.6,1.6,az+AD/2+.06,1.8,2.3,{name:"Porta da recepção",cols:2,sill:false,frame:dark,light:0x6a4a20});
+    [-1,1].forEach(s=>{
+        addEnvironmentBox(group,equipment,"Condensadora","Climatização",1.3,.8,1.0,ax+s*2.2,.3+2*AF+.7,az-1.5,0x8e969e);
+        const fan=new THREE.Mesh(new THREE.CylinderGeometry(.38,.38,.06,18),makeMaterial(0x1f2428)); fan.position.set(ax+s*2.2,.3+2*AF+1.13,az-1.5); group.add(fan); equipment.push(fan);
+    });
+
+    // -------------------------
+    // LAVAGEM DE VEÍCULOS — x 14..20.5, z -1..5
+    // -------------------------
+    aqTexture(addEnvironmentBox(group,shell,"Plataforma de lavagem","Processo",6.5,.18,6.0,17.25,.24,2.0,0x8a8780),"concrete",2);
+    addEnvironmentBox(group,equipment,"Grelha de drenagem","Processo",5.6,.03,.35,17.25,.35,2.0,0x2a2d2f);
+    [[14.2,-.8],[20.3,-.8],[14.2,4.8],[20.3,4.8]].forEach(([x,z])=>addEnvironmentBox(group,shell,"Pilar da lavagem","Estrutura",.28,4.8,.28,x,2.6,z,steel));
+    addEnvironmentBox(group,shell,"Cobertura da lavagem","Cobertura",6.9,.22,6.4,17.25,5.1,2.0,roofC);
+    addEnvironmentBox(group,equipment,"Lavadora de alta pressão","Processo",.9,1.1,.7,20.0,.9,.2,0x2f6fb0,{details:"Ponto de lavagem com consumo de água monitorado"});
+    const reel=new THREE.Mesh(new THREE.TorusGeometry(.35,.08,8,20),makeMaterial(0xd9a92b)); reel.position.set(20.25,1.9,2.0); reel.rotation.y=Math.PI/2; group.add(reel); equipment.push(reel);
+    addEnvironmentBox(group,equipment,"Placa de reúso de água","Sinalização",.05,.6,.9,20.42,2.9,2.0,0x2a8aa0,{emissive:0x0b3f55,emissiveIntensity:.6});
+
+    // -------------------------
+    // UTILIDADES — torre de resfriamento, tanques, chaminé e rack de tubos
+    // -------------------------
+    aqTexture(addEnvironmentBox(group,shell,"Pátio de utilidades","Utilidades",8,.18,11.5,16.8,.24,-8.6,0x5a5852),"concrete",2);
+    // Torre de resfriamento com venezianas e ventilador girando
+    const tx=17.5, tz=-6.5;
+    addEnvironmentBox(group,equipment,"Torre de resfriamento","Resfriamento",4.2,3.8,3.6,tx,2.25,tz,0x515955,{details:"Circuito de água de resfriamento"});
+    for(let y=.8;y<3.6;y+=.35) [-1,1].forEach(s=>{
+        addEnvironmentBox(group,equipment,"Veneziana da torre","Resfriamento",4.25,.08,.12,tx,y,tz+s*1.82,0x3a403e);
+        addEnvironmentBox(group,equipment,"Veneziana da torre","Resfriamento",.12,.08,3.65,tx+s*2.12,y,tz,0x3a403e);
+    });
+    const stack=new THREE.Mesh(new THREE.CylinderGeometry(1.35,1.5,1.0,28,1,true),makeMaterial(0x6d7570)); stack.position.set(tx,4.65,tz); stack.material.side=THREE.DoubleSide; group.add(stack); equipment.push(stack);
+    const fan=new THREE.Group(); fan.position.set(tx,4.5,tz); group.add(fan);
+    for(let i=0;i<5;i++){const blade=new THREE.Mesh(new THREE.BoxGeometry(1.2,.04,.3),makeMaterial(0x23272a)); blade.position.x=.62; const h=new THREE.Group(); h.rotation.y=i*Math.PI*2/5; h.add(blade); fan.add(h); equipment.push(blade);}
+    animatedParts.push(d=>{fan.rotation.y+=d*4;});
+    // Tanques de processo verticais
+    [[15.2,-12.3,1.35],[18.7,-12.3,1.35]].forEach(([x,z,r],i)=>{
+        const tm=makeMaterial(0xaab2b8); tm.metalness=.6; tm.roughness=.3;
+        const body=aqMesh(group,equipment,new THREE.CylinderGeometry(r,r,4.6,28),tm,x,2.6,z,"Tanque de processo 0"+(i+1),"Reservatório");
+        aqMesh(group,equipment,new THREE.SphereGeometry(r,24,10,0,Math.PI*2,0,Math.PI/2),tm,x,4.9,z,"Tanque de processo","Reservatório").scale.y=.4;
+        [1.3,2.6,3.9].forEach(y=>{const ring=aqMesh(group,equipment,new THREE.TorusGeometry(r+.01,.04,6,28),makeMaterial(0x5a6168),x,y,z,null); ring.rotation.x=Math.PI/2;});
+        [-1,1].forEach(s=>addEnvironmentBox(group,equipment,"Escada do tanque","Acesso",.05,4.6,.05,x+s*.2,2.6,z+r+.1,0x3a403e));
+        for(let y=.7;y<4.8;y+=.35) addEnvironmentBox(group,equipment,"Degrau","Acesso",.4,.03,.04,x,y,z+r+.1,0x3a403e);
+        body.userData.aquaComponent.details="Tanque de água de processo";
+    });
+    // Rack de tubulações até o galpão (cores de processo)
+    [13.2,16.9].forEach(x=>{
+        [-1,1].forEach(s=>addEnvironmentBox(group,shell,"Coluna do rack de tubos","Estrutura",.2,4.2,.2,x,2.4,-9.6+s*.6,steel));
+        addEnvironmentBox(group,shell,"Travessa do rack","Estrutura",.2,.15,1.4,x,4.4,-9.6,steel);
+    });
+    [[-.35,0x8b8f94],[0,0x3c7a4a],[.35,0x2f5d8a]].forEach(([dz,c])=>{
+        const p=new THREE.Mesh(new THREE.CylinderGeometry(.12,.12,6.2,12),makeMaterial(c)); p.rotation.z=Math.PI/2; p.position.set(15.0,4.6,-9.6+dz); p.castShadow=true; group.add(p); equipment.push(p);
+    });
+    // Chaminé com faixas de sinalização aérea
+    for(let k=0;k<6;k++){
+        const seg=new THREE.Mesh(new THREE.CylinderGeometry(.55,.62,2.2,20),makeMaterial(k%2?0xe8e6e0:0xb33a2e));
+        seg.position.set(20.2,1.1+k*2.2,-14.2); seg.castShadow=true; group.add(seg); equipment.push(seg);
+        seg.userData.aquaComponent={name:"Chaminé industrial",type:"Utilidade",details:"Exaustão da planta"};
+    }
+
+    // -------------------------
+    // RESERVATÓRIO AQUAFLOW + CASA DE BOMBAS (fundos, à esquerda)
+    // -------------------------
+    aqTexture(addEnvironmentBox(group,shell,"Base do reservatório","Estrutura",6,.3,6,-16,.3,-9,0x55524c),"concrete",2);
+    const res=aqWaterTank(group,equipment,-16,.45,-9,2.3,4.0,"Reservatório industrial");
+    res.userData.aquaComponent={name:"Reservatório industrial",type:"Reservatório",details:"Água para processo, com sensor de nível AquaFlow"};
+    aqTexture(addEnvironmentBox(group,shell,"Casa de bombas","Utilidades",2.6,2.6,2.8,-11.7,1.6,-9,0x5b616a),"concrete",2);
+    addEnvironmentBox(group,shell,"Laje da casa de bombas","Cobertura",2.9,.15,3.1,-11.7,2.98,-9,dark);
+    addEnvironmentBox(group,equipment,"Bomba principal","Bomba",1.4,.9,.9,-11.0,.75,-7.2,0x2f6fb0,{details:"Bombeamento da rede de processo"});
+    addEnvironmentBox(group,equipment,"Porta da casa de bombas","Acesso",.9,1.9,.06,-12.5,1.3,-7.58,0x2c3036);
+
+    // Portaria com cancela e alambrado frontal
+    aqTexture(addEnvironmentBox(group,shell,"Guarita","Acesso",2.6,2.6,2.6,17.5,1.5,13.0,0xb7b9bb),"concrete",1.5);
+    addEnvironmentBox(group,shell,"Cobertura da guarita","Cobertura",3.4,.18,3.4,17.5,2.9,13.0,dark);
+    aqWindow(group,equipment,17.5,1.8,14.32,1.8,1.0,{name:"Janela da guarita",cols:2,frame:dark});
+    aqWindow(group,equipment,16.18,1.8,13.0,1.6,1.0,{ry:-Math.PI/2,name:"Janela da guarita",cols:2,frame:dark});
+    addEnvironmentBox(group,equipment,"Cancela","Acesso",4.6,.12,.12,13.6,1.1,12.2,0xe8e6e0);
+    for(let k=0;k<4;k++) addEnvironmentBox(group,equipment,"Faixa da cancela","Acesso",.5,.13,.13,11.9+k*1.15,1.1,12.2,0xb33a2e);
+    const meshMat=aqMarkTransparent(new THREE.MeshStandardMaterial({color:0x8a9096,transparent:true,opacity:.25,roughness:.6,metalness:.5,depthWrite:false}));
+    for(let x=-20.5;x<10.5;x+=2.5){
+        addEnvironmentBox(group,shell,"Poste do alambrado","Fechamento",.08,2.2,.08,x,1.25,14.6,0x5a6168);
+        const m=aqMesh(group,shell,new THREE.BoxGeometry(2.5,2.0,.03),meshMat,x+1.25,1.2,14.6,"Alambrado","Fechamento",false);
+    }
+
+    // -------------------------
+    // REDE HIDRÁULICA — reservatório → bomba → barrilete do galpão → pontos
     // -------------------------
     const y=.92;
-    createSystemPipe(group,systems,[[8.2,y,6.7],[8.2,y,-2.5],[4.0,y,-2.5],[-1.8,y,-2.5],[-7,y,-2.5]]);
-    createSystemPipe(group,systems,[[4.0,y,-2.5],[9.0,y,-2.5]]);
-    createSystemPipe(group,systems,[[8.2,y,-2.5],[9.5,y,-7.0],[13.5,y,-7.0],[18,y,-6.0]]);
-    createSystemPipe(group,systems,[[8.2,y,6.7],[0,y,6.7],[-7.5,y,7.2]]);
-    createSystemPipe(group,systems,[[0,y,3.6],[6.5,y,3.6]]);
+    createSystemPipe(group,systems,[[-16,y,-9],[-11,y,-9],[-11,y,-6.6],[12.5,y,-6.6]]);
+    [-7,-2,3,8].forEach(x=>createSystemPipe(group,systems,[[x,y,-6.6],[x,y,-4]]));
+    createSystemPipe(group,systems,[[6.5,y,-6.6],[6.5,y,.5]]);
+    createSystemPipe(group,systems,[[12.5,y,-6.6],[17.5,y,-6.6],[17.5,y,-6.5]]);
+    createSystemPipe(group,systems,[[12.5,y,-6.6],[14.5,y,-6.6],[14.5,y,2],[17.2,y,2]]);
 
-    // POSTES — ficam somente no pátio externo, fora das paredes da nave.
-    // A posição é mantida fora do volume do prédio para evitar qualquer interseção.
-    [-12,-4,4,12].forEach(x=>addEnvironmentLightPole(group,x,10.8,4.8,"Poste do pátio industrial"));
-    [-10,0,10].forEach(x=>addEnvironmentLightPole(group,x,-14.0,4.8,"Poste da área externa industrial"));
+    // POSTES DE ILUMINAÇÃO — pátio frontal e fundos
+    [-14,-4,2].forEach(x=>addEnvironmentLightPole(group,x,13.2,5.0,"Poste do pátio industrial"));
+    [-6,4].forEach(x=>addEnvironmentLightPole(group,x,-13.6,4.8,"Poste da área externa industrial"));
 
-    group.rotation.y=Math.PI;
     scene.add(group);
     environmentGroups.industria=group;
     environmentSystems.industria={shell,equipment,systems,flow:[]};
@@ -4008,6 +4715,7 @@ function createIndustryEnvironment() {
     activeBuildGroup = null;
     activeBuildEquipment = null;
 }
+
 function createAgroEnvironment() {
     const group = new THREE.Group();
     const shell = [], equipment = [], systems = [];
@@ -4165,20 +4873,55 @@ function createAgroEnvironment() {
     addEnvironmentBox(group,shell,"Cerca frontal","Estrutura",12,.16,.16,-9,.72,3,0x4f3523);
     addEnvironmentBox(group,shell,"Cerca traseira","Estrutura",12,.16,.16,-9,.72,15,0x4f3523);
     addEnvironmentBox(group,shell,"Cerca lateral","Estrutura",.16,.16,12,-15,.72,9,0x4f3523);
+    // Segunda régua da cerca, lado do portão e gado no pasto
+    addEnvironmentBox(group,shell,"Cerca frontal","Estrutura",12,.14,.14,-9,.38,3,0x4f3523);
+    addEnvironmentBox(group,shell,"Cerca traseira","Estrutura",12,.14,.14,-9,.38,15,0x4f3523);
+    addEnvironmentBox(group,shell,"Cerca lateral","Estrutura",.14,.14,12,-15,.38,9,0x4f3523);
+    [5,13].forEach(zc=>[.38,.72].forEach(y=>addEnvironmentBox(group,shell,"Cerca do portão","Estrutura",.14,.14,4,-3,y,zc,0x4f3523)));
+    [3,5,7,11,13,15].forEach(z=>{const p=new THREE.Mesh(new THREE.BoxGeometry(.18,1.15,.18),fenceMat); p.position.set(-3,.67,z); p.castShadow=true; group.add(p); shell.push(p);});
+    [[-4.8,4.4,.4],[-6.4,6.4,2.4],[-4.6,13.1,Math.PI],[-12.2,13.6,-1.2]].forEach(([x,z,r])=>aqCow(group,x,z,r));
 
     // =====================================================
-    // CASA-SEDE — arquitetura rural, cores quentes e foscas
+    // CASA-SEDE — casa de fazenda com paredes caiadas, telhado
+    // cerâmico de duas águas, varanda com guarda-corpo e janelas
+    // com venezianas (frente voltada para a câmera e fundos detalhados)
     // =====================================================
-    const houseMat=makeMaterial(0x9a6742), trimMat=makeMaterial(0x493022), roofMat=makeMaterial(0x3a2922);
-    addEnvironmentBox(group,shell,"Casa sede","Edificação",7.6,4.0,5.4,-9,2.2,-5.2,0x9a6742);
-    addEnvironmentBox(group,shell,"Rodapé da sede","Estrutura",8.0,.35,5.7,-9,.42,-5.2,0x584332);
-    // telhado baixo e assentado sobre a casa
-    addEnvironmentBox(group,shell,"Telhado da sede","Cobertura",8.5,.45,6.2,-9,4.45,-5.2,0x3a2922);
-    addEnvironmentBox(group,equipment,"Varanda da sede","Estrutura",8.0,.22,1.35,-9,.65,-2.35,0x654127);
-    addEnvironmentBox(group,equipment,"Porta da sede","Acesso",1.45,2.35,.18,-9,1.75,-2.55,0x3b281e);
-    [-11.6,-6.4].forEach(x=>addEnvironmentBox(group,equipment,"Janela da sede","Esquadria",1.55,1.25,.12,x,2.45,-2.57,0x6f684f));
-    [-12.35,-5.65].forEach(x=>addEnvironmentBox(group,equipment,"Pilar da varanda","Estrutura",.22,2.3,.22,x,1.65,-1.8,0x513421));
-    addEnvironmentBox(group,equipment,"Chaminé da sede","Estrutura",.6,1.35,.6,-6.2,5.0,-4.3,0x4b3022);
+    {
+        const sx=-9, sz=-5.2, sw=7.6, sd=5.4, wallTop=3.9, wallC=0xd8c8a8;
+        aqTexture(addEnvironmentBox(group,shell,"Rodapé da sede","Estrutura",sw+.4,.5,sd+.4,sx,.35,sz,0x6b5a48),"stone",1);
+        addEnvironmentBox(group,shell,"Casa sede","Edificação",sw,wallTop-.6,sd,sx,.6+(wallTop-.6)/2,sz,wallC);
+        [-1,1].forEach(a=>[-1,1].forEach(b=>addEnvironmentBox(group,shell,"Cunhal","Estrutura",.22,wallTop-.6,.22,sx+a*sw/2,.6+(wallTop-.6)/2,sz+b*sd/2,0xf1e9da)));
+        addEnvironmentBox(group,shell,"Cinta de madeira","Estrutura",sw+.1,.18,sd+.1,sx,wallTop-.09,sz,0x4a2c20);
+        const tileMat=makeMaterial(0xa4532f); tileMat.roughness=.85;
+        const tTex=aqCanvasTexture("tiles").clone(); tTex.needsUpdate=true; tTex.repeat.set(5,2.5); tileMat.map=tTex;
+        aqGableRoof(group,shell,sx,wallTop,sz,sw,sd,1.7,.55,tileMat,wallC);
+        // Chaminé de tijolos
+        addEnvironmentBox(group,shell,"Chaminé da sede","Estrutura",.6,2.4,.6,-6.6,4.8,-6.2,0x8c4a32);
+        addEnvironmentBox(group,shell,"Chapéu da chaminé","Estrutura",.8,.12,.8,-6.6,6.06,-6.2,0x3a2922);
+
+        // Varanda frontal (lado +Z local) com deck, pilares, guarda-corpo e cobertura
+        const pz=sz+sd/2;
+        aqTexture(addEnvironmentBox(group,equipment,"Varanda da sede","Estrutura",sw+.4,.2,1.7,sx,.5,pz+.85,0x654127),"wood",1);
+        [-3.6,-1.4,1.4,3.6].forEach(dx=>addEnvironmentBox(group,equipment,"Pilar da varanda","Estrutura",.18,2.55,.18,sx+dx,1.875,pz+1.55,0x4a2c20));
+        [[-3.6,-1.4],[1.4,3.6]].forEach(([a,b])=>{
+            addEnvironmentBox(group,equipment,"Guarda-corpo da varanda","Segurança",b-a,.08,.1,sx+(a+b)/2,1.45,pz+1.55,0x4a2c20);
+            for(let x=a+.3;x<b-.1;x+=.3) addEnvironmentBox(group,equipment,"Balaústre","Segurança",.05,.8,.05,sx+x,1.0,pz+1.55,0x6a4630);
+        });
+        const pr=addEnvironmentBox(group,shell,"Cobertura da varanda","Cobertura",sw+.8,.12,1.95,sx,3.36,pz+.95,0xa4532f);
+        pr.rotation.x=Math.atan2(.5,1.75);
+        const prTex=aqCanvasTexture("tiles").clone(); prTex.needsUpdate=true; prTex.repeat.set(5,1.2); pr.material.map=prTex;
+        addEnvironmentBox(group,equipment,"Porta da sede","Acesso",1.2,2.3,.1,sx,1.75,pz+.03,0x3b281e);
+        addEnvironmentBox(group,equipment,"Batente da porta","Acesso",1.45,.14,.14,sx,2.95,pz+.04,0xf1e9da);
+        [-1,1].forEach(s=>addEnvironmentBox(group,equipment,"Batente da porta","Acesso",.14,2.4,.14,sx+s*.68,1.8,pz+.04,0xf1e9da));
+        [-2.4,2.4].forEach(dx=>aqWindow(group,equipment,sx+dx,2.3,pz+.02,1.25,1.3,{name:"Janela da sede",frame:0xf1e9da,shutters:0x2f5d50,cols:2,transom:true}));
+        // Fundos (lado -Z local, voltado para a câmera após a rotação do cenário)
+        [-2.6,0,2.6].forEach(dx=>aqWindow(group,equipment,sx+dx,2.3,sz-sd/2-.02,1.25,1.3,{ry:Math.PI,name:"Janela da sede",frame:0xf1e9da,shutters:0x2f5d50,cols:2,transom:true}));
+        [-1,1].forEach(s=>aqWindow(group,equipment,sx+s*(sw/2+.02),2.3,sz,1.25,1.3,{ry:s*Math.PI/2,name:"Janela lateral da sede",frame:0xf1e9da,shutters:0x2f5d50,cols:2,transom:true}));
+        // Jardim da sede
+        [-3.2,3.2].forEach(dx=>aqShrub(group,shell,sx+dx,.12,pz+2.2,.7,0x3b7d45));
+        aqShrub(group,shell,sx-3.2,.12,sz-sd/2-.7,.75);
+        aqShrub(group,shell,sx+3.2,.12,sz-sd/2-.7,.75);
+    }
 
     // =====================================================
     // CELEIRO — celeiro rural vermelho, com telhado apoiado
@@ -4283,6 +5026,22 @@ function createAgroEnvironment() {
         hay.rotation.y=(i%2)*.12;
     });
 
+    // Detalhes do celeiro: tábuas, telha metálica, porta do palheiro, cúpula e cata-vento
+    body.material=bwall.clone();
+    const plk=aqCanvasTexture("planks").clone(); plk.needsUpdate=true; plk.repeat.set(5,2); body.material.map=plk;
+    const corr=aqCanvasTexture("corrugated").clone(); corr.needsUpdate=true; corr.center.set(.5,.5); corr.rotation=Math.PI/2; corr.repeat.set(4,1);
+    broof.map=corr; broof.needsUpdate=true;
+    addEnvironmentBox(barn,null,"Porta do palheiro","Acesso",1.2,1.0,.1,0,5.75,-3.68,0x6e1717);
+    [[1.4,.1,0,6.3],[1.4,.1,0,5.2],[.1,1.1,-.65,5.75],[.1,1.1,.65,5.75]].forEach(([w,h,x,y])=>addEnvironmentBox(barn,null,"Moldura do palheiro","Estrutura",w,h,.14,x,y,-3.72,0xf0dfc0));
+    [-.66,.66].forEach(r=>{const d=addEnvironmentBox(barn,null,"Diagonal do palheiro","Estrutura",1.45,.08,.14,0,5.75,-3.74,0xf0dfc0); d.rotation.z=r;});
+    addEnvironmentBox(barn,null,"Viga da roldana","Estrutura",.2,.2,.9,0,6.55,-4.0,0x4a2b20);
+    [-1,1].forEach(s=>{const t=addEnvironmentBox(barn,null,"Testeira do oitão","Estrutura",roofLength,.14,.08,s*2.38,5.92,-3.82,0xf0dfc0); t.rotation.z=-s*roofAngle;});
+    addEnvironmentBox(barn,null,"Cúpula de ventilação","Estrutura",.95,.8,.95,0,7.6,0,0xc62828);
+    [-1,1].forEach(s=>addEnvironmentBox(barn,null,"Veneziana da cúpula","Estrutura",.6,.45,.05,0,7.62,s*.49,0xf0dfc0));
+    const cupRoof=new THREE.Mesh(new THREE.ConeGeometry(.8,.6,4),broof); cupRoof.rotation.y=Math.PI/4; cupRoof.position.set(0,8.3,0); cupRoof.castShadow=true; barn.add(cupRoof);
+    addEnvironmentBox(barn,null,"Haste do cata-vento","Estrutura",.04,.8,.04,0,8.95,0,0x2a2a2a);
+    addEnvironmentBox(barn,null,"Seta do cata-vento","Estrutura",.7,.05,.08,0,9.2,0,0x2a2a2a).rotation.y=.5;
+
     group.add(barn); equipment.push(barn);
 
     // =====================================================
@@ -4290,11 +5049,29 @@ function createAgroEnvironment() {
     // =====================================================
     [15.0,18.0].forEach((x,i)=>{
         const silo=new THREE.Group();
-        const sbase=new THREE.Mesh(new THREE.CylinderGeometry(1.45,1.45,.25,20),makeMaterial(0x4b4338)); sbase.position.y=.25; sbase.castShadow=true; silo.add(sbase);
-        const sb=new THREE.Mesh(new THREE.CylinderGeometry(1.3,1.3,4.1,20),makeMaterial(0x6d7560)); sb.position.y=2.35; sb.castShadow=true; sb.receiveShadow=true; silo.add(sb);
-        const sr=new THREE.Mesh(new THREE.ConeGeometry(1.48,1.05,20),makeMaterial(0x403c34)); sr.position.y=4.92; sr.castShadow=true; silo.add(sr);
+        const metal=makeMaterial(0x7d8577); metal.metalness=.55; metal.roughness=.38;
+        const sTex=aqCanvasTexture("corrugated").clone(); sTex.needsUpdate=true; sTex.repeat.set(6,1); metal.map=sTex;
+        const dark=makeMaterial(0x3d4038);
+        const sbase=new THREE.Mesh(new THREE.CylinderGeometry(1.5,1.55,.3,24),makeMaterial(0x5b554c)); sbase.position.y=.2; silo.add(sbase);
+        const sb=new THREE.Mesh(new THREE.CylinderGeometry(1.3,1.3,4.1,28),metal); sb.position.y=2.4; silo.add(sb);
+        [1.0,2.0,3.0,4.0].forEach(y=>{const r=new THREE.Mesh(new THREE.TorusGeometry(1.31,.035,6,28),dark); r.rotation.x=Math.PI/2; r.position.y=y+.35; silo.add(r);});
+        const dome=new THREE.Mesh(new THREE.SphereGeometry(1.36,24,10,0,Math.PI*2,0,Math.PI/2),metal); dome.scale.y=.55; dome.position.y=4.45; silo.add(dome);
+        const vent=new THREE.Mesh(new THREE.CylinderGeometry(.22,.22,.3,12),dark); vent.position.y=5.3; silo.add(vent);
+        const cap=new THREE.Mesh(new THREE.ConeGeometry(.34,.25,12),dark); cap.position.y=5.55; silo.add(cap);
+        // escada de acesso voltada para a frente da cena
+        [-.22,.22].forEach(dx=>{const rail=new THREE.Mesh(new THREE.BoxGeometry(.05,4.3,.05),dark); rail.position.set(dx,2.55,-1.36); silo.add(rail);});
+        for(let y=.7;y<4.5;y+=.32){const rung=new THREE.Mesh(new THREE.BoxGeometry(.44,.035,.04),dark); rung.position.set(0,y,-1.36); silo.add(rung);}
+        silo.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=true;}});
         silo.position.set(x,0,8.0); silo.userData.aquaComponent={name:"Silo "+(i+1),type:"Armazenamento",details:"Estrutura de armazenamento agrícola"};
         group.add(silo); equipment.push(silo);
+    });
+
+    // Fardos de feno redondos perto dos silos
+    [[15.4,.55,4.4],[16.5,.55,4.4],[15.95,1.5,4.4],[13.9,.55,3.4]].forEach(([x,y,z])=>{
+        const hay=new THREE.Mesh(new THREE.CylinderGeometry(.55,.55,.95,18),makeMaterial(0xc9a24f));
+        hay.rotation.x=Math.PI/2; hay.position.set(x,y+.05,z); hay.castShadow=true; hay.receiveShadow=true;
+        hay.userData.aquaComponent={name:"Fardo de feno",type:"Armazenamento",details:""};
+        group.add(hay); shell.push(hay);
     });
 
     // =====================================================
@@ -4330,14 +5107,15 @@ function createAgroEnvironment() {
     const platform=new THREE.Mesh(new THREE.BoxGeometry(2.8,.24,2.3),towerMat); platform.position.y=6.85; platform.castShadow=true; windmill.add(platform);
     const head=new THREE.Mesh(new THREE.CylinderGeometry(.72,.82,1.5,12),headMat); head.rotation.z=Math.PI/2; head.position.set(0,7.55,0); head.castShadow=true; windmill.add(head);
     const hub=new THREE.Mesh(new THREE.CylinderGeometry(.20,.20,.48,16),tDark); hub.rotation.x=Math.PI/2; hub.position.set(0,7.55,1.0); windmill.add(hub);
-    for(let i=0;i<4;i++){const blade=new THREE.Group(); const arm=new THREE.Mesh(new THREE.BoxGeometry(.18,3.0,.12),bladeMat); arm.position.y=1.45; arm.castShadow=true; blade.add(arm); const brace=new THREE.Mesh(new THREE.BoxGeometry(.55,.12,.12),bladeMat); brace.position.set(.18,2.5,0); blade.add(brace); blade.rotation.z=i*Math.PI/2; blade.position.set(0,7.55,1.18); windmill.add(blade);}
+    // Pás montadas em um rotor que gira continuamente.
+    const rotor=new THREE.Group(); rotor.position.set(0,7.55,1.18); windmill.add(rotor);
+    const sail=makeMaterial(0xcdbb98);
+    for(let i=0;i<4;i++){const blade=new THREE.Group(); const arm=new THREE.Mesh(new THREE.BoxGeometry(.18,3.0,.12),bladeMat); arm.position.y=1.45; arm.castShadow=true; blade.add(arm); const brace=new THREE.Mesh(new THREE.BoxGeometry(.55,.12,.12),bladeMat); brace.position.set(.18,2.5,0); blade.add(brace); const cloth=new THREE.Mesh(new THREE.BoxGeometry(.62,2.1,.04),sail); cloth.position.set(.38,1.75,.02); cloth.castShadow=true; blade.add(cloth); blade.rotation.z=i*Math.PI/2; rotor.add(blade);}
+    animatedParts.push(d=>{ rotor.rotation.z+=d*1.1; });
     group.add(windmill); equipment.push(windmill);
 
     // Árvores distribuídas nas bordas
-    [[-19,-11],[-19,16],[20,15],[20,-11],[-2,15]].forEach(([x,z])=>{
-        const trunk=new THREE.Mesh(new THREE.CylinderGeometry(.18,.28,2.3,9),makeMaterial(0x503522)); trunk.position.set(x,1.25,z); trunk.castShadow=true; group.add(trunk); shell.push(trunk);
-        const crown=new THREE.Mesh(new THREE.SphereGeometry(1.45,12,10),makeMaterial(0x2f6533)); crown.position.set(x,3.05,z); crown.scale.y=1.05; crown.castShadow=true; group.add(crown); shell.push(crown);
-    });
+    [[-19,-11],[-19,16],[20,15],[20,-11],[-2,15]].forEach(([x,z])=>aqTree(group,shell,x,z,1.25,.05));
 
     // =====================================================
     // RESERVATÓRIO + BOMBA + IRRIGAÇÃO
@@ -4346,6 +5124,8 @@ function createAgroEnvironment() {
     addEnvironmentBox(group,equipment,"Reservatório rural","Reservatório",4.5,3.5,4.2,-14,2.35,8.0,0x5f7656,{details:"Armazena água para irrigação e uso da propriedade"});
     addEnvironmentBox(group,equipment,"Bomba de irrigação","Bomba",2.5,1.8,2.2,-9,1.05,8.0,0x2d3425,{details:"Bombeamento do sistema de irrigação"});
     addEnvironmentBox(group,equipment,"Bebedouro animal","Ponto de consumo",4,1.2,2.4,-8,.7,13.0,0x5b5141);
+    addEnvironmentBox(group,equipment,"Água do bebedouro","Ponto de consumo",3.6,.04,2.0,-8,1.31,13.0,0x2a8aa0,{emissive:0x0b3f55,emissiveIntensity:.5});
+    addEnvironmentBox(group,equipment,"Sensor AquaFlow do reservatório","Sensor",.5,.35,.08,-14,2.6,5.86,0x7654ff,{emissive:0x7654ff,emissiveIntensity:1.2});
 
     [-2.2,4.2,10.6].forEach((x,i)=>{
         const label=String.fromCharCode(65+i);
@@ -4450,7 +5230,7 @@ function buildEnvironmentFlow(env) {
     if(!visiblePoints.length) return;
 
     const source = env === "agro" ? [-11,.8,7] :
-                   env === "industria" ? [-10,.8,6] :
+                   env === "industria" ? [-11,.92,-9] :
                    env === "escola" ? [0,6,0] :
                    env === "predio_residencial" ? [0,10.5,1.8] :
                    env === "predio_comercial" ? [0,10.5,1.8] :
@@ -4648,25 +5428,25 @@ function toggleXray() {
 
         if(currentEnvironment === "casa"){
             walls.forEach(w=>{
-                w.material.transparent=false; w.material.opacity=1; w.material.depthWrite=true; w.material.needsUpdate=true;
+                aqRestoreMaterial(w);
             });
             houseShellParts.forEach(o=>{
                 if(!o.material) return;
-                o.material.transparent=false; o.material.opacity=1; o.material.depthWrite=true; o.material.needsUpdate=true;
+                aqRestoreMaterial(o);
             });
             roofParts.forEach(p=>p.visible=true);
             furniture.forEach(o=>{
-                o.material.transparent=false; o.material.opacity=1; o.material.depthWrite=true; o.material.needsUpdate=true;
+                aqRestoreMaterial(o);
             });
             hideOriginalHouseSystems();
         } else {
             state.shell.forEach(o=>{
                 if(!o.material) return;
-                o.material.transparent=false; o.material.opacity=1; o.material.depthWrite=true; o.material.needsUpdate=true;
+                aqRestoreMaterial(o);
             });
             state.equipment.forEach(o=>{
                 if(!o.material) return;
-                o.material.transparent=false; o.material.opacity=1; o.material.depthWrite=true; o.material.needsUpdate=true;
+                aqRestoreMaterial(o);
             });
             state.systems.forEach(p=>p.visible=false);
             advancedFlowParticles.forEach(p=>p.visible=false);

@@ -1,3 +1,4 @@
+
 <?php
 
 function iniciarSessao(): void
@@ -9,7 +10,7 @@ function iniciarSessao(): void
 
 function destinoSeguro(
     ?string $destino,
-    string $padrao = '../../dashboard.php'
+    string $padrao = '../dashboard/dashboard.php'
 ): string {
 
     $destino = trim((string)$destino);
@@ -37,11 +38,8 @@ function exigirLogin(): void
 
     if (!isset($_SESSION['usuario_id'])) {
 
-        $destino = basename($_SERVER['PHP_SELF']);
-
         header(
-            'Location: login.php?redirect=' .
-            urlencode($destino)
+            'Location: /grapedev/backend/auth/login.php'
         );
 
         exit;
